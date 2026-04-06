@@ -1,172 +1,147 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Cart</title>
+<title>Products</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  body{font-family:Poppins,Arial;margin:20px;background:#f5f7fb}
-  h2{text-align:center;margin-bottom:20px}
-  table{width:100%;border-collapse:collapse;margin-bottom:20px;background:#fff;box-shadow:0 5px 20px rgba(0,0,0,.08);border-radius:10px;overflow:hidden}
-  th, td{padding:12px;text-align:left;border-bottom:1px solid #ddd}
-  th{background:#0A84FF;color:#fff}
-  tr:last-child td{border-bottom:none}
-  .total-row td{font-weight:bold}
-  input,button{margin:5px 0;padding:10px;border-radius:8px;border:1px solid #ccc;width:95%}
-  button{background:#0A84FF;color:#fff;border:none;cursor:pointer}
-  .cart-actions{text-align:center;margin-top:20px}
-  #upiBox{text-align:center;margin-top:10px}
+body{margin:0;font-family:Poppins,Arial;background:#f5f7fb}
+header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#0A84FF;color:#fff}
+nav a{color:white;margin:0 10px;text-decoration:none;font-weight:500}
+h1,h2{text-align:center}
+.products-grid{display:flex;flex-wrap:wrap;justify-content:center;padding:20px}
+.card{
+  width:240px;
+  margin:12px;
+  padding:15px;
+  background:#fff;
+  border-radius:15px;
+  box-shadow:0 5px 20px rgba(0,0,0,.08);
+  text-align:center;
+  transition:.2s;
+}
+.card:hover{transform:translateY(-5px)}
+.card img{width:100%;height:150px;object-fit:contain}
+button,.btn{
+  background:#0A84FF;
+  color:#fff;
+  border:none;
+  padding:10px 15px;
+  border-radius:10px;
+  cursor:pointer;
+  margin-top:5px;
+}
+input,select,textarea{
+  width:90%;
+  padding:10px;
+  margin:8px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+.cart-btn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#0A84FF;
+  color:#fff;
+  padding:15px;
+  border-radius:50%;
+  font-size:20px;
+}
 </style>
 </head>
 <body>
 
-<h2>My Cart</h2>
+<header>
+  <h2>Our Products</h2>
+</header>
 
-<table>
-  <thead>
-    <tr>
-      <th>Product</th>
-      <th>Price (₹)</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody id="list"></tbody>
-  <tfoot>
-    <tr>
-      <td>Handling Charges</td>
-      <td id="handling"></td>
-      <td></td>
-    </tr>
-    <tr class="total-row">
-      <td>Total</td>
-      <td id="total"></td>
-      <td></td>
-    </tr>
-  </tfoot>
-</table>
+<input id="search" placeholder="Search..." onkeyup="filter()">
 
-<h3>Payment Method</h3>
-<label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
-<label><input type="radio" name="pay" value="UPI"> UPI</label>
+<select id="cat" onchange="filter()">
+  <option value="all">All</option>
+  <option value="bulb">Bulb</option>
+  <option value="fan">Fan</option>
+  <option value="light">Light</option>
+</select>
 
-<p id="upiBox" style="display:none;">
-  UPI ID: <b id="upiText">paytm.s1ktca0@pty</b><br><br>
-  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paytm.s1ktca0@pty" /><br><br>
-  <button onclick="copyUPI()">Copy UPI ID</button>
-</p>
-
-<h3>Your Details</h3>
-<input id="name" placeholder="Your Name" required>
-<input id="phone" placeholder="Phone Number" required>
-
-<div class="cart-actions">
-  <button onclick="clearCart()">Clear Cart</button>
-  <button onclick="orderBoth()">Confirm Order</button>
-</div>
+<div class="products-grid" id="products"></div>
+<a href="cart.html" class="cart-btn">🛒</a>
 
 <script>
-const handling = 9;
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let total = 0;
-let msg = "Order Details:%0A";
-let textSummary = "";
+const productsDiv = document.getElementById("products");
+const search = document.getElementById("search");
+const cat = document.getElementById("cat");
 
-const list = document.getElementById("list");
+let products = [
 
-// SHOW CART ITEMS
-list.innerHTML = cart.map((i,index)=>`
-<tr>
-  <td>${i.name}</td>
-  <td>${i.price}</td>
-  <td><button onclick="removeItem(${index})">❌</button></td>
-</tr>
-`).join("");
+  /* BULBS */
+  {name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg",desc:"Energy saving LED bulb (Fybros / Orient / GM)"},
+  {name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg",desc:"Bright 12W LED bulb (Orient)"},
+  {name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg",desc:"High brightness 15W LED bulb (Orient)"},
+  {name:"LED Bulb 18W",cat:"bulb",price:150,img:"images/led18w.jpg",desc:"Powerful 18W LED bulb (Orient)"},
+  {name:"LED Bulb 20W",cat:"bulb",price:170,img:"images/led20w.jpg",desc:"Strong illumination 20W bulb (Fybros)"},
+  {name:"LED Bulb 30W",cat:"bulb",price:230,img:"images/led30w.jpg",desc:"Heavy duty 30W LED bulb (Fybros / Orient)"},
+  {name:"LED Bulb 50W",cat:"bulb",price:400,img:"images/led50w.jpg",desc:"Ultra bright 50W LED bulb (Fybros)"},
 
-// CALCULATE TOTAL WITHOUT HANDLING
-cart.forEach(i=>{
-  total += i.price;
-  msg += i.name + " ₹" + i.price + "%0A";
-  textSummary += i.name + " ₹" + i.price + "\n";
-});
+  /* FANS */
+  {name:"Master Fan 48 inch",cat:"fan",price:1250,img:"images/fan_master48.jpg",desc:"Durable ceiling fan with smooth airflow"},
+  {name:"Mysore Fan 48 inch",cat:"fan",price:1250,img:"images/fan_mysore48.jpg",desc:"Reliable ceiling fan for home use"},
+  {name:"Orient Fan 48 inch",cat:"fan",price:1550,img:"images/fan_orient48.jpg",desc:"Premium quality Orient ceiling fan"},
+  {name:"Fybros Fan 48 inch",cat:"fan",price:1450,img:"images/fan_fybros48.jpg",desc:"Efficient and durable fan"},
+  {name:"Havells Fan 48 inch",cat:"fan",price:1800,img:"images/fan_havells48.jpg",desc:"High performance Havells fan"},
+  {name:"Anchor Fan 48 inch",cat:"fan",price:1500,img:"images/fan_anchor48.jpg",desc:"Stable and long lasting fan"},
+  {name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"images/fan_kent48.jpg",desc:"Affordable and efficient fan"},
+  {name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg",desc:"Budget friendly ceiling fan"},
+  {name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg",desc:"Low cost durable fan"},
+  {name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg",desc:"Compact 36 inch ceiling fan"},
+  {name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg",desc:"Small size fan for tight spaces"},
+  {name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg",desc:"Portable pedestal fan with adjustable height"},
+  {name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg",desc:"Strong airflow pedestal fan"},
+  {name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg",desc:"Copper motor exhaust fan (Freshair)"},
+  {name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg",desc:"Medium size exhaust fan"},
+  {name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg",desc:"Compact exhaust fan"},
 
-// SHOW HANDLING
-document.getElementById("handling").innerText = handling;
+  /* LIGHTS */
+  {name:"Havells Panel Light 6W",cat:"light",price:120,img:"images/panel_havells6.jpg",desc:"Havells Luna 6W Downlight with 4KV protection"},
+  {name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg",desc:"Energy efficient LED panel light"},
+  {name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg",desc:"Compact 5W LED panel"},
+  {name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg",desc:"Bright and long lasting tube light"}
+];
 
-// ADD HANDLING TO TOTAL
-total += handling;
+// Save products (optional)
+localStorage.setItem("products", JSON.stringify(products));
 
-// SHOW TOTAL
-document.getElementById("total").innerText = total;
+function show(list){
+  productsDiv.innerHTML = list.map(p=>`
+    <div class="card">
+      <img src="${p.img}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>${p.desc}</p>
+      <p><b>₹${p.price}</b></p>
+      <button onclick="add('${p.name}',${p.price})">Add to Cart</button>
+    </div>`).join("");
+}
 
-// REMOVE ITEM
-function removeItem(index){
-  cart.splice(index,1);
+function filter(){
+  let sVal = search.value.toLowerCase();
+  let cVal = cat.value;
+  let f = products.filter(p => 
+    p.name.toLowerCase().includes(sVal) &&
+    (cVal==="all" || p.cat===cVal)
+  );
+  show(f);
+}
+
+function add(name,price){
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.push({name,price});
   localStorage.setItem("cart", JSON.stringify(cart));
-  location.reload();
+  alert("Added to cart");
 }
 
-// CLEAR CART
-function clearCart(){
-  localStorage.removeItem("cart");
-  location.reload();
-}
-
-// COPY UPI
-function copyUPI(){
-  let text = document.getElementById("upiText").innerText;
-  navigator.clipboard.writeText(text);
-  alert("UPI ID copied");
-}
-
-// ORDER FUNCTION
-function orderBoth(){
-  let name = document.getElementById("name").value;
-  let phone = document.getElementById("phone").value;
-  let pay = document.querySelector('input[name="pay"]:checked').value;
-
-  if(!name || !phone){
-    alert("Fill details");
-    return;
-  }
-
-  // SAVE ORDER
-  let orders = JSON.parse(localStorage.getItem("orders")) || [];
-  orders.push({name,name,phone,total,payment:pay,items:cart,handling});
-  localStorage.setItem("orders", JSON.stringify(orders));
-
-  msg += "Handling Charges: ₹" + handling + "%0A";
-  msg += "Total ₹" + total;
-
-  textSummary += "Handling Charges: ₹" + handling + "\n";
-  textSummary += "Total ₹" + total + "\n";
-
-  let finalMsg = msg + "%0APayment: " + pay + "%0AName: " + name + "%0APhone: " + phone;
-
-  // WhatsApp
-  window.open("https://wa.me/919639228237?text=" + finalMsg);
-
-  // Email
-  let mail = "mailto:anisuggestdaily@gmail.com?subject=New Order&body=" + encodeURIComponent(textSummary + "Payment: " + pay + "\nName: " + name + "\nPhone: " + phone);
-  window.location.href = mail;
-
-  // SUCCESS SCREEN
-  document.body.innerHTML = `
-  <h2>✅ Order Placed Successfully</h2>
-  <p>We will contact you soon.</p>
-  <a href="index.html">Back to Home</a>
-  `;
-}
-
-// SHOW/HIDE UPI
-document.querySelectorAll('input[name="pay"]').forEach(r=>{
-  r.addEventListener("change",()=>{
-    if(r.value==="UPI" && r.checked){
-      document.getElementById("upiBox").style.display="block";
-    } else{
-      document.getElementById("upiBox").style.display="none";
-    }
-  });
-});
+// Initial display
+show(products);
 </script>
 
 </body>
-  </html>
+</html>
