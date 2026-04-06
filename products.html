@@ -1,108 +1,172 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Products</title>
+<title>Cart</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  body{font-family:Poppins,Arial;margin:20px;background:#f5f7fb}
+  h2{text-align:center;margin-bottom:20px}
+  table{width:100%;border-collapse:collapse;margin-bottom:20px;background:#fff;box-shadow:0 5px 20px rgba(0,0,0,.08);border-radius:10px;overflow:hidden}
+  th, td{padding:12px;text-align:left;border-bottom:1px solid #ddd}
+  th{background:#0A84FF;color:#fff}
+  tr:last-child td{border-bottom:none}
+  .total-row td{font-weight:bold}
+  input,button{margin:5px 0;padding:10px;border-radius:8px;border:1px solid #ccc;width:95%}
+  button{background:#0A84FF;color:#fff;border:none;cursor:pointer}
+  .cart-actions{text-align:center;margin-top:20px}
+  #upiBox{text-align:center;margin-top:10px}
+</style>
 </head>
 <body>
 
-<header>
-  <h2>Our Products</h2>
-</header>
+<h2>My Cart</h2>
 
-<input id="search" placeholder="Search..." onkeyup="filter()">
+<table>
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Price (₹)</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+  <tfoot>
+    <tr>
+      <td>Handling Charges</td>
+      <td id="handling"></td>
+      <td></td>
+    </tr>
+    <tr class="total-row">
+      <td>Total</td>
+      <td id="total"></td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
 
-<select id="cat" onchange="filter()">
-  <option value="all">All</option>
-  <option value="bulb">Bulb</option>
-  <option value="fan">Fan</option>
-  <option value="light">Light</option>
-</select>
+<h3>Payment Method</h3>
+<label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
+<label><input type="radio" name="pay" value="UPI"> UPI</label>
 
-<div class="products-grid" id="products"></div>
-<a href="cart.html" class="cart-btn">🛒</a>
+<p id="upiBox" style="display:none;">
+  UPI ID: <b id="upiText">paytm.s1ktca0@pty</b><br><br>
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paytm.s1ktca0@pty" /><br><br>
+  <button onclick="copyUPI()">Copy UPI ID</button>
+</p>
+
+<h3>Your Details</h3>
+<input id="name" placeholder="Your Name" required>
+<input id="phone" placeholder="Phone Number" required>
+
+<div class="cart-actions">
+  <button onclick="clearCart()">Clear Cart</button>
+  <button onclick="orderBoth()">Confirm Order</button>
+</div>
 
 <script>
 const handling = 9;
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let total = 0;
+let msg = "Order Details:%0A";
+let textSummary = "";
 
-// Define elements
-const productsDiv = document.getElementById("products");
-const search = document.getElementById("search");
-const cat = document.getElementById("cat");
+const list = document.getElementById("list");
 
-let products = [
+// SHOW CART ITEMS
+list.innerHTML = cart.map((i,index)=>`
+<tr>
+  <td>${i.name}</td>
+  <td>${i.price}</td>
+  <td><button onclick="removeItem(${index})">❌</button></td>
+</tr>
+`).join("");
 
-  /* ================= BULBS ================= */
-  {name:"LED Bulb 9W",cat:"bulb",price:40,img:"bulb1.png",desc:"Energy saving LED bulb (Fybros / Orient / GM)"},
-  {name:"LED Bulb 12W",cat:"bulb",price:90,img:"bulb2.png",desc:"Bright 12W LED bulb (Orient)"},
-  {name:"LED Bulb 15W",cat:"bulb",price:120,img:"bulb3.png",desc:"High brightness 15W LED bulb (Orient)"},
-  {name:"LED Bulb 18W",cat:"bulb",price:150,img:"bulb4.png",desc:"Powerful 18W LED bulb (Orient)"},
-  {name:"LED Bulb 20W",cat:"bulb",price:170,img:"bulb5.png",desc:"Strong illumination 20W bulb (Fybros)"},
-  {name:"LED Bulb 30W",cat:"bulb",price:230,img:"bulb6.png",desc:"Heavy duty 30W LED bulb (Fybros / Orient)"},
-  {name:"LED Bulb 50W",cat:"bulb",price:400,img:"bulb7.png",desc:"Ultra bright 50W LED bulb (Fybros)"},
+// CALCULATE TOTAL WITHOUT HANDLING
+cart.forEach(i=>{
+  total += i.price;
+  msg += i.name + " ₹" + i.price + "%0A";
+  textSummary += i.name + " ₹" + i.price + "\n";
+});
 
-  /* ================= FANS ================= */
-  {name:"Master Fan 48 inch",cat:"fan",price:1250,img:"fan1.png",desc:"Durable ceiling fan with smooth airflow"},
-  {name:"Mysore Fan 48 inch",cat:"fan",price:1250,img:"fan2.png",desc:"Reliable ceiling fan for home use"},
-  {name:"Orient Fan 48 inch",cat:"fan",price:1550,img:"fan3.png",desc:"Premium quality Orient ceiling fan"},
-  {name:"Fybros Fan 48 inch",cat:"fan",price:1450,img:"fan4.png",desc:"Efficient and durable fan"},
-  {name:"Havells Fan 48 inch",cat:"fan",price:1800,img:"fan5.png",desc:"High performance Havells fan"},
-  {name:"Anchor Fan 48 inch",cat:"fan",price:1500,img:"fan6.png",desc:"Stable and long lasting fan"},
-  {name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"fan7.png",desc:"Affordable and efficient fan"},
-  {name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"fan8.png",desc:"Budget friendly ceiling fan"},
-  {name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"fan9.png",desc:"Low cost durable fan"},
-  {name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"fan10.png",desc:"Compact 36 inch ceiling fan"},
-  {name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"fan11.png",desc:"Small size fan for tight spaces"},
-  {name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"fan12.png",desc:"Portable pedestal fan with adjustable height"},
-  {name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"fan13.png",desc:"Strong airflow pedestal fan"},
-  {name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"fan14.png",desc:"Copper motor exhaust fan (Freshair)"},
-  {name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"fan15.png",desc:"Medium size exhaust fan"},
-  {name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"fan16.png",desc:"Compact exhaust fan"},
+// SHOW HANDLING
+document.getElementById("handling").innerText = handling;
 
-  /* ================= LIGHTS ================= */
-  {name:"Havells Panel Light 6W",cat:"light",price:120,img:"light1.png",desc:"Havells Luna 6W Downlight with 4KV protection"},
-  {name:"Fybros Panel Light 6W",cat:"light",price:80,img:"light2.png",desc:"Energy efficient LED panel light"},
-  {name:"Orient Panel Light 5W",cat:"light",price:80,img:"light3.png",desc:"Compact 5W LED panel"},
-  {name:"Orient Tube Light 20W",cat:"light",price:299,img:"light4.png",desc:"Bright and long lasting tube light"}
+// ADD HANDLING TO TOTAL
+total += handling;
 
-];
+// SHOW TOTAL
+document.getElementById("total").innerText = total;
 
-localStorage.setItem("products", JSON.stringify(products));
-
-function show(list){
-  productsDiv.innerHTML = list.map(p=>`
-    <div class="card">
-      <img src="${p.img}" alt="${p.name}">
-      <h3>${p.name}</h3>
-      <p>${p.desc}</p>
-      <p><b>₹${p.price}</b></p>
-      <button onclick="add('${p.name}',${p.price})">Add to Cart</button>
-    </div>`).join("");
-}
-
-function filter(){
-  let sVal = search.value.toLowerCase();
-  let cVal = cat.value;
-
-  let f = products.filter(p =>
-    p.name.toLowerCase().includes(sVal) &&
-    (cVal==="all" || p.cat===cVal)
-  );
-
-  show(f);
-}
-
-function add(name,price){
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.push({name,price}); // handling charges not added here
+// REMOVE ITEM
+function removeItem(index){
+  cart.splice(index,1);
   localStorage.setItem("cart", JSON.stringify(cart));
-  alert("Added to cart");
+  location.reload();
 }
 
-// Initial display
-show(products);
+// CLEAR CART
+function clearCart(){
+  localStorage.removeItem("cart");
+  location.reload();
+}
 
+// COPY UPI
+function copyUPI(){
+  let text = document.getElementById("upiText").innerText;
+  navigator.clipboard.writeText(text);
+  alert("UPI ID copied");
+}
+
+// ORDER FUNCTION
+function orderBoth(){
+  let name = document.getElementById("name").value;
+  let phone = document.getElementById("phone").value;
+  let pay = document.querySelector('input[name="pay"]:checked').value;
+
+  if(!name || !phone){
+    alert("Fill details");
+    return;
+  }
+
+  // SAVE ORDER
+  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+  orders.push({name,name,phone,total,payment:pay,items:cart,handling});
+  localStorage.setItem("orders", JSON.stringify(orders));
+
+  msg += "Handling Charges: ₹" + handling + "%0A";
+  msg += "Total ₹" + total;
+
+  textSummary += "Handling Charges: ₹" + handling + "\n";
+  textSummary += "Total ₹" + total + "\n";
+
+  let finalMsg = msg + "%0APayment: " + pay + "%0AName: " + name + "%0APhone: " + phone;
+
+  // WhatsApp
+  window.open("https://wa.me/919639228237?text=" + finalMsg);
+
+  // Email
+  let mail = "mailto:anisuggestdaily@gmail.com?subject=New Order&body=" + encodeURIComponent(textSummary + "Payment: " + pay + "\nName: " + name + "\nPhone: " + phone);
+  window.location.href = mail;
+
+  // SUCCESS SCREEN
+  document.body.innerHTML = `
+  <h2>✅ Order Placed Successfully</h2>
+  <p>We will contact you soon.</p>
+  <a href="index.html">Back to Home</a>
+  `;
+}
+
+// SHOW/HIDE UPI
+document.querySelectorAll('input[name="pay"]').forEach(r=>{
+  r.addEventListener("change",()=>{
+    if(r.value==="UPI" && r.checked){
+      document.getElementById("upiBox").style.display="block";
+    } else{
+      document.getElementById("upiBox").style.display="none";
+    }
+  });
+});
 </script>
 
 </body>
-</html>
+  </html>
