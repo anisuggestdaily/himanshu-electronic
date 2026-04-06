@@ -3,68 +3,103 @@
 <head>
 <title>Cart</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  body{font-family:Poppins,Arial;margin:20px;background:#f5f7fb}
+  h2{text-align:center;margin-bottom:20px}
+  table{width:100%;border-collapse:collapse;margin-bottom:20px;background:#fff;box-shadow:0 5px 20px rgba(0,0,0,.08);border-radius:10px;overflow:hidden}
+  th, td{padding:12px;text-align:left;border-bottom:1px solid #ddd}
+  th{background:#0A84FF;color:#fff}
+  tr:last-child td{border-bottom:none}
+  .total-row td{font-weight:bold}
+  input,button{margin:5px 0;padding:10px;border-radius:8px;border:1px solid #ccc;width:95%}
+  button{background:#0A84FF;color:#fff;border:none;cursor:pointer}
+  .cart-actions{text-align:center;margin-top:20px}
+  #upiBox{text-align:center;margin-top:10px}
+</style>
 </head>
 <body>
 
 <h2>My Cart</h2>
 
-<ul id="list"></ul>
-<h3>Total ₹<span id="total"></span></h3>
+<table>
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Price (₹)</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+  <tfoot>
+    <tr>
+      <td>Subtotal</td>
+      <td id="subtotal"></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Handling Charges</td>
+      <td id="handling"></td>
+      <td></td>
+    </tr>
+    <tr class="total-row">
+      <td>Total</td>
+      <td id="total"></td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
 
 <h3>Payment Method</h3>
 <label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
 <label><input type="radio" name="pay" value="UPI"> UPI</label>
 
-<p id="upiBox" style="display:none;text-align:center;">
-UPI ID: <b id="upiText">paytm.s1ktca0@pty</b><br><br>
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paytm.s1ktca0@pty" />
-<br><br>
-<button onclick="copyUPI()">Copy UPI ID</button>
+<p id="upiBox" style="display:none;">
+  UPI ID: <b id="upiText">paytm.s1ktca0@pty</b><br><br>
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paytm.s1ktca0@pty" /><br><br>
+  <button onclick="copyUPI()">Copy UPI ID</button>
 </p>
-
-<br><br>
 
 <h3>Your Details</h3>
 <input id="name" placeholder="Your Name" required>
 <input id="phone" placeholder="Phone Number" required>
 
-<br><br>
-
-<button onclick="clearCart()">Clear Cart</button>
-<br><br>
-<button onclick="orderBoth()">Confirm Order</button>
+<div class="cart-actions">
+  <button onclick="clearCart()">Clear Cart</button>
+  <button onclick="orderBoth()">Confirm Order</button>
+</div>
 
 <script>
-const handling = 9; // handling per order
+const handling = 9;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let subtotal = 0;
 let total = 0;
-
 let msg = "Order Details:%0A";
 let textSummary = "";
 
-// SHOW CART ITEMS
 const list = document.getElementById("list");
+
+// SHOW CART ITEMS
 list.innerHTML = cart.map((i,index)=>`
-<li>
-${i.name} ₹${i.price}
-<button onclick="removeItem(${index})">❌</button>
-</li>
+<tr>
+  <td>${i.name}</td>
+  <td>${i.price}</td>
+  <td><button onclick="removeItem(${index})">❌</button></td>
+</tr>
 `).join("");
 
-// CALCULATE TOTAL WITHOUT PER-PRODUCT HANDLING
+// CALCULATE SUBTOTAL
 cart.forEach(i=>{
-  total += i.price;
+  subtotal += i.price;
   msg += i.name + " ₹" + i.price + "%0A";
   textSummary += i.name + " ₹" + i.price + "\n";
 });
 
-// ADD HANDLING CHARGES ONLY ONCE
-total += handling;
-msg += "Handling Charges: ₹" + handling + "%0A";
-textSummary += "Handling Charges: ₹" + handling + "\n";
+// CALCULATE TOTAL
+total = subtotal + handling;
 
-msg += "Total ₹" + total;
-
+// SHOW VALUES
+document.getElementById("subtotal").innerText = subtotal;
+document.getElementById("handling").innerText = handling;
 document.getElementById("total").innerText = total;
 
 // REMOVE ITEM
@@ -100,15 +135,14 @@ function orderBoth(){
 
   // SAVE ORDER
   let orders = JSON.parse(localStorage.getItem("orders")) || [];
-  orders.push({
-    name:name,
-    phone:phone,
-    total:total,
-    payment:pay,
-    items:cart,
-    handling: handling
-  });
+  orders.push({name,phone,subtotal,handling,total,payment:pay,items:cart});
   localStorage.setItem("orders", JSON.stringify(orders));
+
+  msg += "Handling Charges: ₹" + handling + "%0A";
+  msg += "Total ₹" + total;
+
+  textSummary += "Handling Charges: ₹" + handling + "\n";
+  textSummary += "Total ₹" + total + "\n";
 
   let finalMsg = msg + "%0APayment: " + pay + "%0AName: " + name + "%0APhone: " + phone;
 
@@ -116,7 +150,7 @@ function orderBoth(){
   window.open("https://wa.me/919639228237?text=" + finalMsg);
 
   // Email
-  let mail = "mailto:anisuggestdaily@gmail.com?subject=New Order&body=" + encodeURIComponent(textSummary + "Total ₹" + total + "\nPayment: " + pay + "\nName: " + name + "\nPhone: " + phone);
+  let mail = "mailto:anisuggestdaily@gmail.com?subject=New Order&body=" + encodeURIComponent(textSummary + "Payment: " + pay + "\nName: " + name + "\nPhone: " + phone);
   window.location.href = mail;
 
   // SUCCESS SCREEN
