@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cart - Himanshu Electronics</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+<h2>Himanshu Electronics</h2>
+<div>
+<a href="index.html">Home</a>
+<a href="product.html">Products</a>
+</div>
+</header>
+
+<div class="container">
+
+<h2 style="text-align:center;">My Cart</h2>
+
+<table>
+<thead>
+<tr>
+<th>Product</th>
+<th>Price (₹)</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="list"></tbody>
+
+<tfoot>
+<tr>
+<td>Subtotal</td>
+<td id="subtotal"></td>
+<td></td>
+</tr>
+
+<tr>
+<td>Handling Charges</td>
+<td id="handling"></td>
+<td></td>
+</tr>
+
+<tr class="total-row">
+<td>Total</td>
+<td id="total"></td>
+<td></td>
+</tr>
+</tfoot>
+</table>
+
+<h3>Payment Method</h3>
+<label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
+<label><input type="radio" name="pay" value="UPI"> UPI</label>
+
+<div id="upiBox">
+<p>UPI ID: <b id="upiText">paytm.s1ktca0@pty</b></p>
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paytm.s1ktca0@pty">
+<br>
+<button onclick="copyUPI()">Copy UPI</button>
+</div>
+
+<h3>Your Details</h3>
+<input id="name" placeholder="Your Name">
+<input id="phone" placeholder="Phone Number">
+
+<div style="text-align:center;margin-top:20px;">
+<button class="danger" onclick="clearCart()">Clear Cart</button>
+<button class="primary" onclick="order()">Confirm Order</button>
+</div>
+
+</div>
+
+<script>
+
+/* DATA */
+const handling = 9;
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+/* ELEMENTS */
+const list = document.getElementById("list");
+
+/* SHOW CART */
+function showCart(){
+let subtotal = 0;
+
+list.innerHTML = cart.map((i,index)=>{
+subtotal += i.price;
+return `
+<tr>
+<td>${i.name}</td>
+<td>₹${i.price}</td>
+<td><button onclick="removeItem(${index})">❌</button></td>
+</tr>
+`;
+}).join("");
+
+let total = subtotal + handling;
+
+document.getElementById("subtotal").innerText = "₹" + subtotal;
+document.getElementById("handling").innerText = "₹" + handling;
+document.getElementById("total").innerText = "₹" + total;
+}
+
+/* REMOVE */
+function removeItem(i){
+cart.splice(i,1);
+localStorage.setItem("cart", JSON.stringify(cart));
+showCart();
+}
+
+/* CLEAR */
+function clearCart(){
+localStorage.removeItem("cart");
+cart = [];
+showCart();
+}
+
+/* COPY UPI */
+function copyUPI(){
+navigator.clipboard.writeText(document.getElementById("upiText").innerText);
+alert("UPI copied");
+}
+
+/* ORDER */
+function order(){
+let name = document.getElementById("name").value;
+let phone = document.getElementById("phone").value;
+let pay = document.querySelector('input[name="pay"]:checked').value;
+
+if(!name || !phone){
+alert("Fill details");
+return;
+}
+
+let subtotal = cart.reduce((s,i)=>s+i.price,0);
+let total = subtotal + handling;
+
+/* WHATSAPP MSG */
+let msg = "Order Details:%0A";
+
+cart.forEach(i=>{
+msg += i.name + " ₹" + i.price + "%0A";
+});
+
+msg += "Handling: ₹"+handling+"%0A";
+msg += "Total: ₹"+total+"%0A";
+msg += "Payment: "+pay+"%0A";
+msg += "Name: "+name+"%0A";
+msg += "Phone: "+phone;
+
+/* OPEN WHATSAPP */
+window.open("https://wa.me/919639228237?text=" + msg);
+
+/* SUCCESS */
+document.body.innerHTML = `
+<div class="success">
+<h2>✅ Order Placed</h2>
+<p>We will contact you soon</p>
+<a href="index.html">Go Home</a>
+</div>
+`;
+}
+
+/* PAYMENT TOGGLE */
+document.querySelectorAll('input[name="pay"]').forEach(r=>{
+r.addEventListener("change",()=>{
+document.getElementById("upiBox").style.display =
+(r.value==="UPI" && r.checked) ? "block":"none";
+});
+});
+
+/* INIT */
+showCart();
+
+</script>
+
+</body>
+</html>
