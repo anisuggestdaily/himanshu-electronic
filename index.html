@@ -1,26 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Himanshu Electronics</title>
-<link rel="stylesheet" href="style.css">
+  <title>Himanshu Electronics</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Additional styles for home page */
+    body{margin:0;font-family:Poppins,Arial;background:#f5f7fb}
+    header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#0A84FF;color:#fff;position:sticky;top:0;z-index:10;}
+    header a{color:white;text-decoration:none;margin:0 10px;font-weight:500;}
+    header h1{margin:0;font-size:24px;}
+    .hero{background:#0A84FF;color:white;text-align:center;padding:80px 20px;}
+    .hero h2{font-size:36px;margin-bottom:15px;}
+    .hero p{font-size:18px;margin-bottom:20px;}
+    .hero button{background:#FFD700;color:#000;padding:12px 25px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;}
+    .categories{display:flex;justify-content:center;flex-wrap:wrap;margin:40px 0;}
+    .category-card{width:200px;margin:15px;padding:20px;background:#fff;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);text-align:center;transition:.2s;cursor:pointer;}
+    .category-card:hover{transform:translateY(-5px);}
+    .category-card img{width:100px;height:100px;object-fit:contain;margin-bottom:10px;}
+    .featured-products{padding:20px;}
+    .featured-products h2{text-align:center;margin-bottom:20px;}
+    .products-grid{display:flex;flex-wrap:wrap;justify-content:center;}
+    .products-grid .card{width:220px;margin:12px;padding:15px;background:#fff;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);text-align:center;transition:.2s;}
+    .products-grid .card:hover{transform:translateY(-5px);}
+    .products-grid .card img{width:100%;height:150px;object-fit:contain;}
+    footer{background:#0A84FF;color:#fff;text-align:center;padding:20px;margin-top:40px;}
+    footer a{color:white;text-decoration:none;margin:0 5px;}
+  </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
-<h2>Himanshu Electronics</h2>
-<nav>
-<a href="index.html">Home</a>
-<a href="products.html">Products</a>
-<a href="cart.html">Cart</a>
-<a href="contact.html">Contact</a>
-</nav>
+  <h1>Himanshu Electronics</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="product.html">Products</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+  </nav>
+  <a href="cart.html" style="font-size:24px;">🛒</a>
 </header>
 
-<section style="text-align:center;padding:80px;">
-<h1>Electrical Store in Bijnor</h1>
-<p>Bulbs • Fans • Lights</p>
-<a href="products.html" class="btn">Shop Now</a>
-</section>
+<!-- HERO SECTION -->
+<div class="hero">
+  <h2>Best Bulbs, Fans & Lights</h2>
+  <p>High-quality products for your home and office at affordable prices.</p>
+  <button onclick="location.href='product.html'">Shop Now</button>
+</div>
+
+<!-- CATEGORIES SECTION -->
+<div class="categories">
+  <div class="category-card" onclick="location.href='product.html'">
+    <img src="https://via.placeholder.com/100?text=Bulb" alt="Bulb">
+    <h3>Bulbs</h3>
+  </div>
+  <div class="category-card" onclick="location.href='product.html'">
+    <img src="https://via.placeholder.com/100?text=Fan" alt="Fan">
+    <h3>Fans</h3>
+  </div>
+  <div class="category-card" onclick="location.href='product.html'">
+    <img src="https://via.placeholder.com/100?text=Light" alt="Light">
+    <h3>Lights</h3>
+  </div>
+</div>
+
+<!-- FEATURED PRODUCTS -->
+<div class="featured-products">
+  <h2>Featured Products</h2>
+  <div class="products-grid" id="featured"></div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Contact us: <a href="mailto:anisuggestdaily@gmail.com">anisuggestdaily@gmail.com</a> | 📞 +91 9639228237</p>
+  <p>Follow us: 
+    <a href="#">Instagram</a> | 
+    <a href="#">Facebook</a>
+  </p>
+  <p>&copy; 2026 Himanshu Electronics</p>
+</footer>
+
+<script>
+// Featured products (example: first 6 items)
+let featuredProducts = [
+  {name:"LED Bulb 9W",price:40,img:"https://via.placeholder.com/150?text=Bulb"},
+  {name:"LED Bulb 12W",price:90,img:"https://via.placeholder.com/150?text=Bulb"},
+  {name:"Master Fan 48 inch",price:1250,img:"https://via.placeholder.com/150?text=Fan"},
+  {name:"Mysore Fan 48 inch",price:1250,img:"https://via.placeholder.com/150?text=Fan"},
+  {name:"Havells Panel Light 6W",price:120,img:"https://via.placeholder.com/150?text=Light"},
+  {name:"Fybros Panel Light 6W",price:80,img:"https://via.placeholder.com/150?text=Light"}
+];
+
+let featuredDiv = document.getElementById("featured");
+featuredDiv.innerHTML = featuredProducts.map(p=>`
+  <div class="card">
+    <img src="${p.img}" alt="${p.name}">
+    <h3>${p.name}</h3>
+    <p><b>₹${p.price}</b></p>
+    <button onclick="location.href='product.html'">View</button>
+  </div>
+`).join("");
+</script>
 
 </body>
 </html>
