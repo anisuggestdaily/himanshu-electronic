@@ -15,6 +15,10 @@
 <label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
 <label><input type="radio" name="pay" value="UPI"> UPI</label>
 
+<p id="upiBox" style="display:none;">
+UPI ID: <b>paytm.s1ktca0@pty</b>
+</p>
+
 <br><br>
 
 <h3>Your Details</h3>
@@ -62,6 +66,17 @@ window.open("https://wa.me/919639228237?text=" + finalMsg);
 let mail = "mailto:anisuggestdaily@gmail.com?subject=New Order&body=" + textSummary + "Total ₹" + total + "\\nPayment: " + pay + "\\nName: " + name + "\\nPhone: " + phone;
 window.location.href = mail;
 }
+
+/* ✅ UPI SHOW/HIDE SYSTEM ADDED */
+document.querySelectorAll('input[name="pay"]').forEach(r=>{
+r.addEventListener("change",()=>{
+if(r.value==="UPI" && r.checked){
+document.getElementById("upiBox").style.display="block";
+}else{
+document.getElementById("upiBox").style.display="none";
+}
+});
+});
 </script>
 
 </body>
