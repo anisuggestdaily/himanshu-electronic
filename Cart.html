@@ -15,8 +15,15 @@
 <label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
 <label><input type="radio" name="pay" value="UPI"> UPI</label>
 
-<p id="upiBox" style="display:none;">
-UPI ID: <b>paytm.s1ktca0@pty</b>
+<!-- ✅ UPI SECTION UPGRADED -->
+<p id="upiBox" style="display:none;text-align:center;">
+UPI ID: <b id="upiText">paytm.s1ktca0@pty</b><br><br>
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paytm.s1ktca0@pty" />
+
+<br><br>
+
+<button onclick="copyUPI()">Copy UPI ID</button>
 </p>
 
 <br><br>
@@ -24,6 +31,11 @@ UPI ID: <b>paytm.s1ktca0@pty</b>
 <h3>Your Details</h3>
 <input id="name" placeholder="Your Name" required>
 <input id="phone" placeholder="Phone Number" required>
+
+<br><br>
+
+<!-- ✅ CLEAR CART BUTTON -->
+<button onclick="clearCart()">Clear Cart</button>
 
 <br><br>
 
@@ -36,6 +48,14 @@ let total = 0;
 let msg = "Order Details:%0A";
 let textSummary = "";
 
+// ✅ SHOW CART WITH REMOVE BUTTON
+list.innerHTML = cart.map((i,index)=>`
+<li>
+${i.name} ₹${i.price}
+<button onclick="removeItem(${index})">❌</button>
+</li>
+`).join("");
+
 cart.forEach(i=>{
 total += i.price;
 msg += i.name + " ₹" + i.price + "%0A";
@@ -44,9 +64,29 @@ textSummary += i.name + " ₹" + i.price + "\\n";
 
 msg += "Total ₹" + total;
 
-list.innerHTML = cart.map(i=>`<li>${i.name} ₹${i.price}</li>`).join("");
 document.getElementById("total").innerText = total;
 
+// ✅ REMOVE ITEM
+function removeItem(index){
+cart.splice(index,1);
+localStorage.setItem("cart", JSON.stringify(cart));
+location.reload();
+}
+
+// ✅ CLEAR CART
+function clearCart(){
+localStorage.removeItem("cart");
+location.reload();
+}
+
+// ✅ COPY UPI
+function copyUPI(){
+let text = document.getElementById("upiText").innerText;
+navigator.clipboard.writeText(text);
+alert("UPI ID copied");
+}
+
+// ✅ ORDER FUNCTION (UPGRADED)
 function orderBoth(){
 let name = document.getElementById("name").value;
 let phone = document.getElementById("phone").value;
@@ -57,6 +97,19 @@ alert("Fill details");
 return;
 }
 
+// ✅ SAVE ORDER (FOR DASHBOARD)
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+orders.push({
+name:name,
+phone:phone,
+total:total,
+payment:pay,
+items:cart
+});
+
+localStorage.setItem("orders", JSON.stringify(orders));
+
 let finalMsg = msg + "%0APayment: " + pay + "%0AName: " + name + "%0APhone: " + phone;
 
 // WhatsApp
@@ -65,9 +118,16 @@ window.open("https://wa.me/919639228237?text=" + finalMsg);
 // Email
 let mail = "mailto:anisuggestdaily@gmail.com?subject=New Order&body=" + textSummary + "Total ₹" + total + "\\nPayment: " + pay + "\\nName: " + name + "\\nPhone: " + phone;
 window.location.href = mail;
+
+// ✅ SUCCESS SCREEN
+document.body.innerHTML = `
+<h2>✅ Order Placed Successfully</h2>
+<p>We will contact you soon.</p>
+<a href="index.html">Back to Home</a>
+`;
 }
 
-/* ✅ UPI SHOW/HIDE SYSTEM ADDED */
+// ✅ UPI SHOW/HIDE
 document.querySelectorAll('input[name="pay"]').forEach(r=>{
 r.addEventListener("change",()=>{
 if(r.value==="UPI" && r.checked){
@@ -80,4 +140,4 @@ document.getElementById("upiBox").style.display="none";
 </script>
 
 </body>
-</html>
+  </html>
