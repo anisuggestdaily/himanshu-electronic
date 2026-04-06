@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Product Details</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container" id="view"></div>
+
+<script>
+
+// GET PRODUCT
+let p = JSON.parse(localStorage.getItem("viewProduct"));
+
+if(!p){
+document.getElementById("view").innerHTML = "<h2>No Product Found</h2>";
+}else{
+
+document.getElementById("view").innerHTML = `
+<div class="card">
+<img src="${p.img}">
+<h2>${p.name}</h2>
+<p><b>Price: ₹${p.price}</b></p>
+
+<button class="add" onclick="addToCart()">Add to Cart</button>
+<br>
+<button class="back" onclick="goBack()">⬅ Back</button>
+</div>
+`;
+
+}
+
+// ADD TO CART
+function addToCart(){
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+cart.push(p);
+localStorage.setItem("cart", JSON.stringify(cart));
+alert("Added to Cart 🛒");
+}
+
+// BACK
+function goBack(){
+window.history.back();
+}
+
+</script>
+
+</body>
+</html>
