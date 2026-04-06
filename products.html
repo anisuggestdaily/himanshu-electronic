@@ -25,7 +25,7 @@
 <script>
 const handling = 9;
 
-// define elements
+// Define elements
 const productsDiv = document.getElementById("products");
 const search = document.getElementById("search");
 const cat = document.getElementById("cat");
@@ -33,30 +33,37 @@ const cat = document.getElementById("cat");
 let products = [
 
   /* ================= BULBS ================= */
-  {name:"LED Bulb 9W",cat:"bulb",price:40,img:"https://images.pexels.com/photos/256348/pexels-photo-256348.jpeg",desc:"Energy saving LED bulb"},
-  {name:"LED Bulb 12W",cat:"bulb",price:90,img:"https://images.pexels.com/photos/256348/pexels-photo-256348.jpeg",desc:"Bright 12W LED bulb"},
-  {name:"LED Bulb 15W",cat:"bulb",price:120,img:"https://images.pexels.com/photos/256348/pexels-photo-256348.jpeg",desc:"High brightness 15W LED bulb"},
-  {name:"LED Bulb 18W",cat:"bulb",price:150,img:"https://images.pexels.com/photos/256348/pexels-photo-256348.jpeg",desc:"Powerful 18W LED bulb"},
-  {name:"LED Bulb 20W",cat:"bulb",price:170,img:"https://images.pexels.com/photos/256348/pexels-photo-256348.jpeg",desc:"Strong illumination 20W bulb"},
-  {name:"LED Bulb 30W",cat:"bulb",price:230,img:"https://images.pexels.com/photos/256348/pexels-photo-256348.jpeg",desc:"Heavy duty 30W LED bulb"},
-  {name:"LED Bulb 50W",cat:"bulb",price:400,img:"https://images.pexels.com/photos/256348/pexels-photo-256348.jpeg",desc:"Ultra bright 50W LED bulb"},
+  {name:"LED Bulb 9W",cat:"bulb",price:40,img:"https://i.ibb.co/2kT7dGf/bulb1.png",desc:"Energy saving LED bulb (Fybros / Orient / GM)"},
+  {name:"LED Bulb 12W",cat:"bulb",price:90,img:"https://i.ibb.co/2kT7dGf/bulb1.png",desc:"Bright 12W LED bulb (Orient)"},
+  {name:"LED Bulb 15W",cat:"bulb",price:120,img:"https://i.ibb.co/2kT7dGf/bulb1.png",desc:"High brightness 15W LED bulb (Orient)"},
+  {name:"LED Bulb 18W",cat:"bulb",price:150,img:"https://i.ibb.co/2kT7dGf/bulb1.png",desc:"Powerful 18W LED bulb (Orient)"},
+  {name:"LED Bulb 20W",cat:"bulb",price:170,img:"https://i.ibb.co/2kT7dGf/bulb1.png",desc:"Strong illumination 20W bulb (Fybros)"},
+  {name:"LED Bulb 30W",cat:"bulb",price:230,img:"https://i.ibb.co/2kT7dGf/bulb1.png",desc:"Heavy duty 30W LED bulb (Fybros / Orient)"},
+  {name:"LED Bulb 50W",cat:"bulb",price:400,img:"https://i.ibb.co/2kT7dGf/bulb1.png",desc:"Ultra bright 50W LED bulb (Fybros)"},
 
   /* ================= FANS ================= */
-  {name:"Master Fan 48 inch",cat:"fan",price:1250,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"Durable ceiling fan with smooth airflow"},
-  {name:"Mysore Fan 48 inch",cat:"fan",price:1250,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"Reliable ceiling fan"},
-  {name:"Orient Fan 48 inch",cat:"fan",price:1550,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"Premium quality ceiling fan"},
-  {name:"Fybros Fan 48 inch",cat:"fan",price:1450,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"Efficient and durable fan"},
-  {name:"Havells Fan 48 inch",cat:"fan",price:1800,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"High performance fan"},
-  {name:"Anchor Fan 48 inch",cat:"fan",price:1500,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"Stable and long lasting fan"},
-  {name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"Affordable ceiling fan"},
-  {name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"Budget friendly ceiling fan"},
-  {name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"https://images.pexels.com/photos/3758922/pexels-photo-3758922.jpeg",desc:"Low cost durable fan"},
+  {name:"Master Fan 48 inch",cat:"fan",price:1250,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Durable ceiling fan with smooth airflow"},
+  {name:"Mysore Fan 48 inch",cat:"fan",price:1250,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Reliable ceiling fan for home use"},
+  {name:"Orient Fan 48 inch",cat:"fan",price:1550,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Premium quality Orient ceiling fan"},
+  {name:"Fybros Fan 48 inch",cat:"fan",price:1450,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Efficient and durable fan"},
+  {name:"Havells Fan 48 inch",cat:"fan",price:1800,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"High performance Havells fan"},
+  {name:"Anchor Fan 48 inch",cat:"fan",price:1500,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Stable and long lasting fan"},
+  {name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Affordable and efficient fan"},
+  {name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Budget friendly ceiling fan"},
+  {name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Low cost durable fan"},
+  {name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Compact 36 inch ceiling fan"},
+  {name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"https://i.ibb.co/QD0sD3Q/fan1.png",desc:"Small size fan for tight spaces"},
+  {name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"https://i.ibb.co/Y7kL6Cs/fan2.png",desc:"Portable pedestal fan with adjustable height"},
+  {name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"https://i.ibb.co/Y7kL6Cs/fan2.png",desc:"Strong airflow pedestal fan"},
+  {name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"https://i.ibb.co/Y7kL6Cs/fan2.png",desc:"Copper motor exhaust fan (Freshair)"},
+  {name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"https://i.ibb.co/Y7kL6Cs/fan2.png",desc:"Medium size exhaust fan"},
+  {name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"https://i.ibb.co/Y7kL6Cs/fan2.png",desc:"Compact exhaust fan"},
 
   /* ================= LIGHTS ================= */
-  {name:"Havells Panel Light 6W",cat:"light",price:120,img:"https://images.pexels.com/photos/373946/pexels-photo-373946.jpeg",desc:"Panel Light 6W"},
-  {name:"Fybros Panel Light 6W",cat:"light",price:80,img:"https://images.pexels.com/photos/373946/pexels-photo-373946.jpeg",desc:"LED panel light"},
-  {name:"Orient Panel Light 5W",cat:"light",price:80,img:"https://images.pexels.com/photos/373946/pexels-photo-373946.jpeg",desc:"Compact LED panel"},
-  {name:"Orient Tube Light 20W",cat:"light",price:299,img:"https://images.pexels.com/photos/373946/pexels-photo-373946.jpeg",desc:"Bright tube light"}
+  {name:"Havells Panel Light 6W",cat:"light",price:120,img:"https://i.ibb.co/0BBg1cq/light1.png",desc:"Havells Luna 6W Downlight with 4KV protection"},
+  {name:"Fybros Panel Light 6W",cat:"light",price:80,img:"https://i.ibb.co/0BBg1cq/light1.png",desc:"Energy efficient LED panel light"},
+  {name:"Orient Panel Light 5W",cat:"light",price:80,img:"https://i.ibb.co/0BBg1cq/light1.png",desc:"Compact 5W LED panel"},
+  {name:"Orient Tube Light 20W",cat:"light",price:299,img:"https://i.ibb.co/0BBg1cq/light1.png",desc:"Bright and long lasting tube light"}
 
 ];
 
@@ -65,7 +72,7 @@ localStorage.setItem("products", JSON.stringify(products));
 function show(list){
   productsDiv.innerHTML = list.map(p=>`
     <div class="card">
-      <img src="${p.img}">
+      <img src="${p.img}" alt="${p.name}">
       <h3>${p.name}</h3>
       <p>${p.desc}</p>
       <p><b>₹${p.price}</b></p>
@@ -93,6 +100,7 @@ function add(name,price){
   alert("Added to cart");
 }
 
+// Initial display
 show(products);
 
 </script>
