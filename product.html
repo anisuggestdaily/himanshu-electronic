@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Products - Himanshu Electronics</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+<h2>Himanshu Electronics</h2>
+
+<div>
+<a href="index.html">Home</a>
+<a href="#" onclick="toggleCart()">Cart</a>
+</div>
+
+<div class="cart-icon">
+🛒
+<span id="cartCount" class="cart-count">0</span>
+</div>
+</header>
+
+<h2 style="text-align:center;">Our Products</h2>
+
+<div class="top-bar">
+<input id="search" placeholder="Search..." onkeyup="filter()">
+
+<select id="cat" onchange="filter()">
+<option value="all">All</option>
+<option value="bulb">Bulbs</option>
+<option value="fan">Fans</option>
+<option value="light">Lights</option>
+</select>
+</div>
+
+<div class="products-grid" id="products"></div>
+
+<!-- MINI CART -->
+<div class="mini-cart" id="miniCart">
+<h3>Your Cart</h3>
+<div id="miniItems"></div>
+<button onclick="location.href='cart.html'">Checkout</button>
+</div>
+
+<script>
+
+/* DEFAULT PRODUCTS */
+let defaultProducts = [
+
+/* BULBS */
+{name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg",best:true},
+{name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},
+{name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg"},
+{name:"LED Bulb 18W",cat:"bulb",price:150,img:"images/led18w.jpg"},
+{name:"LED Bulb 20W",cat:"bulb",price:170,img:"images/led20w.jpg"},
+{name:"LED Bulb 30W",cat:"bulb",price:230,img:"images/led30w.jpg"},
+{name:"LED Bulb 50W",cat:"bulb",price:400,img:"images/led50w.jpg"},
+
+/* FANS */
+{name:"Master Fan 48 inch",cat:"fan",price:1250,img:"images/fan_master48.jpg",best:true},
+{name:"Mysore Fan 48 inch",cat:"fan",price:1250,img:"images/fan_mysore48.jpg"},
+{name:"Orient Fan 48 inch",cat:"fan",price:1550,img:"images/fan_orient48.jpg"},
+{name:"Fybros Fan 48 inch",cat:"fan",price:1450,img:"images/fan_fybros48.jpg"},
+{name:"Havells Fan 48 inch",cat:"fan",price:1800,img:"images/fan_havells48.jpg"},
+{name:"Anchor Fan 48 inch",cat:"fan",price:1500,img:"images/fan_anchor48.jpg"},
+{name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"images/fan_kent48.jpg"},
+{name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg"},
+{name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg"},
+
+/* SMALL FANS */
+{name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg"},
+{name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg"},
+
+/* PEDESTAL */
+{name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg"},
+{name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg"},
+
+/* EXHAUST */
+{name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg"},
+{name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg"},
+{name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg"},
+
+/* LIGHTS */
+{name:"Havells Panel Light 6W",cat:"light",price:120,img:"images/panel_havells6.jpg"},
+{name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},
+{name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg"},
+{name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}
+
+];
+
+/* ADMIN PRODUCTS */
+let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+
+/* MERGE */
+let products = [...defaultProducts, ...adminProducts];
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+/* SHOW PRODUCTS */
+function showProducts(list=products){
+if(list.length===0){
+document.getElementById("products").innerHTML="<p class='empty'>No products found</p>";
+return;
+}
+
+document.getElementById("products").innerHTML = list.map((p,i)=>`
+<div class="card">
+${p.best ? '<div class="badge">Best Seller</div>' : ''}
+<img src="${p.img}" onclick="view(${i})">
+<h3>${p.name}</h3>
+<p>₹${p.price}</p>
+
+<button class="add" onclick="add(${i})">Add</button>
+<button class="wish" onclick="addWish(${i})">❤️</button>
+</div>
+`).join("");
+}
+
+/* ADD CART */
+function add(i){
+cart.push(products[i]);
+localStorage.setItem("cart",JSON.stringify(cart));
+updateCartCount();
+showMiniCart();
+}
+
+/* WISHLIST */
+function addWish(i){
+wishlist.push(products[i]);
+localStorage.setItem("wishlist",JSON.stringify(wishlist));
+alert("Added to wishlist ❤️");
+}
+
+/* VIEW PRODUCT */
+function view(i){
+localStorage.setItem("viewProduct",JSON.stringify(products[i]));
+location.href="product-view.html";
+}
+
+/* FILTER */
+function filter(){
+let s = document.getElementById("search").value.toLowerCase();
+let c = document.getElementById("cat").value;
+
+let filtered = products.filter(p =>
+p.name.toLowerCase().includes(s) &&
+(c==="all" || p.cat===c)
+);
+
+showProducts(filtered);
+}
+
+/* CART COUNT */
+function updateCartCount(){
+document.getElementById("cartCount").innerText = cart.length;
+}
+
+/* MINI CART */
+function toggleCart(){
+let c = document.getElementById("miniCart");
+c.style.display = c.style.display==="block" ? "none":"block";
+showMiniCart();
+}
+
+function showMiniCart(){
+let div = document.getElementById("miniItems");
+div.innerHTML = cart.map(p=>`
+<p>${p.name} - ₹${p.price}</p>
+`).join("");
+}
+
+/* INIT */
+updateCartCount();
+showProducts();
+
+</script>
+
+</body>
+</html>
