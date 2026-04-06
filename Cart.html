@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cart</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>My Cart</h2>
+
+<ul id="list"></ul>
+<h3>Total ₹<span id="total"></span></h3>
+
+<h3>Payment Method</h3>
+<label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
+<label><input type="radio" name="pay" value="UPI"> UPI</label>
+
+<br><br>
+
+<h3>Your Details</h3>
+<input id="name" placeholder="Your Name" required>
+<input id="phone" placeholder="Phone Number" required>
+
+<br><br>
+
+<button onclick="orderBoth()">Confirm Order</button>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let total = 0;
+
+let msg = "Order Details:%0A";
+let textSummary = "";
+
+cart.forEach(i=>{
+total += i.price;
+msg += i.name + " ₹" + i.price + "%0A";
+textSummary += i.name + " ₹" + i.price + "\\n";
+});
+
+msg += "Total ₹" + total;
+
+list.innerHTML = cart.map(i=>`<li>${i.name} ₹${i.price}</li>`).join("");
+document.getElementById("total").innerText = total;
+
+function orderBoth(){
+let name = document.getElementById("name").value;
+let phone = document.getElementById("phone").value;
+let pay = document.querySelector('input[name="pay"]:checked').value;
+
+if(!name || !phone){
+alert("Fill details");
+return;
+}
+
+let finalMsg = msg + "%0APayment: " + pay + "%0AName: " + name + "%0APhone: " + phone;
+
+// WhatsApp
+window.open("https://wa.me/919639228237?text=" + finalMsg);
+
+// Email
+let mail = "mailto:anisuggestdaily@gmail.com?subject=New Order&body=" + textSummary + "Total ₹" + total + "\\nPayment: " + pay + "\\nName: " + name + "\\nPhone: " + phone;
+window.location.href = mail;
+}
+</script>
+
+</body>
+</html>
