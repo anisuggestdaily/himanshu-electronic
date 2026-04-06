@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<h2>Admin Panel</h2>
+
+<div class="container">
+
+<input id="name" placeholder="Product Name">
+<input id="price" type="number" placeholder="Price">
+<input id="img" placeholder="Image Path (images/product.jpg)">
+
+<select id="cat">
+<option value="bulb">Bulb</option>
+<option value="fan">Fan</option>
+<option value="light">Light</option>
+</select>
+
+<br>
+<button onclick="addProduct()">Add Product</button>
+
+<h3>All Products</h3>
+<div id="list"></div>
+
+</div>
+
+<script>
+
+let products = JSON.parse(localStorage.getItem("adminProducts")) || [];
+
+/* ADD PRODUCT */
+function addProduct(){
+let name = document.getElementById("name").value;
+let price = document.getElementById("price").value;
+let img = document.getElementById("img").value;
+let cat = document.getElementById("cat").value;
+
+if(!name || !price || !img){
+alert("Fill all fields");
+return;
+}
+
+products.push({name,price:Number(price),img,cat});
+
+localStorage.setItem("adminProducts", JSON.stringify(products));
+
+showProducts();
+
+document.getElementById("name").value="";
+document.getElementById("price").value="";
+document.getElementById("img").value="";
+}
+
+/* SHOW PRODUCTS */
+function showProducts(){
+let div = document.getElementById("list");
+
+div.innerHTML = products.map((p,i)=>`
+<div class="product">
+${p.name} - ₹${p.price}
+<br>
+<button onclick="deleteProduct(${i})">Delete</button>
+</div>
+`).join("");
+}
+
+/* DELETE */
+function deleteProduct(i){
+products.splice(i,1);
+localStorage.setItem("adminProducts", JSON.stringify(products));
+showProducts();
+}
+
+showProducts();
+
+</script>
+
+</body>
+</html>
