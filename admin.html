@@ -3,8 +3,10 @@
 <head>
 <title>Admin Login</title>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0A84FF">
 <link rel="manifest" href="manifest.json">
 
@@ -73,7 +75,7 @@ margin:10px 0;
 
 <hr>
 
-<!-- ✅ ORDER CONTROLS -->
+<!-- ORDER CONTROLS -->
 <h3>All Orders</h3>
 
 <div class="top-bar">
@@ -170,9 +172,7 @@ localStorage.setItem("adminProducts", JSON.stringify(products));
 showProducts();
 }
 
-/* ===================== */
 /* ORDER SYSTEM */
-/* ===================== */
 
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
@@ -202,7 +202,10 @@ div.innerHTML = "<p>No matching orders</p>";
 return;
 }
 
-div.innerHTML = filtered.map((o,i)=>{
+/* IMPORTANT FIX: USE ORIGINAL INDEX */
+div.innerHTML = filtered.map((o)=>{
+
+let realIndex = orders.findIndex(or => or.id === o.id);
 
 let items = o.items.map(p=>
 `${p.name} x${p.qty} = ₹${p.price * p.qty}`
@@ -224,8 +227,8 @@ return `
 
 <p><b>Status:</b> ${o.status || "Pending"}</p>
 
-<button onclick="markDelivered(${i})">Mark Delivered</button>
-<button class="danger" onclick="deleteOrder(${i})">Delete</button>
+<button onclick="markDelivered(${realIndex})">Mark Delivered</button>
+<button class="danger" onclick="deleteOrder(${realIndex})">Delete</button>
 
 </div>
 `;
