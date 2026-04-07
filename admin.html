@@ -15,6 +15,13 @@ border-radius:12px;
 box-shadow:0 5px 20px rgba(0,0,0,.1);
 text-align:center;
 }
+
+.top-bar{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin:10px 0;
+}
 </style>
 
 </head>
@@ -35,13 +42,19 @@ text-align:center;
 <!-- ADMIN PANEL -->
 <div id="adminPage" style="display:none;">
 
-<h2>Admin Panel</h2>
+<h2 style="text-align:center;">Admin Panel</h2>
 
 <div class="container">
 
+<!-- LOGOUT -->
+<button class="danger" onclick="logout()">Logout</button>
+
+<!-- PRODUCT SECTION -->
+<h3>Add Product</h3>
+
 <input id="name" placeholder="Product Name">
 <input id="price" type="number" placeholder="Price">
-<input id="img" placeholder="Image Path (images/product.jpg)">
+<input id="img" placeholder="Image Path">
 
 <select id="cat">
 <option value="bulb">Bulb</option>
@@ -55,6 +68,23 @@ text-align:center;
 <h3>All Products</h3>
 <div id="list"></div>
 
+<hr>
+
+<!-- ✅ ORDER CONTROLS -->
+<h3>All Orders</h3>
+
+<div class="top-bar">
+<input id="searchOrder" placeholder="Search by ID / Name / Phone" onkeyup="showOrders()">
+
+<select id="filterStatus" onchange="showOrders()">
+<option value="all">All</option>
+<option value="Pending">Pending</option>
+<option value="Delivered">Delivered</option>
+</select>
+</div>
+
+<div id="orders"></div>
+
 </div>
 
 </div>
@@ -67,17 +97,37 @@ let u = document.getElementById("user").value;
 let p = document.getElementById("pass").value;
 
 if(u === "admin" && p === "1234"){
+localStorage.setItem("adminLogin","true");
 document.getElementById("loginPage").style.display = "none";
 document.getElementById("adminPage").style.display = "block";
+init();
 }else{
 alert("Wrong Username or Password");
 }
 }
 
+/* AUTO LOGIN */
+if(localStorage.getItem("adminLogin")==="true"){
+document.getElementById("loginPage").style.display="none";
+document.getElementById("adminPage").style.display="block";
+init();
+}
+
+/* LOGOUT */
+function logout(){
+localStorage.removeItem("adminLogin");
+location.reload();
+}
+
+/* INIT */
+function init(){
+showProducts();
+showOrders();
+}
+
 /* PRODUCT SYSTEM */
 let products = JSON.parse(localStorage.getItem("adminProducts")) || [];
 
-/* ADD PRODUCT */
 function addProduct(){
 let name = document.getElementById("name").value;
 let price = document.getElementById("price").value;
@@ -90,7 +140,6 @@ return;
 }
 
 products.push({name,price:Number(price),img,cat});
-
 localStorage.setItem("adminProducts", JSON.stringify(products));
 
 showProducts();
@@ -100,7 +149,6 @@ document.getElementById("price").value="";
 document.getElementById("img").value="";
 }
 
-/* SHOW PRODUCTS */
 function showProducts(){
 let div = document.getElementById("list");
 
@@ -113,14 +161,93 @@ ${p.name} - ₹${p.price}
 `).join("");
 }
 
-/* DELETE */
 function deleteProduct(i){
 products.splice(i,1);
 localStorage.setItem("adminProducts", JSON.stringify(products));
 showProducts();
 }
 
-showProducts();
+/* ===================== */
+/* ORDER SYSTEM */
+/* ===================== */
+
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+function showOrders(){
+
+let div = document.getElementById("orders");
+
+let search = document.getElementById("searchOrder").value.toLowerCase();
+let filter = document.getElementById("filterStatus").value;
+
+/* FILTER + SEARCH */
+let filtered = orders.filter(o => {
+
+let matchSearch =
+o.id.toLowerCase().includes(search) ||
+o.name.toLowerCase().includes(search) ||
+o.phone.includes(search);
+
+let matchFilter =
+filter==="all" || (o.status || "Pending") === filter;
+
+return matchSearch && matchFilter;
+});
+
+if(filtered.length === 0){
+div.innerHTML = "<p>No matching orders</p>";
+return;
+}
+
+div.innerHTML = filtered.map((o,i)=>{
+
+let items = o.items.map(p=>
+`${p.name} x${p.qty} = ₹${p.price * p.qty}`
+).join("<br>");
+
+return `
+<div class="product">
+
+<p><b>Order ID:</b> ${o.id}</p>
+<p><b>Date:</b> ${o.date}</p>
+<p><b>Name:</b> ${o.name}</p>
+<p><b>Phone:</b> ${o.phone}</p>
+<p><b>Address:</b> ${o.address}</p>
+
+<p><b>Items:</b><br>${items}</p>
+
+<p><b>Total:</b> ₹${o.total}</p>
+<p><b>Payment:</b> ${o.payment}</p>
+
+<p><b>Status:</b> ${o.status || "Pending"}</p>
+
+<button onclick="markDelivered(${i})">Mark Delivered</button>
+<button class="danger" onclick="deleteOrder(${i})">Delete</button>
+
+</div>
+`;
+}).join("");
+}
+
+/* MARK DELIVERED */
+function markDelivered(i){
+orders[i].status = "Delivered";
+saveOrders();
+}
+
+/* DELETE */
+function deleteOrder(i){
+if(confirm("Delete this order?")){
+orders.splice(i,1);
+saveOrders();
+}
+}
+
+/* SAVE */
+function saveOrders(){
+localStorage.setItem("orders", JSON.stringify(orders));
+showOrders();
+}
 
 </script>
 
