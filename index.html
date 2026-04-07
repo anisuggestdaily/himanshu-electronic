@@ -11,6 +11,15 @@
 
 <style>
 
+/* PAGE LOAD */
+body{
+animation:pageFade .5s ease;
+}
+@keyframes pageFade{
+from{opacity:0;}
+to{opacity:1;}
+}
+
 /* LOGO ANIMATION */
 .logo{
 font-size:26px;
@@ -21,23 +30,20 @@ background-size:200% auto;
 -webkit-text-fill-color:transparent;
 animation:shine 3s linear infinite;
 }
-
 @keyframes shine{
 to{background-position:200% center;}
 }
 
-/* HERO IMPROVED */
+/* HERO */
 .hero{
 animation:fadeIn 1s ease;
 }
-
 .hero h2{
 font-size:32px;
 animation:slideUp 1s ease;
 }
-
 .hero p{
-animation:fadeIn 2s ease;
+animation:fadeIn 1.5s ease;
 }
 
 /* BUTTON EFFECT */
@@ -45,7 +51,6 @@ animation:fadeIn 2s ease;
 position:relative;
 overflow:hidden;
 }
-
 .hero button:after{
 content:"";
 position:absolute;
@@ -56,7 +61,6 @@ left:-100%;
 background:rgba(255,255,255,0.4);
 transition:.4s;
 }
-
 .hero button:hover:after{
 left:100%;
 }
@@ -67,13 +71,14 @@ transition:all .3s ease;
 }
 .card:hover{
 transform:translateY(-8px) scale(1.03);
+box-shadow:0 10px 25px rgba(0,0,0,.15);
 }
 
-/* FADE ANIMATION */
+/* FADE */
 .fade{
 opacity:0;
 transform:translateY(30px);
-transition:.8s;
+transition:.7s ease;
 }
 .fade.show{
 opacity:1;
@@ -84,7 +89,6 @@ transform:translateY(0);
 from{opacity:0;}
 to{opacity:1;}
 }
-
 @keyframes slideUp{
 from{transform:translateY(50px);opacity:0;}
 to{transform:translateY(0);opacity:1;}
@@ -183,32 +187,29 @@ to{transform:translateY(0);opacity:1;}
 <script>
 
 /* LOADER */
-window.onload = ()=>{
+window.addEventListener("load", ()=>{
 document.getElementById("loader").style.display="none";
-showFade();
-}
+reveal();
+});
 
 /* SCROLL ANIMATION */
-function showFade(){
-let f=document.querySelectorAll(".fade");
-f.forEach(el=>{
-let top=el.getBoundingClientRect().top;
-if(top < window.innerHeight-50){
+function reveal(){
+document.querySelectorAll(".fade").forEach(el=>{
+let top = el.getBoundingClientRect().top;
+if(top < window.innerHeight - 50){
 el.classList.add("show");
 }
 });
 }
-window.addEventListener("scroll",showFade);
+window.addEventListener("scroll", reveal);
 
 /* DARK MODE */
 function toggleDark(){
 document.body.classList.toggle("dark");
 
-if(document.body.classList.contains("dark")){
-localStorage.setItem("dark","on");
-}else{
-localStorage.setItem("dark","off");
-}
+localStorage.setItem("dark",
+document.body.classList.contains("dark") ? "on":"off"
+);
 }
 
 if(localStorage.getItem("dark")==="on"){
@@ -246,7 +247,8 @@ location.href = "product-view.html";
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function updateCartCount(){
-document.getElementById("cartCount").innerText = cart.length;
+let total = cart.reduce((s,p)=>s+(p.qty||1),0);
+document.getElementById("cartCount").innerText = total;
 }
 
 function toggleCart(){
@@ -257,6 +259,11 @@ showMiniCart();
 
 function showMiniCart(){
 let div = document.getElementById("miniItems");
+
+if(cart.length===0){
+div.innerHTML = "Cart is empty";
+return;
+}
 
 div.innerHTML = cart.map(p=>`
 <p>${p.name} x${p.qty || 1}</p>
