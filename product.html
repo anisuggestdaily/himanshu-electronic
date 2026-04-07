@@ -10,45 +10,6 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-
-/* PAGE LOAD */
-body{animation:fadePage .5s ease;}
-@keyframes fadePage{from{opacity:0;}to{opacity:1;}}
-
-/* FADE */
-.fade{opacity:0;transform:translateY(30px);transition:.6s;}
-.fade.show{opacity:1;transform:translateY(0);}
-
-/* CARD */
-.card{
-position:relative;
-transition:.3s;
-}
-.card:hover{
-transform:translateY(-8px) scale(1.03);
-box-shadow:0 10px 25px rgba(0,0,0,.15);
-}
-
-/* BUTTON EFFECT */
-button{
-position:relative;
-overflow:hidden;
-}
-button::after{
-content:"";
-position:absolute;
-width:100%;
-height:100%;
-top:0;
-left:-100%;
-background:rgba(255,255,255,.4);
-transition:.4s;
-}
-button:hover::after{
-left:100%;
-}
-
-/* WISHLIST */
 .wish-btn{
 position:absolute;
 top:10px;
@@ -57,12 +18,11 @@ background:#fff;
 border-radius:50%;
 padding:6px;
 cursor:pointer;
+font-size:16px;
 box-shadow:0 2px 5px rgba(0,0,0,.2);
 }
 .wish-active{color:red;}
-
 .rating{color:#f5a623;font-size:14px;}
-
 </style>
 
 </head>
@@ -78,71 +38,41 @@ box-shadow:0 2px 5px rgba(0,0,0,.2);
 </div>
 
 <div class="cart-icon" onclick="toggleCart()">
-🛒
-<span id="cartCount" class="cart-count">0</span>
+🛒 <span id="cartCount" class="cart-count">0</span>
 </div>
 </header>
 
-<!-- SOUND -->
-<audio id="cartSound" preload="auto">
+<audio id="cartSound">
 <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3">
 </audio>
 
-<h2 class="fade" style="text-align:center;">Our Products</h2>
+<h2 style="text-align:center;">Our Products</h2>
 
-<div class="top-bar fade" style="max-width:900px;margin:auto;">
-<input id="search" placeholder="🔍 Search products..." onkeyup="filter()">
+<div style="max-width:900px;margin:auto;">
+<input id="search" placeholder="🔍 Search..." onkeyup="filter()">
+
 <select id="cat" onchange="filter()">
-<option value="all">All Categories</option>
+<option value="all">All</option>
 <option value="bulb">Bulbs</option>
 <option value="fan">Fans</option>
 <option value="light">Lights</option>
 </select>
 </div>
 
-<div class="products-grid fade" id="products"></div>
+<div class="products-grid" id="products"></div>
 
-<!-- OVERLAY -->
-<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" style="display:none;"></div>
-
-<!-- MINI CART -->
 <div class="mini-cart" id="miniCart">
-
-<div style="display:flex;justify-content:space-between;">
 <h3>Your Cart</h3>
-<button onclick="toggleCart()">❌</button>
-</div>
-
 <div id="miniItems"></div>
-
-<button class="primary" onclick="location.href='cart.html'">Checkout</button>
-<button style="margin-top:10px;background:#ccc;" onclick="toggleCart()">Continue Shopping</button>
-
+<button onclick="location.href='cart.html'">Checkout</button>
 </div>
-
-<!-- FLOATING CART -->
-<a href="#" class="floating-cart" onclick="toggleCart()">
-🛒
-<span id="floatingCount">0</span>
-</a>
 
 <script>
 
-/* SCROLL ANIMATION */
-function reveal(){
-document.querySelectorAll(".fade").forEach(el=>{
-if(el.getBoundingClientRect().top < window.innerHeight-50){
-el.classList.add("show");
-}
-});
-}
-window.addEventListener("scroll",reveal);
-window.addEventListener("load",reveal);
-
-/* PRODUCTS */
+/* ✅ YOUR FULL PRODUCT LIST */
 let defaultProducts = [
 
-{name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg",best:true},
+{name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg"},
 {name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},
 {name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg"},
 {name:"LED Bulb 18W",cat:"bulb",price:150,img:"images/led18w.jpg"},
@@ -160,28 +90,33 @@ let defaultProducts = [
 {name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg"},
 {name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg"},
 
+{name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg"},
+{name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg"},
+
+{name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg"},
+{name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg"},
+
+{name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg"},
+{name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg"},
+{name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg"},
+
 {name:"Havells Panel Light 6W",cat:"light",price:120,img:"images/panel_havells6.jpg"},
-{name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"}
+{name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},
+{name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg"},
+{name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}
 
 ];
 
+/* ADMIN PRODUCTS */
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
-let products = [...defaultProducts,...adminProducts];
+let products = [...defaultProducts, ...adminProducts];
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-/* SOUND */
-function playSound(){
-let s=document.getElementById("cartSound");
-if(!s) return;
-s.currentTime=0;
-s.play().catch(()=>{});
-}
-
-/* SHOW */
+/* SHOW PRODUCTS */
 function showProducts(list=products){
-document.getElementById("products").innerHTML = list.map((p,i)=>{
+document.getElementById("products").innerHTML = list.map(p=>{
 
 let inCart = cart.find(c=>c.name===p.name);
 let inWish = wishlist.includes(p.name);
@@ -191,14 +126,14 @@ return `
 
 <div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish('${p.name}')">❤</div>
 
-<img src="${p.img}" onclick="view(${i})">
+<img src="${p.img}" onclick="viewProduct('${p.name}')">
 
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
 
-<p class="rating">⭐⭐⭐⭐☆</p>
+<p class="rating">⭐ ${(Math.random()*0.8+4.1).toFixed(1)}</p>
 
-<button class="add" onclick="add(${i})">
+<button class="add" onclick="addToCart('${p.name}')">
 ${inCart ? "✅ Added" : "Add to Cart"}
 </button>
 
@@ -207,9 +142,27 @@ ${inCart ? "✅ Added" : "Add to Cart"}
 }).join("");
 }
 
+/* ✅ FIXED ADD */
+function addToCart(name){
+let item = products.find(p => p.name === name);
+
+let existing = cart.find(p => p.name === name);
+
+if(existing){existing.qty++;}
+else{cart.push({...item, qty:1});}
+
+localStorage.setItem("cart", JSON.stringify(cart));
+
+updateCartCount();
+showMiniCart();
+showProducts();
+playSound();
+}
+
 /* VIEW */
-function view(i){
-localStorage.setItem("viewProduct",JSON.stringify(products[i]));
+function viewProduct(name){
+let item = products.find(p => p.name === name);
+localStorage.setItem("viewProduct", JSON.stringify(item));
 location.href="product-view.html";
 }
 
@@ -220,64 +173,8 @@ wishlist = wishlist.filter(n=>n!==name);
 }else{
 wishlist.push(name);
 }
-localStorage.setItem("wishlist",JSON.stringify(wishlist));
+localStorage.setItem("wishlist", JSON.stringify(wishlist));
 showProducts();
-}
-
-/* ADD */
-function add(i){
-let item=products[i];
-let existing=cart.find(p=>p.name===item.name);
-
-if(existing){existing.qty++;}
-else{cart.push({...item,qty:1});}
-
-localStorage.setItem("cart",JSON.stringify(cart));
-
-updateCartCount();
-showMiniCart();
-showProducts();
-playSound();
-}
-
-/* MINI CART */
-function showMiniCart(){
-let div=document.getElementById("miniItems");
-
-if(cart.length===0){
-div.innerHTML="Cart is empty";
-return;
-}
-
-let total=0;
-
-div.innerHTML=cart.map(p=>{
-let sub=p.price*p.qty;
-total+=sub;
-return `<p>${p.name} x${p.qty} = ₹${sub}</p>`;
-}).join("") + `<h3>Total: ₹${total}</h3>`;
-}
-
-/* COUNT */
-function updateCartCount(){
-let c=cart.reduce((s,p)=>s+p.qty,0);
-document.getElementById("cartCount").innerText=c;
-document.getElementById("floatingCount").innerText=c;
-}
-
-/* CART TOGGLE */
-function toggleCart(){
-let c=document.getElementById("miniCart");
-let o=document.getElementById("cartOverlay");
-
-if(c.style.display==="block"){
-c.style.display="none";
-o.style.display="none";
-}else{
-c.style.display="block";
-o.style.display="block";
-}
-showMiniCart();
 }
 
 /* FILTER */
@@ -285,12 +182,41 @@ function filter(){
 let s=document.getElementById("search").value.toLowerCase();
 let c=document.getElementById("cat").value;
 
-let f=products.filter(p=>
-p.name.toLowerCase().includes(s)&&
-(c==="all"||p.cat===c)
+let filtered = products.filter(p =>
+p.name.toLowerCase().includes(s) &&
+(c==="all" || p.cat===c)
 );
 
-showProducts(f);
+showProducts(filtered);
+}
+
+/* MINI CART */
+function showMiniCart(){
+let div=document.getElementById("miniItems");
+
+div.innerHTML = cart.map(p=>
+`<p>${p.name} x${p.qty}</p>`
+).join("");
+}
+
+/* COUNT */
+function updateCartCount(){
+let total = cart.reduce((s,p)=>s+p.qty,0);
+document.getElementById("cartCount").innerText = total;
+}
+
+/* TOGGLE */
+function toggleCart(){
+let c=document.getElementById("miniCart");
+c.style.display = c.style.display==="block" ? "none":"block";
+showMiniCart();
+}
+
+/* SOUND */
+function playSound(){
+let s=document.getElementById("cartSound");
+s.currentTime=0;
+s.play().catch(()=>{});
 }
 
 /* INIT */
