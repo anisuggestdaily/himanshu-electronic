@@ -2,6 +2,10 @@
 <html>
 <head>
 <title>Products - Himanshu Electronics</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -15,7 +19,7 @@
 <a href="#" onclick="toggleCart()">Cart</a>
 </div>
 
-<div class="cart-icon">
+<div class="cart-icon" onclick="toggleCart()">
 🛒
 <span id="cartCount" class="cart-count">0</span>
 </div>
@@ -42,7 +46,7 @@
 <div class="products-grid" id="products"></div>
 
 <!-- OVERLAY -->
-<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()" style="display:none;"></div>
 
 <!-- MINI CART -->
 <div class="mini-cart" id="miniCart">
@@ -59,7 +63,7 @@
 
 <script>
 
-/* YOUR ORIGINAL PRODUCTS (UNCHANGED) */
+/* PRODUCTS */
 let defaultProducts = [
 
 /* BULBS */
@@ -105,7 +109,7 @@ let products = [...defaultProducts, ...adminProducts];
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-/* SHOW PRODUCTS (UNCHANGED) */
+/* SHOW PRODUCTS */
 function showProducts(list=products){
 document.getElementById("products").innerHTML = list.map((p,i)=>`
 <div class="card">
@@ -118,7 +122,7 @@ ${p.best ? '<div class="badge">Best Seller</div>' : ''}
 `).join("");
 }
 
-/* ADVANCED ADD */
+/* ADD */
 function add(i){
 
 let img = document.querySelectorAll(".card img")[i];
@@ -130,7 +134,6 @@ fly.style.left = rect.left+"px";
 document.body.appendChild(fly);
 setTimeout(()=>fly.remove(),800);
 
-/* CART LOGIC */
 let item = products[i];
 let existing = cart.find(p=>p.name===item.name);
 
@@ -151,8 +154,10 @@ if(s){s.currentTime=0;s.play().catch(()=>{});}
 
 /* BOUNCE */
 let c=document.querySelector(".cart-icon");
+if(c){
 c.classList.add("cart-bounce");
 setTimeout(()=>c.classList.remove("cart-bounce"),500);
+}
 }
 
 /* MINI CART */
@@ -204,8 +209,10 @@ document.getElementById("floatingCount").innerText=c;
 function toggleCart(){
 let c=document.getElementById("miniCart");
 let o=document.getElementById("cartOverlay");
+
 c.classList.toggle("active");
 o.style.display=c.classList.contains("active")?"block":"none";
+
 showMiniCart();
 }
 
@@ -229,4 +236,4 @@ updateCartCount();
 </script>
 
 </body>
-</html>
+  </html>
