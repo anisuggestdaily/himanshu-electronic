@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Himanshu Electronics</title>
+<title>Himanshu Electronics - Bulbs, Fans & Lights in Bijnor</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="style.css">
 
@@ -57,6 +60,16 @@ cursor:pointer;
 z-index:1001;
 }
 
+.dark .dark-btn{
+background:#fff;
+color:#000;
+}
+
+/* MINI CART HIDDEN BY DEFAULT */
+.mini-cart{
+display:none;
+}
+
 </style>
 
 </head>
@@ -84,7 +97,6 @@ z-index:1001;
 <a href="contact.html">Contact</a>
 </nav>
 
-<a href="#" onclick="toggleCart()" style="font-size:22px;">🛒</a>
 </header>
 
 <!-- FLOATING CART -->
@@ -152,10 +164,38 @@ z-index:1001;
 
 <script>
 
-/* LOADER */
+/* FEATURED PRODUCTS */
+let featuredProducts = [
+
+{name:"LED Bulb 9W",price:40,img:"images/led9w.jpg"},
+{name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"},
+{name:"Master Fan 48 inch",price:1250,img:"images/fan_master48.jpg"},
+{name:"Mysore Fan 48 inch",price:1250,img:"images/fan_mysore48.jpg"},
+{name:"Havells Panel Light 6W",price:120,img:"images/panel_havells6.jpg"},
+{name:"Fybros Panel Light 6W",price:80,img:"images/panel_fybros6.jpg"}
+
+];
+
+/* LOAD EVERYTHING AFTER PAGE LOAD */
 window.onload = ()=>{
+
+/* LOADER */
 document.getElementById("loader").style.display="none";
-}
+
+/* LOAD FEATURED */
+let featuredDiv = document.getElementById("featured");
+
+featuredDiv.innerHTML = featuredProducts.map((p,i)=>`
+<div class="card">
+<img src="${p.img}" onclick="viewFeatured(${i})">
+<h3>${p.name}</h3>
+<p><b>₹${p.price}</b></p>
+<p>⭐⭐⭐⭐☆</p>
+<button onclick="viewFeatured(${i})">View</button>
+</div>
+`).join("");
+
+};
 
 /* DARK MODE */
 function toggleDark(){
@@ -172,32 +212,6 @@ localStorage.setItem("dark","off");
 if(localStorage.getItem("dark")==="on"){
 document.body.classList.add("dark");
 }
-
-/* FEATURED PRODUCTS WITH RATING */
-let featuredProducts = [
-
-{name:"LED Bulb 9W",price:40,img:"images/led9w.jpg"},
-{name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"},
-{name:"Master Fan 48 inch",price:1250,img:"images/fan_master48.jpg"},
-{name:"Mysore Fan 48 inch",price:1250,img:"images/fan_mysore48.jpg"},
-{name:"Havells Panel Light 6W",price:120,img:"images/panel_havells6.jpg"},
-{name:"Fybros Panel Light 6W",price:80,img:"images/panel_fybros6.jpg"}
-
-];
-
-let featuredDiv = document.getElementById("featured");
-
-featuredDiv.innerHTML = featuredProducts.map((p,i)=>`
-<div class="card">
-<img src="${p.img}" onclick="viewFeatured(${i})">
-<h3>${p.name}</h3>
-<p><b>₹${p.price}</b></p>
-
-<p>⭐⭐⭐⭐☆</p>
-
-<button onclick="viewFeatured(${i})">View</button>
-</div>
-`).join("");
 
 /* VIEW PRODUCT */
 function viewFeatured(i){
