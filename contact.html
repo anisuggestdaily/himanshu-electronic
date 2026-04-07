@@ -3,6 +3,9 @@
 <head>
 <title>Contact Us - Himanshu Electronics</title>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
 
 </head>
@@ -79,14 +82,17 @@ alert("Please fill all fields");
 return;
 }
 
-/* FORMAT MESSAGE */
-let text = "📩 New Contact Message:%0A%0A";
-text += "Name: "+name+"%0A";
-text += "Email: "+email+"%0A";
+/* FORMAT MESSAGE (FIXED ENCODING) */
+let text = "📩 New Contact Message:\n\n";
+text += "Name: "+name+"\n";
+text += "Email: "+email+"\n";
 text += "Message: "+msg;
 
+/* ENCODE TEXT (IMPORTANT FIX) */
+let url = "https://wa.me/919639228237?text=" + encodeURIComponent(text);
+
 /* OPEN WHATSAPP */
-window.open("https://wa.me/919639228237?text="+text);
+window.open(url);
 
 }
 
