@@ -10,10 +10,43 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
+
 input,textarea{
 width:100%;
 margin:8px 0;
 }
+
+/* PAGE ANIMATION */
+body{animation:fadePage .5s ease;}
+@keyframes fadePage{from{opacity:0;}to{opacity:1;}}
+
+/* SUCCESS UI */
+.success-box{
+max-width:400px;
+margin:80px auto;
+background:#fff;
+padding:25px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+animation:pop .5s ease;
+}
+@keyframes pop{
+from{transform:scale(.8);opacity:0;}
+to{transform:scale(1);opacity:1;}
+}
+
+.success-icon{
+font-size:60px;
+color:#28a745;
+animation:bounce .6s;
+}
+@keyframes bounce{
+0%{transform:scale(0);}
+60%{transform:scale(1.2);}
+100%{transform:scale(1);}
+}
+
 </style>
 
 </head>
@@ -243,7 +276,10 @@ alert("❌ Delivery available only in Bijnor");
 return;
 }
 
-let subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+/* SAVE COPY BEFORE CLEAR */
+let orderItems = [...cart];
+
+let subtotal = orderItems.reduce((s,i)=>s+(i.price*i.qty),0);
 let handlingCharge = subtotal>=500?0:handling;
 let total = subtotal + handlingCharge - discount;
 
@@ -253,35 +289,46 @@ let orderID = generateOrderID();
 saveOrder({
 id: orderID,
 name, phone, address,
-items: cart,
+items: orderItems,
 total,
 payment: pay,
 date: new Date().toLocaleDateString(),
 status:"Pending"
 });
 
-/* CLEAR CART */
-localStorage.removeItem("cart");
-cart=[];
-
-/* WHATSAPP */
+/* WHATSAPP MESSAGE */
 let msg = `🧾 Order ID: ${orderID}%0A%0A`;
 
-cart.forEach(i=>{
+orderItems.forEach(i=>{
 msg += `${i.name} x${i.qty} = ₹${i.price*i.qty}%0A`;
 });
 
 msg += `Total: ₹${total}%0APayment: ${pay}%0AName: ${name}%0APhone: ${phone}%0AAddress: ${address}`;
 
+/* CLEAR CART */
+localStorage.removeItem("cart");
+cart=[];
+
+/* OPEN WHATSAPP */
 window.open("https://wa.me/919639228237?text="+msg);
 
-/* SUCCESS PAGE */
+/* PREMIUM SUCCESS UI */
 document.body.innerHTML = `
-<div class="success">
-<h2>✅ Order Placed</h2>
+<div class="success-box">
+
+<div class="success-icon">✅</div>
+
+<h2>Order Placed Successfully</h2>
+
 <p>Order ID: <b>${orderID}</b></p>
 <p>Delivery only in Bijnor</p>
-<a href="index.html">Go Home</a>
+
+<br>
+
+<a href="index.html">
+<button class="primary">Go Home</button>
+</a>
+
 </div>
 `;
 }
@@ -300,4 +347,4 @@ showCart();
 </script>
 
 </body>
-  </html>
+</html>
