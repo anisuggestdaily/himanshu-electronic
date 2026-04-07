@@ -5,9 +5,74 @@
 
 <link rel="stylesheet" href="style.css">
 
+<style>
+
+/* LOADER */
+#loader{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+font-size:20px;
+}
+
+/* DARK MODE */
+.dark{
+background:#111;
+color:#fff;
+}
+.dark .card,
+.dark .feature,
+.dark header,
+.dark footer{
+background:#1e1e1e;
+color:#fff;
+}
+
+/* OFFER BAR */
+.offer{
+background:#ff3b30;
+color:#fff;
+text-align:center;
+padding:8px;
+font-weight:bold;
+}
+
+/* DARK BUTTON */
+.dark-btn{
+position:fixed;
+top:20px;
+right:20px;
+background:#000;
+color:#fff;
+padding:8px 12px;
+border-radius:8px;
+cursor:pointer;
+z-index:1001;
+}
+
+</style>
+
 </head>
 
 <body>
+
+<!-- LOADER -->
+<div id="loader">Loading...</div>
+
+<!-- OFFER -->
+<div class="offer">
+🔥 Special Offer: Free Delivery in Bijnor Today!
+</div>
+
+<!-- DARK MODE BUTTON -->
+<div class="dark-btn" onclick="toggleDark()">🌙</div>
 
 <!-- HEADER -->
 <header>
@@ -19,8 +84,14 @@
 <a href="contact.html">Contact</a>
 </nav>
 
-<a href="cart.html" style="font-size:22px;">🛒</a>
+<a href="#" onclick="toggleCart()" style="font-size:22px;">🛒</a>
 </header>
+
+<!-- FLOATING CART -->
+<div class="cart-icon" onclick="toggleCart()">
+🛒
+<span id="cartCount" class="cart-count">0</span>
+</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -29,22 +100,22 @@
 <button onclick="location.href='product.html'">Shop Now</button>
 </div>
 
-<!-- CATEGORIES -->
-<div class="categories">
+<!-- FEATURES -->
+<div class="features">
 
-<div class="category-card" onclick="location.href='product.html'">
-<img src="https://via.placeholder.com/100?text=Bulb">
-<h3>Bulbs</h3>
+<div class="feature">
+<h3>⚡ Fast Delivery</h3>
+<p>Only in Bijnor</p>
 </div>
 
-<div class="category-card" onclick="location.href='product.html'">
-<img src="https://via.placeholder.com/100?text=Fan">
-<h3>Fans</h3>
+<div class="feature">
+<h3>💰 Best Prices</h3>
+<p>Affordable & genuine</p>
 </div>
 
-<div class="category-card" onclick="location.href='product.html'">
-<img src="https://via.placeholder.com/100?text=Light">
-<h3>Lights</h3>
+<div class="feature">
+<h3>📞 Support</h3>
+<p>WhatsApp anytime</p>
 </div>
 
 </div>
@@ -54,6 +125,13 @@
 <h2>Featured Products</h2>
 
 <div class="products-grid" id="featured"></div>
+</div>
+
+<!-- MINI CART -->
+<div class="mini-cart" id="miniCart">
+<h3>Your Cart</h3>
+<div id="miniItems"></div>
+<button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
 <!-- FOOTER -->
@@ -74,7 +152,28 @@
 
 <script>
 
-/* FEATURED PRODUCTS */
+/* LOADER */
+window.onload = ()=>{
+document.getElementById("loader").style.display="none";
+}
+
+/* DARK MODE */
+function toggleDark(){
+document.body.classList.toggle("dark");
+
+if(document.body.classList.contains("dark")){
+localStorage.setItem("dark","on");
+}else{
+localStorage.setItem("dark","off");
+}
+}
+
+/* LOAD DARK MODE */
+if(localStorage.getItem("dark")==="on"){
+document.body.classList.add("dark");
+}
+
+/* FEATURED PRODUCTS WITH RATING */
 let featuredProducts = [
 
 {name:"LED Bulb 9W",price:40,img:"images/led9w.jpg"},
@@ -88,16 +187,48 @@ let featuredProducts = [
 
 let featuredDiv = document.getElementById("featured");
 
-featuredDiv.innerHTML = featuredProducts.map(p=>`
+featuredDiv.innerHTML = featuredProducts.map((p,i)=>`
 <div class="card">
-<img src="${p.img}">
+<img src="${p.img}" onclick="viewFeatured(${i})">
 <h3>${p.name}</h3>
 <p><b>₹${p.price}</b></p>
-<button onclick="location.href='product.html'">View</button>
+
+<p>⭐⭐⭐⭐☆</p>
+
+<button onclick="viewFeatured(${i})">View</button>
 </div>
 `).join("");
+
+/* VIEW PRODUCT */
+function viewFeatured(i){
+localStorage.setItem("viewProduct", JSON.stringify(featuredProducts[i]));
+location.href = "product-view.html";
+}
+
+/* CART */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function updateCartCount(){
+document.getElementById("cartCount").innerText = cart.length;
+}
+
+function toggleCart(){
+let c = document.getElementById("miniCart");
+c.style.display = c.style.display==="block" ? "none":"block";
+showMiniCart();
+}
+
+function showMiniCart(){
+let div = document.getElementById("miniItems");
+
+div.innerHTML = cart.map(p=>`
+<p>${p.name} x${p.qty || 1}</p>
+`).join("");
+}
+
+updateCartCount();
 
 </script>
 
 </body>
-  </html>
+</html>
