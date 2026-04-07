@@ -23,6 +23,9 @@
 </div>
 </header>
 
+<!-- ✅ SOUND ADDED -->
+<audio id="cartSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3"></audio>
+
 <h2 style="text-align:center;">Our Products</h2>
 
 <div class="top-bar">
@@ -126,12 +129,49 @@ ${p.best ? '<div class="badge">Best Seller</div>' : ''}
 `).join("");
 }
 
-/* ADD CART */
+/* ✅ FINAL ADD TO CART FUNCTION */
 function add(i){
+
+/* ANIMATION START */
+let img = document.querySelectorAll(".card img")[i];
+let rect = img.getBoundingClientRect();
+
+let flyingImg = img.cloneNode(true);
+flyingImg.classList.add("fly-img");
+
+flyingImg.style.top = rect.top + "px";
+flyingImg.style.left = rect.left + "px";
+
+document.body.appendChild(flyingImg);
+
+setTimeout(()=>{
+flyingImg.remove();
+},800);
+/* ANIMATION END */
+
+/* ADD TO CART */
 cart.push(products[i]);
 localStorage.setItem("cart",JSON.stringify(cart));
+
 updateCartCount();
 showMiniCart();
+
+/* SOUND */
+let sound = document.getElementById("cartSound");
+if(sound){
+sound.currentTime = 0;
+sound.play();
+}
+
+/* CART BOUNCE */
+let cartIcon = document.querySelector(".cart-icon");
+if(cartIcon){
+cartIcon.classList.add("cart-bounce");
+setTimeout(()=>{
+cartIcon.classList.remove("cart-bounce");
+},500);
+}
+
 }
 
 /* WISHLIST */
@@ -190,4 +230,4 @@ showProducts();
 </script>
 
 </body>
-</html>
+  </html>
