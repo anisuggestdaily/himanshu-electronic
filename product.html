@@ -45,6 +45,12 @@
 <button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
+<!-- ✅ FLOATING CART BUTTON (ADDED) -->
+<a href="cart.html" class="floating-cart">
+🛒
+<span id="floatingCount">0</span>
+</a>
+
 <script>
 
 /* DEFAULT PRODUCTS */
@@ -157,6 +163,10 @@ showProducts(filtered);
 /* CART COUNT */
 function updateCartCount(){
 document.getElementById("cartCount").innerText = cart.length;
+
+/* ✅ ALSO UPDATE FLOATING BUTTON */
+let f = document.getElementById("floatingCount");
+if(f) f.innerText = cart.length;
 }
 
 /* MINI CART */
