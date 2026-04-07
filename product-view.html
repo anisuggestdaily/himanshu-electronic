@@ -10,6 +10,31 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
+
+/* PAGE LOAD */
+body{animation:fadePage .5s ease;}
+@keyframes fadePage{from{opacity:0;}to{opacity:1;}}
+
+/* CARD */
+.card{
+text-align:center;
+animation:fadeUp .6s ease;
+}
+@keyframes fadeUp{
+from{transform:translateY(40px);opacity:0;}
+to{transform:translateY(0);opacity:1;}
+}
+
+/* IMAGE HOVER */
+#productImg{
+transition:.3s;
+cursor:pointer;
+}
+#productImg:hover{
+transform:scale(1.1);
+}
+
+/* QTY */
 .qty-box{
 display:flex;
 align-items:center;
@@ -17,10 +42,31 @@ justify-content:center;
 gap:10px;
 margin:15px 0;
 }
+
+/* PRICE */
 .price{
-font-size:20px;
+font-size:22px;
 color:#0A84FF;
+font-weight:600;
 }
+
+/* MINI CART FIX */
+.mini-cart{
+display:none;
+z-index:2000;
+}
+
+.cart-overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.4);
+display:none;
+z-index:1500;
+}
+
 </style>
 
 </head>
@@ -43,32 +89,37 @@ color:#0A84FF;
 
 <!-- SOUND -->
 <audio id="cartSound" preload="auto">
-<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3" type="audio/mpeg">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3">
 </audio>
 
 <div class="container" id="view"></div>
 
+<!-- OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
 <!-- MINI CART -->
 <div class="mini-cart" id="miniCart">
+
+<div style="display:flex;justify-content:space-between;">
 <h3>Your Cart</h3>
+<button onclick="toggleCart()">❌</button>
+</div>
+
 <div id="miniItems"></div>
-<button onclick="location.href='cart.html'">Checkout</button>
+
+<button class="primary" onclick="location.href='cart.html'">Checkout</button>
+<button style="margin-top:10px;background:#ccc;" onclick="toggleCart()">Continue Shopping</button>
+
 </div>
 
 <script>
 
-/* SOUND */
+/* SOUND FIX */
 function playSound(){
 let s=document.getElementById("cartSound");
 if(!s) return;
-
-s.pause();
 s.currentTime=0;
-
-let p=s.play();
-if(p!==undefined){
-p.catch(()=>{setTimeout(()=>{s.play().catch(()=>{});},100);});
-}
+s.play().catch(()=>{});
 }
 
 /* GET PRODUCT */
@@ -106,6 +157,7 @@ document.getElementById("view").innerHTML = `
 `;
 }
 
+/* DATA */
 let quantity = 1;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -135,14 +187,14 @@ showMiniCart();
 /* SOUND */
 playSound();
 
-/* BETTER UX */
+/* UX */
 alert("Added to Cart 🛒");
 }
 
 /* BUY */
 function buyNow(){
 addToCart();
-setTimeout(()=>{ location.href="cart.html"; },500);
+setTimeout(()=>{ location.href="cart.html"; },400);
 }
 
 /* BACK */
@@ -154,9 +206,18 @@ window.history.back();
 function showMiniCart(){
 let div=document.getElementById("miniItems");
 
-div.innerHTML=cart.map(p=>`
-<p>${p.name} x${p.qty}</p>
-`).join("");
+if(cart.length===0){
+div.innerHTML="Cart is empty";
+return;
+}
+
+let total=0;
+
+div.innerHTML=cart.map(p=>{
+let sub=p.price*p.qty;
+total+=sub;
+return `<p>${p.name} x${p.qty} = ₹${sub}</p>`;
+}).join("") + `<h3>Total: ₹${total}</h3>`;
 }
 
 /* COUNT */
@@ -165,10 +226,19 @@ document.getElementById("cartCount").innerText =
 cart.reduce((s,p)=>s+p.qty,0);
 }
 
-/* TOGGLE */
+/* TOGGLE FIX */
 function toggleCart(){
 let c=document.getElementById("miniCart");
-c.style.display = c.style.display==="block" ? "none":"block";
+let o=document.getElementById("cartOverlay");
+
+if(c.style.display==="block"){
+c.style.display="none";
+o.style.display="none";
+}else{
+c.style.display="block";
+o.style.display="block";
+}
+
 showMiniCart();
 }
 
