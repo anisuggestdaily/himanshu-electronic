@@ -16,9 +16,7 @@ width:100%;
 margin:8px 0;
 }
 
-body{animation:fadePage .5s ease;}
-@keyframes fadePage{from{opacity:0;}to{opacity:1;}}
-
+/* SUCCESS UI */
 .success-box{
 max-width:400px;
 margin:80px auto;
@@ -37,12 +35,6 @@ to{transform:scale(1);opacity:1;}
 .success-icon{
 font-size:60px;
 color:#28a745;
-animation:bounce .6s;
-}
-@keyframes bounce{
-0%{transform:scale(0);}
-60%{transform:scale(1.2);}
-100%{transform:scale(1);}
 }
 
 </style>
@@ -68,7 +60,7 @@ animation:bounce .6s;
 <thead>
 <tr>
 <th>Product</th>
-<th>Price (₹)</th>
+<th>Price</th>
 <th>Qty</th>
 <th>Subtotal</th>
 <th>Action</th>
@@ -78,52 +70,17 @@ animation:bounce .6s;
 <tbody id="list"></tbody>
 
 <tfoot>
-<tr>
-<td>Subtotal</td>
-<td id="subtotal"></td>
-<td></td><td></td><td></td>
-</tr>
-
-<tr>
-<td>Handling Charges</td>
-<td id="handling"></td>
-<td></td><td></td><td></td>
-</tr>
-
-<tr>
-<td>Delivery Charges</td>
-<td id="delivery"></td>
-<td></td><td></td><td></td>
-</tr>
-
-<tr>
-<td>Total</td>
-<td id="total"></td>
-<td></td><td></td><td></td>
-</tr>
+<tr><td>Subtotal</td><td id="subtotal"></td></tr>
+<tr><td>Handling</td><td id="handling"></td></tr>
+<tr><td>Delivery</td><td id="delivery"></td></tr>
+<tr><td><b>Total</b></td><td id="total"></td></tr>
 </tfoot>
 </table>
-
-<h3>Apply Coupon</h3>
-<input id="coupon" placeholder="Enter coupon code">
-<button onclick="applyCoupon()">Apply</button>
-<p id="couponMsg" style="color:green;"></p>
-
-<h3>Payment Method</h3>
-<label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
-<label><input type="radio" name="pay" value="UPI"> UPI</label>
-
-<div id="upiBox" style="display:none;">
-<p>UPI ID: <b id="upiText">paytm.s1ktca0@pty</b></p>
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paytm.s1ktca0@pty">
-<br>
-<button onclick="copyUPI()">Copy UPI</button>
-</div>
 
 <h3>Your Details</h3>
 <input id="name" placeholder="Your Name">
 <input id="phone" placeholder="Phone Number">
-<textarea id="address" placeholder="Full Address (Only Bijnor delivery available)"></textarea>
+<textarea id="address" placeholder="Full Address"></textarea>
 
 <div style="text-align:center;margin-top:20px;">
 <button class="danger" onclick="clearCart()">Clear Cart</button>
@@ -134,25 +91,23 @@ animation:bounce .6s;
 
 <script>
 
-const handling = 9;
-const deliveryCharge = 20;
-
-let discount = 0;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-const list = document.getElementById("list");
+/* FIRST ORDER CHECK */
+let firstOrder = localStorage.getItem("firstOrderDone");
 
+/* SHOW CART */
 function showCart(){
 
 if(cart.length===0){
-list.innerHTML = `<tr><td colspan="5" style="text-align:center;">Cart is Empty</td></tr>`;
+document.getElementById("list").innerHTML = `<tr><td colspan="5">Cart Empty</td></tr>`;
 updateTotals(0);
 return;
 }
 
 let subtotal = 0;
 
-list.innerHTML = cart.map((i,index)=>{
+document.getElementById("list").innerHTML = cart.map((i,index)=>{
 let sub = i.price * i.qty;
 subtotal += sub;
 
@@ -160,15 +115,12 @@ return `
 <tr>
 <td>${i.name}</td>
 <td>₹${i.price}</td>
-
 <td>
-<button onclick="decreaseQty(${index})">-</button>
+<button onclick="dec(${index})">-</button>
 ${i.qty}
-<button onclick="increaseQty(${index})">+</button>
+<button onclick="inc(${index})">+</button>
 </td>
-
 <td>₹${sub}</td>
-
 <td><button onclick="removeItem(${index})">❌</button></td>
 </tr>
 `;
@@ -177,187 +129,119 @@ ${i.qty}
 updateTotals(subtotal);
 }
 
+/* TOTAL */
 function updateTotals(subtotal){
 
-let orderCount = Number(localStorage.getItem("orderCount") || 0);
+let handling = firstOrder ? 9 : 0;
+let delivery = subtotal >= 500 ? 0 : 20;
 
-let handlingCharge = orderCount === 0 ? 0 : handling;
-let delivery = subtotal >= 500 ? 0 : deliveryCharge;
-
-if(subtotal >= 500 && !localStorage.getItem("freeDeliveryShown")){
-alert("🎉 Wow! You get FREE delivery on orders above ₹500");
-localStorage.setItem("freeDeliveryShown","yes");
+if(subtotal>=500){
+alert("🎉 Wow! You get FREE Delivery!");
 }
 
-let total = subtotal + handlingCharge + delivery - discount;
+let total = subtotal + handling + delivery;
 
-document.getElementById("subtotal").innerText = "₹" + subtotal;
-document.getElementById("handling").innerText = handlingCharge===0?"FREE":"₹"+handlingCharge;
+document.getElementById("subtotal").innerText = "₹"+subtotal;
+document.getElementById("handling").innerText = handling===0?"FREE":"₹"+handling;
 document.getElementById("delivery").innerText = delivery===0?"FREE":"₹"+delivery;
-document.getElementById("total").innerText = "₹" + total;
+document.getElementById("total").innerText = "₹"+total;
 }
 
-function increaseQty(i){cart[i].qty++;save();}
-function decreaseQty(i){
-cart[i].qty--;
-if(cart[i].qty<=0){cart.splice(i,1);}
-save();
-}
+/* QTY */
+function inc(i){cart[i].qty++;save();}
+function dec(i){cart[i].qty--; if(cart[i].qty<=0) cart.splice(i,1); save();}
 
-function removeItem(i){
-cart.splice(i,1);
-save();
-}
+/* REMOVE */
+function removeItem(i){cart.splice(i,1);save();}
 
+/* SAVE */
 function save(){
 localStorage.setItem("cart", JSON.stringify(cart));
 showCart();
 }
 
+/* CLEAR */
 function clearCart(){
-if(confirm("Clear entire cart?")){
 localStorage.removeItem("cart");
 cart=[];
 showCart();
 }
-}
 
-function applyCoupon(){
-let code = document.getElementById("coupon").value.toUpperCase();
-
-if(code==="SAVE50"){
-discount=50;
-document.getElementById("couponMsg").innerText="₹50 discount applied!";
-}
-else if(code==="FIRST100"){
-discount=100;
-document.getElementById("couponMsg").innerText="₹100 discount applied!";
-}
-else{
-discount=0;
-document.getElementById("couponMsg").innerText="Invalid coupon ❌";
-}
-
-showCart();
-}
-
-function copyUPI(){
-navigator.clipboard.writeText(document.getElementById("upiText").innerText);
-alert("UPI copied");
-}
-
-function generateOrderID(){
-let d = new Date();
-return "HE-" + d.getFullYear() + (d.getMonth()+1) + d.getDate() + "-" + Math.floor(1000 + Math.random()*9000);
-}
-
-function saveOrder(data){
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-orders.push(data);
-localStorage.setItem("orders", JSON.stringify(orders));
-}
-
+/* ORDER */
 function order(){
 
-if(cart.length===0){
-alert("Cart is empty");
-return;
-}
+if(cart.length===0){alert("Cart empty");return;}
 
-let name = document.getElementById("name").value.trim();
-let phone = document.getElementById("phone").value.trim();
-let address = document.getElementById("address").value.trim();
-let pay = document.querySelector('input[name="pay"]:checked').value;
+let name = document.getElementById("name").value;
+let phone = document.getElementById("phone").value;
+let address = document.getElementById("address").value;
 
-if(!name || !phone || !address){
-alert("Please fill all details");
-return;
-}
-
-if(!address.toLowerCase().includes("bijnor")){
-alert("❌ Delivery available only in Bijnor");
+if(!name||!phone||!address){
+alert("Fill all details");
 return;
 }
 
 let orderItems = [...cart];
 
 let subtotal = orderItems.reduce((s,i)=>s+(i.price*i.qty),0);
-let orderCount = Number(localStorage.getItem("orderCount") || 0);
+let handling = firstOrder ? 9 : 0;
+let delivery = subtotal >= 500 ? 0 : 20;
+let total = subtotal + handling + delivery;
 
-let handlingCharge = orderCount === 0 ? 0 : handling;
-let delivery = subtotal >= 500 ? 0 : deliveryCharge;
+let orderID = "HE-" + Date.now();
 
-let total = subtotal + handlingCharge + delivery - discount;
-
-let orderID = generateOrderID();
-
-saveOrder({
-id: orderID,
-name, phone, address,
-items: orderItems,
+/* SAVE ORDER */
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+orders.push({
+id:orderID,
+name,phone,address,
+items:orderItems,
 total,
-payment: pay,
-date: new Date().toLocaleDateString(),
+date:new Date().toLocaleDateString(),
 status:"Pending"
 });
+localStorage.setItem("orders", JSON.stringify(orders));
 
-localStorage.setItem("orderCount", orderCount + 1);
+/* MARK FIRST ORDER */
+localStorage.setItem("firstOrderDone","yes");
 
-/* ✅ FINAL WHATSAPP FIX */
-let msg = `🧾 Order ID: ${orderID}\n\n`;
+/* WHATSAPP MESSAGE */
+let msg = `🧾 New Order\n\n`;
+msg += `Order ID: ${orderID}\n\n`;
 
 orderItems.forEach(i=>{
 msg += `${i.name} x${i.qty} = ₹${i.price*i.qty}\n`;
 });
 
 msg += `\nTotal: ₹${total}`;
-msg += `\nPayment: ${pay}`;
 msg += `\nName: ${name}`;
 msg += `\nPhone: ${phone}`;
 msg += `\nAddress: ${address}`;
 
 let url = "https://wa.me/919639228237?text=" + encodeURIComponent(msg);
 
-/* ✅ MOBILE SAFE OPEN */
-let a = document.createElement("a");
-a.href = url;
-a.target = "_blank";
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
+/* OPEN WHATSAPP */
+window.open(url, "_blank");
 
 /* CLEAR CART */
 localStorage.removeItem("cart");
 cart=[];
 
-/* SUCCESS UI DELAY */
-setTimeout(()=>{
+/* SUCCESS UI */
 document.body.innerHTML = `
 <div class="success-box">
 <div class="success-icon">✅</div>
-<h2>Order Placed Successfully</h2>
-<p>Order ID: <b>${orderID}</b></p>
-<p>Delivery only in Bijnor</p>
-<br>
-<a href="index.html">
-<button class="primary">Go Home</button>
-</a>
+<h2>Order Placed</h2>
+<p>ID: <b>${orderID}</b></p>
+<a href="index.html"><button class="primary">Go Home</button></a>
 </div>
 `;
-},1000);
-
 }
 
-document.querySelectorAll('input[name="pay"]').forEach(r=>{
-r.addEventListener("change",()=>{
-document.getElementById("upiBox").style.display =
-(r.value==="UPI" && r.checked)?"block":"none";
-});
-});
-
+/* INIT */
 showCart();
 
 </script>
 
 </body>
-                                      </html>
+</html>
