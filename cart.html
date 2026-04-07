@@ -16,11 +16,9 @@ width:100%;
 margin:8px 0;
 }
 
-/* PAGE ANIMATION */
 body{animation:fadePage .5s ease;}
 @keyframes fadePage{from{opacity:0;}to{opacity:1;}}
 
-/* SUCCESS UI */
 .success-box{
 max-width:400px;
 margin:80px auto;
@@ -183,13 +181,9 @@ function updateTotals(subtotal){
 
 let orderCount = Number(localStorage.getItem("orderCount") || 0);
 
-/* HANDLING */
 let handlingCharge = orderCount === 0 ? 0 : handling;
-
-/* DELIVERY */
 let delivery = subtotal >= 500 ? 0 : deliveryCharge;
 
-/* POPUP */
 if(subtotal >= 500 && !localStorage.getItem("freeDeliveryShown")){
 alert("🎉 Wow! You get FREE delivery on orders above ₹500");
 localStorage.setItem("freeDeliveryShown","yes");
@@ -297,7 +291,6 @@ let total = subtotal + handlingCharge + delivery - discount;
 
 let orderID = generateOrderID();
 
-/* SAVE ORDER */
 saveOrder({
 id: orderID,
 name, phone, address,
@@ -308,10 +301,9 @@ date: new Date().toLocaleDateString(),
 status:"Pending"
 });
 
-/* UPDATE ORDER COUNT */
 localStorage.setItem("orderCount", orderCount + 1);
 
-/* WHATSAPP MESSAGE FIXED */
+/* ✅ FINAL WHATSAPP FIX */
 let msg = `🧾 Order ID: ${orderID}\n\n`;
 
 orderItems.forEach(i=>{
@@ -324,15 +316,17 @@ msg += `\nName: ${name}`;
 msg += `\nPhone: ${phone}`;
 msg += `\nAddress: ${address}`;
 
-/* OPEN WHATSAPP */
 let url = "https://wa.me/919639228237?text=" + encodeURIComponent(msg);
-window.location.href = url;
+
+/* OPEN WHATSAPP */
+window.open(url, "_blank");
 
 /* CLEAR CART */
 localStorage.removeItem("cart");
 cart=[];
 
-/* SUCCESS UI */
+/* DELAY SUCCESS UI */
+setTimeout(()=>{
 document.body.innerHTML = `
 <div class="success-box">
 <div class="success-icon">✅</div>
@@ -345,6 +339,8 @@ document.body.innerHTML = `
 </a>
 </div>
 `;
+},1000);
+
 }
 
 document.querySelectorAll('input[name="pay"]').forEach(r=>{
