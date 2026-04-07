@@ -47,37 +47,6 @@ animation:bounce .6s;
 100%{transform:scale(1);}
 }
 
-/* FREE DELIVERY POPUP */
-#freePopup{
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-background:#0A84FF;
-color:#fff;
-padding:15px 20px;
-border-radius:10px;
-box-shadow:0 5px 15px rgba(0,0,0,.2);
-display:none;
-z-index:9999;
-animation:slideUp .5s;
-}
-
-@keyframes slideUp{
-from{transform:translate(-50%,50px);opacity:0;}
-to{transform:translate(-50%,0);opacity:1;}
-}
-
-/* FREE DELIVERY BAR */
-#freeBar{
-background:#fff3cd;
-padding:12px;
-border-radius:10px;
-margin-bottom:15px;
-font-weight:500;
-display:none;
-}
-
 </style>
 
 </head>
@@ -96,8 +65,6 @@ display:none;
 <div class="container">
 
 <h2 style="text-align:center;">My Cart</h2>
-
-<div id="freeBar"></div>
 
 <table>
 <thead>
@@ -139,7 +106,6 @@ display:none;
 </tfoot>
 </table>
 
-<!-- COUPON -->
 <h3>Apply Coupon</h3>
 <input id="coupon" placeholder="Enter coupon code">
 <button onclick="applyCoupon()">Apply</button>
@@ -168,27 +134,16 @@ display:none;
 
 </div>
 
-<!-- FREE DELIVERY POPUP -->
-<div id="freePopup">
-🎉 Wow! You got FREE Delivery on orders above ₹500
-</div>
-
 <script>
 
-/* CONFIG */
 const handling = 9;
-const delivery = 20;
+const deliveryCharge = 20;
 
 let discount = 0;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-/* FIRST ORDER */
-let isFirstOrder = localStorage.getItem("firstOrderDone") !== "true";
-let freeDeliveryShown = false;
-
 const list = document.getElementById("list");
 
-/* SHOW CART */
 function showCart(){
 
 if(cart.length===0){
@@ -207,12 +162,15 @@ return `
 <tr>
 <td>${i.name}</td>
 <td>₹${i.price}</td>
+
 <td>
 <button onclick="decreaseQty(${index})">-</button>
 ${i.qty}
 <button onclick="increaseQty(${index})">+</button>
 </td>
+
 <td>₹${sub}</td>
+
 <td><button onclick="removeItem(${index})">❌</button></td>
 </tr>
 `;
@@ -221,65 +179,30 @@ ${i.qty}
 updateTotals(subtotal);
 }
 
-/* TOTAL */
 function updateTotals(subtotal){
 
-let handlingCharge = isFirstOrder ? 0 : handling;
-let deliveryCharge = subtotal < 500 ? delivery : 0;
+let orderCount = Number(localStorage.getItem("orderCount") || 0);
 
-let total = subtotal + handlingCharge + deliveryCharge - discount;
+/* HANDLING */
+let handlingCharge = orderCount === 0 ? 0 : handling;
+
+/* DELIVERY */
+let delivery = subtotal >= 500 ? 0 : deliveryCharge;
+
+/* POPUP */
+if(subtotal >= 500 && !localStorage.getItem("freeDeliveryShown")){
+alert("🎉 Wow! You get FREE delivery on orders above ₹500");
+localStorage.setItem("freeDeliveryShown","yes");
+}
+
+let total = subtotal + handlingCharge + delivery - discount;
 
 document.getElementById("subtotal").innerText = "₹" + subtotal;
 document.getElementById("handling").innerText = handlingCharge===0?"FREE":"₹"+handlingCharge;
-document.getElementById("delivery").innerText = deliveryCharge===0?"FREE":"₹"+deliveryCharge;
+document.getElementById("delivery").innerText = delivery===0?"FREE":"₹"+delivery;
 document.getElementById("total").innerText = "₹" + total;
-
-/* POPUP */
-if(subtotal >= 500 && !freeDeliveryShown){
-showFreeDeliveryPopup();
-freeDeliveryShown = true;
 }
 
-/* PROGRESS BAR */
-updateFreeBar(subtotal);
-}
-
-/* PROGRESS BAR */
-function updateFreeBar(subtotal){
-
-let bar = document.getElementById("freeBar");
-
-if(subtotal >= 500){
-bar.style.display = "block";
-bar.innerHTML = "🎉 You unlocked FREE delivery!";
-return;
-}
-
-let remaining = 500 - subtotal;
-
-bar.style.display = "block";
-bar.innerHTML = `
-Add <b>₹${remaining}</b> more to get <b>FREE Delivery</b> 🚚
-<div style="background:#ddd;height:6px;border-radius:5px;margin-top:6px;">
-<div style="
-width:${(subtotal/500)*100}%;
-height:6px;
-background:#0A84FF;
-border-radius:5px;
-transition:.3s;
-"></div>
-</div>
-`;
-}
-
-/* POPUP */
-function showFreeDeliveryPopup(){
-let p=document.getElementById("freePopup");
-p.style.display="block";
-setTimeout(()=>{p.style.display="none";},3000);
-}
-
-/* QTY */
 function increaseQty(i){cart[i].qty++;save();}
 function decreaseQty(i){
 cart[i].qty--;
@@ -287,16 +210,16 @@ if(cart[i].qty<=0){cart.splice(i,1);}
 save();
 }
 
-/* REMOVE */
-function removeItem(i){cart.splice(i,1);save();}
+function removeItem(i){
+cart.splice(i,1);
+save();
+}
 
-/* SAVE */
 function save(){
 localStorage.setItem("cart", JSON.stringify(cart));
 showCart();
 }
 
-/* CLEAR */
 function clearCart(){
 if(confirm("Clear entire cart?")){
 localStorage.removeItem("cart");
@@ -305,82 +228,132 @@ showCart();
 }
 }
 
-/* COUPON */
 function applyCoupon(){
-let code=document.getElementById("coupon").value.toUpperCase();
+let code = document.getElementById("coupon").value.toUpperCase();
 
-if(code==="SAVE50"){discount=50;}
-else if(code==="FIRST100"){discount=100;}
-else{discount=0;}
-
-document.getElementById("couponMsg").innerText =
-discount>0 ? "Discount Applied!" : "Invalid coupon ❌";
+if(code==="SAVE50"){
+discount=50;
+document.getElementById("couponMsg").innerText="₹50 discount applied!";
+}
+else if(code==="FIRST100"){
+discount=100;
+document.getElementById("couponMsg").innerText="₹100 discount applied!";
+}
+else{
+discount=0;
+document.getElementById("couponMsg").innerText="Invalid coupon ❌";
+}
 
 showCart();
 }
 
-/* COPY */
 function copyUPI(){
 navigator.clipboard.writeText(document.getElementById("upiText").innerText);
 alert("UPI copied");
 }
 
-/* ORDER */
-function order(){
-
-if(cart.length===0){alert("Cart is empty");return;}
-
-let name=document.getElementById("name").value.trim();
-let phone=document.getElementById("phone").value.trim();
-let address=document.getElementById("address").value.trim();
-let pay=document.querySelector('input[name="pay"]:checked').value;
-
-if(!name||!phone||!address){alert("Fill all details");return;}
-if(!address.toLowerCase().includes("bijnor")){
-alert("❌ Delivery only in Bijnor");return;
+function generateOrderID(){
+let d = new Date();
+return "HE-" + d.getFullYear() + (d.getMonth()+1) + d.getDate() + "-" + Math.floor(1000 + Math.random()*9000);
 }
 
-let orderItems=[...cart];
+function saveOrder(data){
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+orders.push(data);
+localStorage.setItem("orders", JSON.stringify(orders));
+}
 
-let subtotal=orderItems.reduce((s,i)=>s+(i.price*i.qty),0);
-let handlingCharge = isFirstOrder ? 0 : handling;
-let deliveryCharge = subtotal < 500 ? delivery : 0;
+function order(){
 
-let total = subtotal + handlingCharge + deliveryCharge - discount;
+if(cart.length===0){
+alert("Cart is empty");
+return;
+}
 
-let orderID="HE-"+Date.now();
+let name = document.getElementById("name").value.trim();
+let phone = document.getElementById("phone").value.trim();
+let address = document.getElementById("address").value.trim();
+let pay = document.querySelector('input[name="pay"]:checked').value;
+
+if(!name || !phone || !address){
+alert("Please fill all details");
+return;
+}
+
+if(!address.toLowerCase().includes("bijnor")){
+alert("❌ Delivery available only in Bijnor");
+return;
+}
+
+let orderItems = [...cart];
+
+let subtotal = orderItems.reduce((s,i)=>s+(i.price*i.qty),0);
+let orderCount = Number(localStorage.getItem("orderCount") || 0);
+
+let handlingCharge = orderCount === 0 ? 0 : handling;
+let delivery = subtotal >= 500 ? 0 : deliveryCharge;
+
+let total = subtotal + handlingCharge + delivery - discount;
+
+let orderID = generateOrderID();
 
 /* SAVE ORDER */
-let orders=JSON.parse(localStorage.getItem("orders"))||[];
-orders.push({
-id:orderID,name,phone,address,
-items:orderItems,total,payment:pay,
-date:new Date().toLocaleDateString(),
+saveOrder({
+id: orderID,
+name, phone, address,
+items: orderItems,
+total,
+payment: pay,
+date: new Date().toLocaleDateString(),
 status:"Pending"
 });
-localStorage.setItem("orders",JSON.stringify(orders));
 
-/* MARK FIRST ORDER */
-localStorage.setItem("firstOrderDone","true");
+/* UPDATE ORDER COUNT */
+localStorage.setItem("orderCount", orderCount + 1);
+
+/* WHATSAPP MESSAGE FIXED */
+let msg = `🧾 Order ID: ${orderID}\n\n`;
+
+orderItems.forEach(i=>{
+msg += `${i.name} x${i.qty} = ₹${i.price*i.qty}\n`;
+});
+
+msg += `\nTotal: ₹${total}`;
+msg += `\nPayment: ${pay}`;
+msg += `\nName: ${name}`;
+msg += `\nPhone: ${phone}`;
+msg += `\nAddress: ${address}`;
+
+/* OPEN WHATSAPP */
+let url = "https://wa.me/919639228237?text=" + encodeURIComponent(msg);
+window.location.href = url;
 
 /* CLEAR CART */
 localStorage.removeItem("cart");
 cart=[];
 
 /* SUCCESS UI */
-document.body.innerHTML=`
+document.body.innerHTML = `
 <div class="success-box">
 <div class="success-icon">✅</div>
 <h2>Order Placed Successfully</h2>
 <p>Order ID: <b>${orderID}</b></p>
 <p>Delivery only in Bijnor</p>
 <br>
-<a href="index.html"><button class="primary">Go Home</button></a>
+<a href="index.html">
+<button class="primary">Go Home</button>
+</a>
 </div>
 `;
 }
 
-/* INIT */
+document.querySelectorAll('input[name="pay"]').forEach(r=>{
+r.addEventListener("change",()=>{
+document.getElementById("upiBox").style.display =
+(r.value==="UPI" && r.checked)?"block":"none";
+});
+});
+
 showCart();
 
 </script>
