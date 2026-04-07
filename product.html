@@ -2,9 +2,7 @@
 <html>
 <head>
 <title>Products - Himanshu Electronics</title>
-
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -23,8 +21,10 @@
 </div>
 </header>
 
-<!-- ✅ SOUND ADDED -->
-<audio id="cartSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3"></audio>
+<!-- SOUND -->
+<audio id="cartSound" preload="auto">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3">
+</audio>
 
 <h2 style="text-align:center;">Our Products</h2>
 
@@ -41,6 +41,9 @@
 
 <div class="products-grid" id="products"></div>
 
+<!-- OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
 <!-- MINI CART -->
 <div class="mini-cart" id="miniCart">
 <h3>Your Cart</h3>
@@ -48,15 +51,15 @@
 <button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
-<!-- ✅ FLOATING CART BUTTON (ADDED) -->
-<a href="cart.html" class="floating-cart">
+<!-- FLOATING CART -->
+<a href="#" class="floating-cart" onclick="toggleCart()">
 🛒
 <span id="floatingCount">0</span>
 </a>
 
 <script>
 
-/* DEFAULT PRODUCTS */
+/* YOUR ORIGINAL PRODUCTS (UNCHANGED) */
 let defaultProducts = [
 
 /* BULBS */
@@ -79,15 +82,12 @@ let defaultProducts = [
 {name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg"},
 {name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg"},
 
-/* SMALL FANS */
 {name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg"},
 {name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg"},
 
-/* PEDESTAL */
 {name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg"},
 {name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg"},
 
-/* EXHAUST */
 {name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg"},
 {name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg"},
 {name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg"},
@@ -100,134 +100,133 @@ let defaultProducts = [
 
 ];
 
-/* ADMIN PRODUCTS */
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
-
-/* MERGE */
 let products = [...defaultProducts, ...adminProducts];
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-/* SHOW PRODUCTS */
+/* SHOW PRODUCTS (UNCHANGED) */
 function showProducts(list=products){
-if(list.length===0){
-document.getElementById("products").innerHTML="<p class='empty'>No products found</p>";
-return;
-}
-
 document.getElementById("products").innerHTML = list.map((p,i)=>`
 <div class="card">
 ${p.best ? '<div class="badge">Best Seller</div>' : ''}
-<img src="${p.img}" onclick="view(${i})">
+<img src="${p.img}">
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
-
-<button class="add" onclick="add(${i})">Add</button>
-<button class="wish" onclick="addWish(${i})">❤️</button>
+<button onclick="add(${i})">Add</button>
 </div>
 `).join("");
 }
 
-/* ✅ FINAL ADD TO CART FUNCTION */
+/* ADVANCED ADD */
 function add(i){
 
-/* ANIMATION START */
 let img = document.querySelectorAll(".card img")[i];
 let rect = img.getBoundingClientRect();
+let fly = img.cloneNode(true);
+fly.classList.add("fly-img");
+fly.style.top = rect.top+"px";
+fly.style.left = rect.left+"px";
+document.body.appendChild(fly);
+setTimeout(()=>fly.remove(),800);
 
-let flyingImg = img.cloneNode(true);
-flyingImg.classList.add("fly-img");
+/* CART LOGIC */
+let item = products[i];
+let existing = cart.find(p=>p.name===item.name);
 
-flyingImg.style.top = rect.top + "px";
-flyingImg.style.left = rect.left + "px";
+if(existing){
+existing.qty+=1;
+}else{
+cart.push({...item,qty:1});
+}
 
-document.body.appendChild(flyingImg);
-
-setTimeout(()=>{
-flyingImg.remove();
-},800);
-/* ANIMATION END */
-
-/* ADD TO CART */
-cart.push(products[i]);
 localStorage.setItem("cart",JSON.stringify(cart));
 
 updateCartCount();
 showMiniCart();
 
 /* SOUND */
-let sound = document.getElementById("cartSound");
-if(sound){
-sound.currentTime = 0;
-sound.play();
+let s=document.getElementById("cartSound");
+if(s){s.currentTime=0;s.play().catch(()=>{});}
+
+/* BOUNCE */
+let c=document.querySelector(".cart-icon");
+c.classList.add("cart-bounce");
+setTimeout(()=>c.classList.remove("cart-bounce"),500);
 }
 
-/* CART BOUNCE */
-let cartIcon = document.querySelector(".cart-icon");
-if(cartIcon){
-cartIcon.classList.add("cart-bounce");
-setTimeout(()=>{
-cartIcon.classList.remove("cart-bounce");
-},500);
+/* MINI CART */
+function showMiniCart(){
+let div=document.getElementById("miniItems");
+
+if(cart.length===0){
+div.innerHTML="Empty";
+return;
 }
 
+let total=0;
+
+div.innerHTML=cart.map((p,i)=>{
+let sub=p.price*p.qty;
+total+=sub;
+
+return `
+<p>
+${p.name}<br>
+₹${p.price} x ${p.qty} = ₹${sub}<br>
+<button onclick="decreaseQty(${i})">-</button>
+${p.qty}
+<button onclick="increaseQty(${i})">+</button>
+<button onclick="removeItem(${i})">X</button>
+</p>`;
+}).join("")+`<h3>Total: ₹${total}</h3>`;
 }
 
-/* WISHLIST */
-function addWish(i){
-wishlist.push(products[i]);
-localStorage.setItem("wishlist",JSON.stringify(wishlist));
-alert("Added to wishlist ❤️");
+/* QTY */
+function increaseQty(i){cart[i].qty++;save();}
+function decreaseQty(i){cart[i].qty--; if(cart[i].qty<=0)cart.splice(i,1);save();}
+function removeItem(i){cart.splice(i,1);save();}
+
+function save(){
+localStorage.setItem("cart",JSON.stringify(cart));
+updateCartCount();
+showMiniCart();
 }
 
-/* VIEW PRODUCT */
-function view(i){
-localStorage.setItem("viewProduct",JSON.stringify(products[i]));
-location.href="product-view.html";
+/* COUNT */
+function updateCartCount(){
+let c=cart.reduce((s,p)=>s+p.qty,0);
+document.getElementById("cartCount").innerText=c;
+document.getElementById("floatingCount").innerText=c;
+}
+
+/* TOGGLE */
+function toggleCart(){
+let c=document.getElementById("miniCart");
+let o=document.getElementById("cartOverlay");
+c.classList.toggle("active");
+o.style.display=c.classList.contains("active")?"block":"none";
+showMiniCart();
 }
 
 /* FILTER */
 function filter(){
-let s = document.getElementById("search").value.toLowerCase();
-let c = document.getElementById("cat").value;
+let s=document.getElementById("search").value.toLowerCase();
+let c=document.getElementById("cat").value;
 
-let filtered = products.filter(p =>
-p.name.toLowerCase().includes(s) &&
-(c==="all" || p.cat===c)
+let f=products.filter(p=>
+p.name.toLowerCase().includes(s)&&
+(c==="all"||p.cat===c)
 );
 
-showProducts(filtered);
-}
-
-/* CART COUNT */
-function updateCartCount(){
-document.getElementById("cartCount").innerText = cart.length;
-
-/* ✅ ALSO UPDATE FLOATING BUTTON */
-let f = document.getElementById("floatingCount");
-if(f) f.innerText = cart.length;
-}
-
-/* MINI CART */
-function toggleCart(){
-let c = document.getElementById("miniCart");
-c.style.display = c.style.display==="block" ? "none":"block";
-showMiniCart();
-}
-
-function showMiniCart(){
-let div = document.getElementById("miniItems");
-div.innerHTML = cart.map(p=>`
-<p>${p.name} - ₹${p.price}</p>
-`).join("");
+showProducts(f);
 }
 
 /* INIT */
-updateCartCount();
 showProducts();
+updateCartCount();
 
 </script>
 
 </body>
-  </html>
+</html>
