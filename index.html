@@ -1,69 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Himanshu Electronics - Bulbs, Fans & Lights in Bijnor</title>
+<title>Himanshu Electronics</title>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- GOOGLE FONT -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
 <style>
 
-/* LOADER */
-#loader{
-position:fixed;
-top:0;
-left:0;
+/* LOGO ANIMATION */
+.logo{
+font-size:26px;
+font-weight:700;
+background:linear-gradient(90deg,#fff,#FFD700,#fff);
+background-size:200% auto;
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:shine 3s linear infinite;
+}
+
+@keyframes shine{
+to{background-position:200% center;}
+}
+
+/* HERO IMPROVED */
+.hero{
+animation:fadeIn 1s ease;
+}
+
+.hero h2{
+font-size:32px;
+animation:slideUp 1s ease;
+}
+
+.hero p{
+animation:fadeIn 2s ease;
+}
+
+/* BUTTON EFFECT */
+.hero button{
+position:relative;
+overflow:hidden;
+}
+
+.hero button:after{
+content:"";
+position:absolute;
 width:100%;
 height:100%;
-background:#fff;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:9999;
-font-size:20px;
+top:0;
+left:-100%;
+background:rgba(255,255,255,0.4);
+transition:.4s;
 }
 
-/* OFFER */
-.offer{
-background:#fb641b;
-color:#fff;
-text-align:center;
-padding:8px;
-font-weight:500;
+.hero button:hover:after{
+left:100%;
 }
 
-/* DARK MODE */
-.dark{
-background:#121212;
-color:#fff;
+/* CARD ANIMATION */
+.card{
+transition:all .3s ease;
 }
-.dark .card,
-.dark header,
-.dark footer{
-background:#1e1e1e;
+.card:hover{
+transform:translateY(-8px) scale(1.03);
 }
 
-/* DARK BUTTON */
-.dark-btn{
-position:fixed;
-top:20px;
-right:20px;
-background:#000;
-color:#fff;
-padding:8px 12px;
-border-radius:8px;
-cursor:pointer;
-z-index:1001;
+/* FADE ANIMATION */
+.fade{
+opacity:0;
+transform:translateY(30px);
+transition:.8s;
+}
+.fade.show{
+opacity:1;
+transform:translateY(0);
 }
 
-/* MINI CART */
-.mini-cart{
-display:none;
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
+}
+
+@keyframes slideUp{
+from{transform:translateY(50px);opacity:0;}
+to{transform:translateY(0);opacity:1;}
 }
 
 </style>
@@ -77,7 +101,7 @@ display:none;
 
 <!-- OFFER -->
 <div class="offer">
-🔥 Free Delivery in Bijnor Today
+🔥 Special Offer: Free Delivery in Bijnor Today!
 </div>
 
 <!-- DARK MODE -->
@@ -85,13 +109,15 @@ display:none;
 
 <!-- HEADER -->
 <header>
-<h2 style="font-weight:600;">Himanshu Electronics</h2>
+<h1 class="logo">Himanshu Electronics</h1>
 
 <nav>
 <a href="index.html">Home</a>
 <a href="product.html">Products</a>
 <a href="contact.html">Contact</a>
 </nav>
+
+<a href="#" onclick="toggleCart()" style="font-size:22px;">🛒</a>
 </header>
 
 <!-- FLOATING CART -->
@@ -101,15 +127,35 @@ display:none;
 </div>
 
 <!-- HERO -->
-<div class="hero">
+<div class="hero fade">
 <h2>Best Bulbs, Fans & Lights</h2>
-<p>Top quality electrical products at best price</p>
+<p>High-quality electrical products at affordable prices.</p>
 <button onclick="location.href='product.html'">Shop Now</button>
 </div>
 
+<!-- FEATURES -->
+<div class="features fade">
+
+<div class="feature">
+<h3>⚡ Fast Delivery</h3>
+<p>Only in Bijnor</p>
+</div>
+
+<div class="feature">
+<h3>💰 Best Prices</h3>
+<p>Affordable & genuine</p>
+</div>
+
+<div class="feature">
+<h3>📞 Support</h3>
+<p>WhatsApp anytime</p>
+</div>
+
+</div>
+
 <!-- FEATURED -->
-<div class="featured-products">
-<h2 style="text-align:center;">Featured Products</h2>
+<div class="featured-products fade">
+<h2>Featured Products</h2>
 <div class="products-grid" id="featured"></div>
 </div>
 
@@ -122,12 +168,54 @@ display:none;
 
 <!-- FOOTER -->
 <footer>
-<p>📧 anisuggestdaily@gmail.com | 📞 +91 9639228237</p>
+<p>
+📧 <a href="mailto:anisuggestdaily@gmail.com">anisuggestdaily@gmail.com</a> |
+📞 +91 9639228237
+</p>
+
+<p>
+<a href="contact.html">Contact Us</a>
+</p>
+
 <p>&copy; 2026 Himanshu Electronics</p>
 </footer>
 
 <script>
 
+/* LOADER */
+window.onload = ()=>{
+document.getElementById("loader").style.display="none";
+showFade();
+}
+
+/* SCROLL ANIMATION */
+function showFade(){
+let f=document.querySelectorAll(".fade");
+f.forEach(el=>{
+let top=el.getBoundingClientRect().top;
+if(top < window.innerHeight-50){
+el.classList.add("show");
+}
+});
+}
+window.addEventListener("scroll",showFade);
+
+/* DARK MODE */
+function toggleDark(){
+document.body.classList.toggle("dark");
+
+if(document.body.classList.contains("dark")){
+localStorage.setItem("dark","on");
+}else{
+localStorage.setItem("dark","off");
+}
+}
+
+if(localStorage.getItem("dark")==="on"){
+document.body.classList.add("dark");
+}
+
+/* PRODUCTS */
 let featuredProducts = [
 {name:"LED Bulb 9W",price:40,img:"images/led9w.jpg"},
 {name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"},
@@ -137,54 +225,42 @@ let featuredProducts = [
 {name:"Fybros Panel Light 6W",price:80,img:"images/panel_fybros6.jpg"}
 ];
 
-/* LOAD */
-window.onload = ()=>{
-document.getElementById("loader").style.display="none";
-
 let featuredDiv = document.getElementById("featured");
 
 featuredDiv.innerHTML = featuredProducts.map((p,i)=>`
 <div class="card">
 <img src="${p.img}" onclick="viewFeatured(${i})">
 <h3>${p.name}</h3>
-<p>₹${p.price}</p>
-<button class="primary" onclick="viewFeatured(${i})">View</button>
+<p><b>₹${p.price}</b></p>
+<p>⭐⭐⭐⭐☆</p>
+<button onclick="viewFeatured(${i})">View</button>
 </div>
 `).join("");
-};
 
-/* DARK MODE */
-function toggleDark(){
-document.body.classList.toggle("dark");
-localStorage.setItem("dark", document.body.classList.contains("dark")?"on":"off");
-}
-
-if(localStorage.getItem("dark")==="on"){
-document.body.classList.add("dark");
-}
-
-/* VIEW */
 function viewFeatured(i){
 localStorage.setItem("viewProduct", JSON.stringify(featuredProducts[i]));
-location.href="product-view.html";
+location.href = "product-view.html";
 }
 
 /* CART */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function updateCartCount(){
-document.getElementById("cartCount").innerText = cart.reduce((s,p)=>s+(p.qty||1),0);
+document.getElementById("cartCount").innerText = cart.length;
 }
 
 function toggleCart(){
-let c=document.getElementById("miniCart");
-c.style.display = c.style.display==="block"?"none":"block";
+let c = document.getElementById("miniCart");
+c.style.display = c.style.display==="block" ? "none":"block";
 showMiniCart();
 }
 
 function showMiniCart(){
-let div=document.getElementById("miniItems");
-div.innerHTML = cart.map(p=>`<p>${p.name} x${p.qty||1}</p>`).join("");
+let div = document.getElementById("miniItems");
+
+div.innerHTML = cart.map(p=>`
+<p>${p.name} x${p.qty || 1}</p>
+`).join("");
 }
 
 updateCartCount();
