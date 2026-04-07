@@ -318,14 +318,19 @@ msg += `\nAddress: ${address}`;
 
 let url = "https://wa.me/919639228237?text=" + encodeURIComponent(msg);
 
-/* OPEN WHATSAPP */
-window.open(url, "_blank");
+/* ✅ MOBILE SAFE OPEN */
+let a = document.createElement("a");
+a.href = url;
+a.target = "_blank";
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
 
 /* CLEAR CART */
 localStorage.removeItem("cart");
 cart=[];
 
-/* DELAY SUCCESS UI */
+/* SUCCESS UI DELAY */
 setTimeout(()=>{
 document.body.innerHTML = `
 <div class="success-box">
@@ -355,4 +360,4 @@ showCart();
 </script>
 
 </body>
-</html>
+                                      </html>
