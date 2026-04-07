@@ -2,6 +2,10 @@
 <html>
 <head>
 <title>Cart - Himanshu Electronics</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -63,7 +67,7 @@
 <label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
 <label><input type="radio" name="pay" value="UPI"> UPI</label>
 
-<div id="upiBox">
+<div id="upiBox" style="display:none;">
 <p>UPI ID: <b id="upiText">paytm.s1ktca0@pty</b></p>
 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=paytm.s1ktca0@pty">
 <br>
@@ -215,7 +219,10 @@ alert("❌ Delivery available only in Bijnor");
 return;
 }
 
-let subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+/* COPY CART BEFORE CLEAR (IMPORTANT FIX) */
+let orderItems = [...cart];
+
+let subtotal = orderItems.reduce((s,i)=>s+(i.price*i.qty),0);
 let handlingCharge = subtotal>=500?0:handling;
 let total = subtotal + handlingCharge - discount;
 
@@ -228,7 +235,7 @@ id: orderID,
 name: name,
 phone: phone,
 address: address,
-items: cart,
+items: orderItems,
 total: total,
 payment: pay,
 date: new Date().toLocaleDateString()
@@ -240,10 +247,10 @@ saveOrder(orderData);
 localStorage.removeItem("cart");
 cart=[];
 
-/* WHATSAPP */
+/* WHATSAPP (FIXED BUG) */
 let msg = "🧾 Order ID: "+orderID+"%0A%0AOrder Details:%0A";
 
-cart.forEach(i=>{
+orderItems.forEach(i=>{
 msg += i.name+" x"+i.qty+" = ₹"+(i.price*i.qty)+"%0A";
 });
 
