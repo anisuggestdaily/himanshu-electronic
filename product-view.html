@@ -6,82 +6,72 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- GOOGLE FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="style.css">
 
 <style>
-
-/* LAYOUT */
-.product-page{
-display:flex;
-flex-wrap:wrap;
-gap:20px;
-padding:20px;
-max-width:1000px;
-margin:auto;
-}
-
-/* IMAGE */
-.product-img{
-flex:1;
-background:#fff;
-padding:20px;
-border-radius:10px;
-text-align:center;
-box-shadow:0 2px 10px rgba(0,0,0,.08);
-}
-
-.product-img img{
-width:100%;
-max-height:300px;
-object-fit:contain;
-}
-
-/* DETAILS */
-.product-info{
-flex:1;
-background:#fff;
-padding:20px;
-border-radius:10px;
-box-shadow:0 2px 10px rgba(0,0,0,.08);
-}
-
-/* PRICE */
-.price{
-font-size:22px;
-font-weight:600;
-color:#388e3c;
-margin:10px 0;
-}
-
-/* BUTTONS */
-.btn-row{
-margin-top:15px;
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
-
 .qty-box{
-margin:10px 0;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+margin:15px 0;
 }
-
+.price{
+font-size:20px;
+color:#0A84FF;
+}
 </style>
 
 </head>
 
 <body>
 
+<header>
+<h2>Himanshu Electronics</h2>
+
+<div>
+<a href="index.html">Home</a>
+<a href="product.html">Products</a>
+</div>
+
+<div class="cart-icon" onclick="toggleCart()">
+🛒
+<span id="cartCount" class="cart-count">0</span>
+</div>
+</header>
+
 <!-- SOUND -->
-<audio id="cartSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3"></audio>
+<audio id="cartSound" preload="auto">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3" type="audio/mpeg">
+</audio>
 
 <div class="container" id="view"></div>
 
+<!-- MINI CART -->
+<div class="mini-cart" id="miniCart">
+<h3>Your Cart</h3>
+<div id="miniItems"></div>
+<button onclick="location.href='cart.html'">Checkout</button>
+</div>
+
 <script>
 
-// GET PRODUCT
+/* SOUND */
+function playSound(){
+let s=document.getElementById("cartSound");
+if(!s) return;
+
+s.pause();
+s.currentTime=0;
+
+let p=s.play();
+if(p!==undefined){
+p.catch(()=>{setTimeout(()=>{s.play().catch(()=>{});},100);});
+}
+}
+
+/* GET PRODUCT */
 let p = JSON.parse(localStorage.getItem("viewProduct"));
 
 if(!p){
@@ -89,94 +79,101 @@ document.getElementById("view").innerHTML = "<h2>No Product Found</h2>";
 }else{
 
 document.getElementById("view").innerHTML = `
-<div class="product-page">
+<div class="card">
 
-<div class="product-img">
 <img src="${p.img}" id="productImg">
-</div>
-
-<div class="product-info">
 
 <h2>${p.name}</h2>
-
-<p style="color:#f5a623;">⭐⭐⭐⭐☆ (120 reviews)</p>
-
 <p class="price">₹${p.price}</p>
 
-<!-- QTY -->
 <div class="qty-box">
 <button onclick="changeQty(-1)">-</button>
 <span id="qty">1</span>
 <button onclick="changeQty(1)">+</button>
 </div>
 
-<div class="btn-row">
 <button class="add" onclick="addToCart()">Add to Cart</button>
-<button class="primary" onclick="buyNow()">Buy Now</button>
-</div>
 
-<br>
+<br><br>
+
+<button class="primary" onclick="buyNow()">Buy Now</button>
+
+<br><br>
 
 <button class="back" onclick="goBack()">⬅ Back</button>
-
-</div>
 
 </div>
 `;
 }
 
 let quantity = 1;
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-/* CHANGE QTY */
+/* QTY */
 function changeQty(x){
 quantity += x;
 if(quantity < 1) quantity = 1;
 document.getElementById("qty").innerText = quantity;
 }
 
-/* ADD TO CART */
+/* ADD */
 function addToCart(){
 
-let img = document.getElementById("productImg");
-let rect = img.getBoundingClientRect();
+let existing = cart.find(i=>i.name===p.name);
 
-let flyingImg = img.cloneNode(true);
-flyingImg.classList.add("fly-img");
-
-flyingImg.style.top = rect.top + "px";
-flyingImg.style.left = rect.left + "px";
-
-document.body.appendChild(flyingImg);
-
-setTimeout(()=>{ flyingImg.remove(); },800);
-
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
+if(existing){
+existing.qty += quantity;
+}else{
 cart.push({...p, qty: quantity});
+}
 
 localStorage.setItem("cart", JSON.stringify(cart));
 
-let sound = document.getElementById("cartSound");
-if(sound){
-sound.currentTime = 0;
-sound.play().catch(()=>{});
-}
+updateCartCount();
+showMiniCart();
 
+/* SOUND */
+playSound();
+
+/* BETTER UX */
 alert("Added to Cart 🛒");
 }
 
-/* BUY NOW */
+/* BUY */
 function buyNow(){
 addToCart();
-setTimeout(()=>{
-location.href = "cart.html";
-},500);
+setTimeout(()=>{ location.href="cart.html"; },500);
 }
 
 /* BACK */
 function goBack(){
 window.history.back();
 }
+
+/* MINI CART */
+function showMiniCart(){
+let div=document.getElementById("miniItems");
+
+div.innerHTML=cart.map(p=>`
+<p>${p.name} x${p.qty}</p>
+`).join("");
+}
+
+/* COUNT */
+function updateCartCount(){
+document.getElementById("cartCount").innerText =
+cart.reduce((s,p)=>s+p.qty,0);
+}
+
+/* TOGGLE */
+function toggleCart(){
+let c=document.getElementById("miniCart");
+c.style.display = c.style.display==="block" ? "none":"block";
+showMiniCart();
+}
+
+/* INIT */
+updateCartCount();
 
 </script>
 
