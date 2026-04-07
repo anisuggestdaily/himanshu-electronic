@@ -26,6 +26,8 @@
 <tr>
 <th>Product</th>
 <th>Price (₹)</th>
+<th>Qty</th>
+<th>Subtotal</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -37,11 +39,15 @@
 <td>Subtotal</td>
 <td id="subtotal"></td>
 <td></td>
+<td></td>
+<td></td>
 </tr>
 
 <tr>
 <td>Handling Charges</td>
 <td id="handling"></td>
+<td></td>
+<td></td>
 <td></td>
 </tr>
 
@@ -49,9 +55,17 @@
 <td>Total</td>
 <td id="total"></td>
 <td></td>
+<td></td>
+<td></td>
 </tr>
 </tfoot>
 </table>
+
+<!-- ✅ COUPON -->
+<h3>Apply Coupon</h3>
+<input id="coupon" placeholder="Enter coupon code">
+<button onclick="applyCoupon()">Apply</button>
+<p id="couponMsg" style="color:green;"></p>
 
 <h3>Payment Method</h3>
 <label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
@@ -79,9 +93,12 @@
 
 /* DATA */
 const handling = 9;
+let discount = 0;
+let appliedCoupon = "";
+
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-/* ELEMENTS */
+/* ELEMENT */
 const list = document.getElementById("list");
 
 /* SHOW CART */
@@ -89,26 +106,54 @@ function showCart(){
 let subtotal = 0;
 
 list.innerHTML = cart.map((i,index)=>{
-subtotal += i.price;
+let sub = i.price * i.qty;
+subtotal += sub;
+
 return `
 <tr>
 <td>${i.name}</td>
 <td>₹${i.price}</td>
+
+<td>
+<button onclick="decreaseQty(${index})">-</button>
+${i.qty}
+<button onclick="increaseQty(${index})">+</button>
+</td>
+
+<td>₹${sub}</td>
+
 <td><button onclick="removeItem(${index})">❌</button></td>
 </tr>
 `;
 }).join("");
 
-let total = subtotal + handling;
+/* FREE DELIVERY */
+let handlingCharge = subtotal >= 500 ? 0 : handling;
+
+/* FINAL TOTAL */
+let total = subtotal + handlingCharge - discount;
 
 document.getElementById("subtotal").innerText = "₹" + subtotal;
-document.getElementById("handling").innerText = "₹" + handling;
+document.getElementById("handling").innerText = handlingCharge === 0 ? "FREE" : "₹" + handlingCharge;
 document.getElementById("total").innerText = "₹" + total;
+}
+
+/* QTY */
+function increaseQty(i){cart[i].qty++;save();}
+function decreaseQty(i){
+cart[i].qty--;
+if(cart[i].qty<=0){cart.splice(i,1);}
+save();
 }
 
 /* REMOVE */
 function removeItem(i){
 cart.splice(i,1);
+save();
+}
+
+/* SAVE */
+function save(){
 localStorage.setItem("cart", JSON.stringify(cart));
 showCart();
 }
@@ -117,6 +162,29 @@ showCart();
 function clearCart(){
 localStorage.removeItem("cart");
 cart = [];
+showCart();
+}
+
+/* COUPON */
+function applyCoupon(){
+let code = document.getElementById("coupon").value.toUpperCase();
+
+if(code === "SAVE50"){
+discount = 50;
+appliedCoupon = code;
+document.getElementById("couponMsg").innerText = "₹50 discount applied!";
+}
+else if(code === "FIRST100"){
+discount = 100;
+appliedCoupon = code;
+document.getElementById("couponMsg").innerText = "₹100 discount applied!";
+}
+else{
+discount = 0;
+appliedCoupon = "";
+document.getElementById("couponMsg").innerText = "Invalid coupon ❌";
+}
+
 showCart();
 }
 
@@ -137,26 +205,26 @@ alert("Fill details");
 return;
 }
 
-let subtotal = cart.reduce((s,i)=>s+i.price,0);
-let total = subtotal + handling;
+let subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+let handlingCharge = subtotal >= 500 ? 0 : handling;
+let total = subtotal + handlingCharge - discount;
 
-/* WHATSAPP MSG */
+/* WHATSAPP */
 let msg = "Order Details:%0A";
 
 cart.forEach(i=>{
-msg += i.name + " ₹" + i.price + "%0A";
+msg += i.name + " x"+i.qty+" = ₹" + (i.price*i.qty) + "%0A";
 });
 
-msg += "Handling: ₹"+handling+"%0A";
+msg += "Handling: "+(handlingCharge===0?"FREE":"₹"+handlingCharge)+"%0A";
+msg += "Discount: ₹"+discount+"%0A";
 msg += "Total: ₹"+total+"%0A";
 msg += "Payment: "+pay+"%0A";
 msg += "Name: "+name+"%0A";
 msg += "Phone: "+phone;
 
-/* OPEN WHATSAPP */
 window.open("https://wa.me/919639228237?text=" + msg);
 
-/* SUCCESS */
 document.body.innerHTML = `
 <div class="success">
 <h2>✅ Order Placed</h2>
@@ -180,4 +248,4 @@ showCart();
 </script>
 
 </body>
-</html>
+  </html>
