@@ -3,6 +3,9 @@
 <head>
 <title>Product Details</title>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
 
 </head>
@@ -59,14 +62,21 @@ let quantity = 1;
 function changeQty(x){
 quantity += x;
 if(quantity < 1) quantity = 1;
-document.getElementById("qty").innerText = quantity;
+
+let q = document.getElementById("qty");
+if(q){
+q.innerText = quantity;
+}
 }
 
 /* ADD TO CART */
 function addToCart(){
 
+if(!p) return;
+
 /* ANIMATION */
 let img = document.getElementById("productImg");
+if(img){
 let rect = img.getBoundingClientRect();
 
 let flyingImg = img.cloneNode(true);
@@ -78,11 +88,18 @@ flyingImg.style.left = rect.left + "px";
 document.body.appendChild(flyingImg);
 
 setTimeout(()=>{ flyingImg.remove(); },800);
+}
 
 /* CART */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+let existing = cart.find(item => item.name === p.name);
+
+if(existing){
+existing.qty += quantity;
+}else{
 cart.push({...p, qty: quantity});
+}
 
 localStorage.setItem("cart", JSON.stringify(cart));
 
