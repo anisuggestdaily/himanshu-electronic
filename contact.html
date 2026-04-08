@@ -1,17 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>Contact Us - Himanshu Electronics</title>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
 <style>
 
-/* PAGE LOAD */
+/* HEADER */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+background:#111;
+color:#fff;
+}
+
+/* LOGO */
+.logo{
+font-size:22px;
+font-weight:700;
+background:linear-gradient(90deg,#fff,#FFD700,#fff);
+background-size:200% auto;
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:shine 3s linear infinite;
+}
+@keyframes shine{
+to{background-position:200% center;}
+}
+
+/* PAGE */
 body{animation:fadePage .5s ease;}
 @keyframes fadePage{from{opacity:0;}to{opacity:1;}}
 
@@ -22,7 +46,7 @@ flex-wrap:wrap;
 gap:20px;
 }
 
-/* CARD STYLE */
+/* CARDS */
 .contact-form,
 .contact-info{
 flex:1;
@@ -31,56 +55,42 @@ padding:20px;
 border-radius:12px;
 box-shadow:0 5px 20px rgba(0,0,0,.08);
 transition:.3s;
-animation:fadeUp .6s ease;
 }
 
-/* HOVER EFFECT */
+/* HOVER */
 .contact-form:hover,
 .contact-info:hover{
 transform:translateY(-5px);
 box-shadow:0 10px 25px rgba(0,0,0,.12);
 }
 
-/* INPUT FOCUS */
+/* INPUT */
+input,textarea{
+width:100%;
+padding:10px;
+margin:8px 0;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
 input:focus, textarea:focus{
 outline:none;
 border:1px solid #0A84FF;
 box-shadow:0 0 5px rgba(10,132,255,.3);
 }
 
-/* BUTTON EFFECT */
+/* BUTTON */
 button{
-position:relative;
-overflow:hidden;
+padding:10px 15px;
+border:none;
+background:#111;
+color:#fff;
+cursor:pointer;
+border-radius:5px;
 }
-button::after{
-content:"";
-position:absolute;
-width:100%;
-height:100%;
-top:0;
-left:-100%;
-background:rgba(255,255,255,.4);
-transition:.4s;
-}
-button:hover::after{
-left:100%;
-}
-
-/* TITLE ANIMATION */
-h2{
-animation:fadeDown .6s ease;
-}
-
-/* ANIMATIONS */
-@keyframes fadeUp{
-from{transform:translateY(40px);opacity:0;}
-to{transform:translateY(0);opacity:1;}
-}
-
-@keyframes fadeDown{
-from{transform:translateY(-30px);opacity:0;}
-to{transform:translateY(0);opacity:1;}
+button:hover{
+background:#FFD700;
+color:#000;
 }
 
 /* MOBILE */
@@ -97,7 +107,7 @@ flex-direction:column;
 <body>
 
 <header>
-<h2 style="font-weight:600;">Himanshu Electronics</h2>
+<h2 class="logo">Himanshu Electronics</h2>
 
 <div>
 <a href="index.html">Home</a>
@@ -109,7 +119,6 @@ flex-direction:column;
 <div class="container">
 
 <h2 style="text-align:center;">📞 Contact Us</h2>
-
 <p style="text-align:center;">We’re here to help you with your orders and queries.</p>
 
 <div class="contact-page">
@@ -123,17 +132,17 @@ flex-direction:column;
 <input type="email" id="email" placeholder="Your Email">
 <textarea rows="4" id="message" placeholder="Your Message"></textarea>
 
-<button class="primary" onclick="sendMsg()">Send Message</button>
+<button onclick="sendMsg()">Send Message</button>
 
 <br><br>
 
-<a class="whatsapp" href="https://wa.me/919639228237?text=Hello%20I%20need%20help%20with%20an%20order" target="_blank">
+<a href="https://wa.me/919639228237?text=Hello%20I%20need%20help%20with%20an%20order" target="_blank">
 💬 Order Help on WhatsApp
 </a>
 
 <br><br>
 
-<a class="whatsapp" href="tel:919639228237">
+<a href="tel:919639228237">
 📞 Call Now
 </a>
 
@@ -155,7 +164,7 @@ View Location on Google Maps
 
 <br>
 
-<a class="whatsapp" href="https://wa.me/919639228237" target="_blank">
+<a href="https://wa.me/919639228237" target="_blank">
 Chat on WhatsApp
 </a>
 
@@ -179,17 +188,11 @@ alert("Please fill all fields");
 return;
 }
 
-/* FORMAT */
-let text = "📩 New Contact Message:%0A%0A";
-text += "Name: "+name+"%0A";
-text += "Email: "+email+"%0A";
-text += "Message: "+msg;
+/* FORMAT MESSAGE */
+let text = `📩 New Contact Message:\n\nName: ${name}\nEmail: ${email}\nMessage: ${msg}`;
 
 /* OPEN WHATSAPP */
-window.open("https://wa.me/919639228237?text="+text);
-
-/* UX IMPROVEMENT */
-alert("Message sent to WhatsApp 👍");
+window.open("https://wa.me/919639228237?text=" + encodeURIComponent(text));
 
 /* CLEAR FORM */
 document.getElementById("name").value="";
