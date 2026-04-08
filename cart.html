@@ -1,17 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>Cart - Himanshu Electronics</title>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
 <style>
-input,textarea{width:100%;margin:8px 0;}
 
+/* HEADER */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+background:#111;
+color:#fff;
+}
+
+/* LOGO */
+.logo{
+font-size:22px;
+font-weight:700;
+background:linear-gradient(90deg,#fff,#FFD700,#fff);
+background-size:200% auto;
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:shine 3s linear infinite;
+}
+@keyframes shine{
+to{background-position:200% center;}
+}
+
+/* INPUT */
+input,textarea{
+width:100%;
+margin:8px 0;
+padding:10px;
+}
+
+/* FREE DELIVERY MESSAGE */
+#freeMsg{
+text-align:center;
+font-weight:600;
+margin:10px 0;
+}
+
+/* SUCCESS */
 .success-box{
 max-width:400px;
 margin:80px auto;
@@ -22,9 +60,30 @@ text-align:center;
 box-shadow:0 5px 20px rgba(0,0,0,.1);
 animation:pop .5s ease;
 }
-@keyframes pop{from{transform:scale(.8);}to{transform:scale(1);}}
+@keyframes pop{
+from{transform:scale(.8);}
+to{transform:scale(1);}
+}
 
-.success-icon{font-size:60px;color:#28a745;}
+.success-icon{
+font-size:60px;
+color:#28a745;
+}
+
+button{
+padding:10px 15px;
+border:none;
+background:#111;
+color:#fff;
+cursor:pointer;
+border-radius:5px;
+margin:5px;
+}
+button:hover{
+background:#FFD700;
+color:#000;
+}
+
 </style>
 
 </head>
@@ -32,7 +91,8 @@ animation:pop .5s ease;
 <body>
 
 <header>
-<h2>Himanshu Electronics</h2>
+<h2 class="logo">Himanshu Electronics</h2>
+
 <div>
 <a href="index.html">Home</a>
 <a href="product.html">Products</a>
@@ -42,6 +102,9 @@ animation:pop .5s ease;
 <div class="container">
 
 <h2 style="text-align:center;">My Cart</h2>
+
+<!-- FREE DELIVERY MESSAGE -->
+<p id="freeMsg"></p>
 
 <table>
 <thead>
@@ -64,7 +127,6 @@ animation:pop .5s ease;
 </tfoot>
 </table>
 
-<!-- ✅ PAYMENT ADDED -->
 <h3>Payment Method</h3>
 <label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
 <label><input type="radio" name="pay" value="UPI"> UPI</label>
@@ -79,8 +141,8 @@ animation:pop .5s ease;
 <textarea id="address" placeholder="Full Address"></textarea>
 
 <div style="text-align:center;margin-top:20px;">
-<button class="danger" onclick="clearCart()">Clear Cart</button>
-<button class="primary" onclick="order()">Confirm Order</button>
+<button onclick="clearCart()">Clear Cart</button>
+<button onclick="order()">Confirm Order</button>
 </div>
 
 </div>
@@ -93,7 +155,8 @@ let firstOrder = localStorage.getItem("firstOrderDone");
 /* SHOW CART */
 function showCart(){
 if(cart.length===0){
-document.getElementById("list").innerHTML = `<tr><td colspan="5">Cart Empty</td></tr>`;
+document.getElementById("list").innerHTML =
+`<tr><td colspan="5">Cart Empty</td></tr>`;
 updateTotals(0);
 return;
 }
@@ -122,18 +185,30 @@ ${i.qty}
 updateTotals(subtotal);
 }
 
-/* TOTAL */
+/* TOTAL + FREE DELIVERY MESSAGE */
 function updateTotals(subtotal){
 
 let handling = firstOrder ? 9 : 0;
 let delivery = subtotal >= 500 ? 0 : 20;
-
-if(subtotal>=500){
-alert("🎉 Wow! You get FREE Delivery!");
-}
-
 let total = subtotal + handling + delivery;
 
+/* MESSAGE */
+let msg = document.getElementById("freeMsg");
+
+if(subtotal === 0){
+msg.innerText = "";
+}
+else if(subtotal >= 500){
+msg.innerText = "🎉 Wow! You get FREE delivery on orders above ₹500";
+msg.style.color = "green";
+}
+else{
+let remaining = 500 - subtotal;
+msg.innerText = `Add ₹${remaining} more to get FREE delivery`;
+msg.style.color = "#0A84FF";
+}
+
+/* TOTAL UI */
 document.getElementById("subtotal").innerText = "₹"+subtotal;
 document.getElementById("handling").innerText = handling===0?"FREE":"₹"+handling;
 document.getElementById("delivery").innerText = delivery===0?"FREE":"₹"+delivery;
@@ -142,10 +217,17 @@ document.getElementById("total").innerText = "₹"+total;
 
 /* QTY */
 function inc(i){cart[i].qty++;save();}
-function dec(i){cart[i].qty--; if(cart[i].qty<=0) cart.splice(i,1); save();}
+function dec(i){
+cart[i].qty--;
+if(cart[i].qty<=0) cart.splice(i,1);
+save();
+}
 
 /* REMOVE */
-function removeItem(i){cart.splice(i,1);save();}
+function removeItem(i){
+cart.splice(i,1);
+save();
+}
 
 /* SAVE */
 function save(){
@@ -163,21 +245,22 @@ showCart();
 /* ORDER */
 function order(){
 
-if(cart.length===0){alert("Cart empty");return;}
+if(cart.length===0){
+alert("Cart empty");
+return;
+}
 
 let name = document.getElementById("name").value;
 let phone = document.getElementById("phone").value;
 let address = document.getElementById("address").value;
-let pay = document.querySelector('input[name="pay"]:checked').value; // ✅ FIX
+let pay = document.querySelector('input[name="pay"]:checked').value;
 
 if(!name||!phone||!address){
 alert("Fill all details");
 return;
 }
 
-let orderItems = [...cart];
-
-let subtotal = orderItems.reduce((s,i)=>s+(i.price*i.qty),0);
+let subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
 let handling = firstOrder ? 9 : 0;
 let delivery = subtotal >= 500 ? 0 : 20;
 let total = subtotal + handling + delivery;
@@ -189,26 +272,24 @@ let orders = JSON.parse(localStorage.getItem("orders")) || [];
 orders.push({
 id:orderID,
 name,phone,address,
-items:orderItems,
+items:cart,
 total,
-payment:pay, // ✅ FIX
+payment:pay,
 date:new Date().toLocaleDateString(),
 status:"Pending"
 });
 localStorage.setItem("orders", JSON.stringify(orders));
-
 localStorage.setItem("firstOrderDone","yes");
 
 /* WHATSAPP */
-let msg = `🧾 New Order\n\n`;
-msg += `Order ID: ${orderID}\n\n`;
+let msg = `🧾 New Order\n\nOrder ID: ${orderID}\n\n`;
 
-orderItems.forEach(i=>{
+cart.forEach(i=>{
 msg += `${i.name} x${i.qty} = ₹${i.price*i.qty}\n`;
 });
 
 msg += `\nTotal: ₹${total}`;
-msg += `\nPayment: ${pay}`; // ✅ FIX
+msg += `\nPayment: ${pay}`;
 msg += `\nName: ${name}`;
 msg += `\nPhone: ${phone}`;
 msg += `\nAddress: ${address}`;
@@ -216,7 +297,6 @@ msg += `\nAddress: ${address}`;
 window.open("https://wa.me/919639228237?text="+encodeURIComponent(msg));
 
 localStorage.removeItem("cart");
-cart=[];
 
 /* SUCCESS */
 document.body.innerHTML = `
@@ -225,7 +305,29 @@ document.body.innerHTML = `
 <h2>Order Placed</h2>
 <p>ID: <b>${orderID}</b></p>
 <p>Payment: <b>${pay}</b></p>
-<a href="index.html"><button class="primary">Go Home</button></a>
+
+<button onclick="location.href='index.html'">Go Home</button>
+<button onclick="viewOrders()">View Orders</button>
+</div>
+`;
+}
+
+/* VIEW ORDERS */
+function viewOrders(){
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+document.body.innerHTML = `
+<div class="container">
+<h2>Your Orders</h2>
+${orders.map(o=>`
+<div style="border:1px solid #ccc;padding:10px;margin:10px;">
+<b>${o.id}</b> (${o.status})<br>
+${o.items.map(i=>`${i.name} x${i.qty}`).join("<br>")}
+<br>Total: ₹${o.total}
+</div>
+`).join("")}
+
+<button onclick="location.href='index.html'">Back Home</button>
 </div>
 `;
 }
@@ -244,4 +346,4 @@ showCart();
 </script>
 
 </body>
-</html>
+  </html>
