@@ -23,10 +23,34 @@ color:#fff;
 box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
 
+/* ✨ LOGO ANIMATION (NEW) */
+.logo{
+font-weight:600;
+font-size:20px;
+background:linear-gradient(90deg,#fff,#FFD700,#fff);
+background-size:200% auto;
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:shine 3s linear infinite;
+}
+@keyframes shine{
+to{background-position:200% center;}
+}
+
 header a{
 color:#fff;
 text-decoration:none;
 margin:0 10px;
+font-size:14px;
+}
+
+/* 🚨 DELIVERY BANNER (NEW) */
+.delivery-banner{
+background:#ffeb3b;
+color:#000;
+text-align:center;
+padding:8px;
+font-weight:600;
 font-size:14px;
 }
 
@@ -71,6 +95,7 @@ padding:15px;
 text-align:center;
 transition:.2s;
 box-shadow:0 2px 8px rgba(0,0,0,.08);
+position:relative;
 }
 
 .card:hover{
@@ -115,6 +140,11 @@ border-radius:6px;
 padding:8px 14px;
 cursor:pointer;
 font-size:14px;
+transition:.2s;
+}
+
+button:hover{
+opacity:.9;
 }
 
 .add{
@@ -173,10 +203,10 @@ text-align:center;
 border-bottom:1px solid #eee;
 }
 
-/* MINI CART */
+/* 🛒 MINI CART (UPGRADED) */
 .mini-cart{
 position:fixed;
-right:0;
+right:-320px;
 top:0;
 width:300px;
 height:100%;
@@ -185,7 +215,12 @@ padding:20px;
 box-shadow:-5px 0 20px rgba(0,0,0,.2);
 overflow-y:auto;
 z-index:1002;
-display:none;
+transition:.3s;
+}
+
+/* OPEN STATE */
+.mini-cart.open{
+right:0;
 }
 
 /* OVERLAY */
@@ -198,6 +233,10 @@ height:100%;
 background:rgba(0,0,0,.5);
 z-index:1001;
 display:none;
+}
+
+.cart-overlay.show{
+display:block;
 }
 
 /* FLOATING CART */
@@ -273,4 +312,4 @@ align-items:flex-start;
 .hero{
 margin:10px;
 }
-  }
+                          }
