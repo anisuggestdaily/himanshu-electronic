@@ -21,7 +21,7 @@ background:#111;
 color:#fff;
 }
 
-/* LOGO */
+/* LOGO (SYNCED) */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -31,12 +31,14 @@ background-size:200% auto;
 -webkit-text-fill-color:transparent;
 animation:shine 3s linear infinite;
 }
-@keyframes shine{
-to{background-position:200% center;}
-}
+@keyframes shine{to{background-position:200% center;}}
 
 /* PAGE */
-body{animation:fadePage .5s ease;}
+body{
+animation:fadePage .5s ease;
+background:#f5f6fa;
+font-family:'Poppins',sans-serif;
+}
 @keyframes fadePage{from{opacity:0;}to{opacity:1;}}
 
 /* LAYOUT */
@@ -87,11 +89,25 @@ background:#111;
 color:#fff;
 cursor:pointer;
 border-radius:5px;
+width:100%;
 }
 button:hover{
 background:#FFD700;
 color:#000;
 }
+
+/* LINKS AS BUTTON */
+.action-btn{
+display:block;
+margin:10px 0;
+padding:10px;
+border-radius:6px;
+text-align:center;
+text-decoration:none;
+background:#25D366;
+color:#fff;
+}
+.call-btn{background:#0A84FF;}
 
 /* MOBILE */
 @media(max-width:768px){
@@ -136,13 +152,11 @@ flex-direction:column;
 
 <br><br>
 
-<a href="https://wa.me/919639228237?text=Hello%20I%20need%20help%20with%20an%20order" target="_blank">
+<a class="action-btn" href="https://wa.me/919639228237?text=Hello%20I%20need%20help%20with%20an%20order" target="_blank">
 💬 Order Help on WhatsApp
 </a>
 
-<br><br>
-
-<a href="tel:919639228237">
+<a class="action-btn call-btn" href="tel:919639228237">
 📞 Call Now
 </a>
 
@@ -164,7 +178,7 @@ View Location on Google Maps
 
 <br>
 
-<a href="https://wa.me/919639228237" target="_blank">
+<a class="action-btn" href="https://wa.me/919639228237" target="_blank">
 Chat on WhatsApp
 </a>
 
@@ -188,7 +202,7 @@ alert("Please fill all fields");
 return;
 }
 
-let text = `📩 New Contact Message:\n\nName: ${name}\nEmail: ${email}\nMessage: ${msg}`;
+let text = `📩 *New Contact Message*\n\n👤 Name: ${name}\n📧 Email: ${email}\n📝 Message: ${msg}`;
 
 window.open("https://wa.me/919639228237?text=" + encodeURIComponent(text));
 
