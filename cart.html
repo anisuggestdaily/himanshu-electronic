@@ -7,9 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
 
 <style>
+
+body{font-family:Poppins;}
 
 /* HEADER */
 header{
@@ -21,7 +22,6 @@ background:#111;
 color:#fff;
 }
 
-/* LOGO */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -35,39 +35,10 @@ animation:shine 3s linear infinite;
 to{background-position:200% center;}
 }
 
-/* INPUT */
 input,textarea{
 width:100%;
 margin:8px 0;
 padding:10px;
-}
-
-/* FREE DELIVERY MESSAGE */
-#freeMsg{
-text-align:center;
-font-weight:600;
-margin:10px 0;
-}
-
-/* SUCCESS */
-.success-box{
-max-width:400px;
-margin:80px auto;
-background:#fff;
-padding:25px;
-border-radius:12px;
-text-align:center;
-box-shadow:0 5px 20px rgba(0,0,0,.1);
-animation:pop .5s ease;
-}
-@keyframes pop{
-from{transform:scale(.8);}
-to{transform:scale(1);}
-}
-
-.success-icon{
-font-size:60px;
-color:#28a745;
 }
 
 button{
@@ -79,63 +50,66 @@ cursor:pointer;
 border-radius:5px;
 margin:5px;
 }
-button:hover{
-background:#FFD700;
-color:#000;
-}
 
-/* ✅ FLOATING CART */
-.cart-icon{
+/* FLOATING CART (MATCHED) */
+.floating-cart{
 position:fixed;
 bottom:20px;
 right:20px;
-background:#fb641b;
-color:#fff;
-width:55px;
-height:55px;
+background:#FFD700;
+width:60px;
+height:60px;
 border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:22px;
-box-shadow:0 5px 15px rgba(0,0,0,.2);
+font-size:24px;
 cursor:pointer;
 z-index:1000;
 }
 
-.cart-count{
-position:absolute;
-top:-5px;
-right:-5px;
-background:red;
+/* POPUP */
+#popup{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%) scale(0);
+background:#28a745;
 color:#fff;
-font-size:12px;
-padding:3px 7px;
-border-radius:50%;
+padding:12px 20px;
+border-radius:8px;
+transition:.4s;
+z-index:5000;
 }
 
 </style>
-
 </head>
 
 <body>
 
 <header>
 <h2 class="logo">Himanshu Electronics</h2>
-
 <div>
 <a href="index.html">Home</a>
 <a href="product.html">Products</a>
 </div>
 </header>
 
-<div class="container">
-
 <h2 style="text-align:center;">My Cart</h2>
 
 <p id="freeMsg"></p>
 
-<table>
+<!-- COUPON -->
+<div style="text-align:center;">
+<input id="coupon" placeholder="Enter Coupon">
+<button onclick="applyCoupon()">Apply</button>
+<p id="couponMsg"></p>
+</div>
+
+<!-- POPUP -->
+<div id="popup">🎉 Free Delivery Unlocked!</div>
+
+<table border="1" width="100%">
 <thead>
 <tr>
 <th>Product</th>
@@ -150,77 +124,67 @@ border-radius:50%;
 
 <tfoot>
 <tr><td>Subtotal</td><td id="subtotal"></td></tr>
-<tr><td>Handling</td><td id="handling"></td></tr>
+<tr><td>Discount</td><td id="discountRow">₹0</td></tr>
 <tr><td>Delivery</td><td id="delivery"></td></tr>
 <tr><td><b>Total</b></td><td id="total"></td></tr>
 </tfoot>
 </table>
 
-<h3>Payment Method</h3>
-<label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
+<h3>Payment</h3>
+<label><input type="radio" name="pay" value="COD" checked> COD</label>
 <label><input type="radio" name="pay" value="UPI"> UPI</label>
 
 <div id="upiBox" style="display:none;">
-<p>UPI ID: <b>paytm.s1ktca0@pty</b></p>
+UPI: paytm.s1ktca0@pty
 </div>
 
 <h3>Your Details</h3>
-<input id="name" placeholder="Your Name">
-<input id="phone" placeholder="Phone Number">
-<textarea id="address" placeholder="Full Address"></textarea>
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
+<textarea id="address" placeholder="Address"></textarea>
 
-<p style="color:red;font-size:14px;">
-🚚 Delivery available only in Bijnor
-</p>
-
-<div style="text-align:center;margin-top:20px;">
+<div style="text-align:center;">
 <button onclick="clearCart()">Clear Cart</button>
 <button onclick="order()">Confirm Order</button>
 </div>
 
-</div>
-
-<!-- ✅ FLOATING CART -->
-<div class="cart-icon">
-🛒 <span id="cartCount" class="cart-count">0</span>
-</div>
+<!-- FLOATING CART -->
+<div class="floating-cart" onclick="location.href='product.html'">🛒</div>
 
 <script>
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let firstOrder = localStorage.getItem("firstOrderDone");
+let discount = 0;
+let couponUsed = false;
+let popupShown = false;
 
-/* SHOW CART */
+/* SHOW */
 function showCart(){
 
-updateCartCount(); // ✅ FIX
-
 if(cart.length===0){
-document.getElementById("list").innerHTML =
-`<tr><td colspan="5">Cart Empty</td></tr>`;
+list.innerHTML=`<tr><td colspan="5">Cart Empty</td></tr>`;
 updateTotals(0);
 return;
 }
 
-let subtotal = 0;
+let subtotal=0;
 
-document.getElementById("list").innerHTML = cart.map((i,index)=>{
-let sub = i.price * i.qty;
-subtotal += sub;
+list.innerHTML = cart.map((i,idx)=>{
+let qty=i.qty||1;
+let sub=i.price*qty;
+subtotal+=sub;
 
-return `
-<tr>
+return `<tr>
 <td>${i.name}</td>
 <td>₹${i.price}</td>
 <td>
-<button onclick="dec(${index})">-</button>
-${i.qty}
-<button onclick="inc(${index})">+</button>
+<button onclick="dec(${idx})">-</button>
+${qty}
+<button onclick="inc(${idx})">+</button>
 </td>
 <td>₹${sub}</td>
-<td><button onclick="removeItem(${index})">❌</button></td>
-</tr>
-`;
+<td><button onclick="removeItem(${idx})">❌</button></td>
+</tr>`;
 }).join("");
 
 updateTotals(subtotal);
@@ -229,33 +193,52 @@ updateTotals(subtotal);
 /* TOTAL */
 function updateTotals(subtotal){
 
-let handling = firstOrder ? 9 : 0;
-let delivery = subtotal >= 500 ? 0 : 20;
-let total = subtotal + handling + delivery;
+let delivery = subtotal>=500?0:20;
 
-let msg = document.getElementById("freeMsg");
-
-if(subtotal === 0){
-msg.innerText = "";
+/* POPUP ONCE */
+if(subtotal>=500 && !popupShown){
+popupShown=true;
+let p=document.getElementById("popup");
+p.style.transform="translateX(-50%) scale(1)";
+setTimeout(()=>p.style.transform="translateX(-50%) scale(0)",2000);
 }
-else if(subtotal >= 500){
-msg.innerText = "🎉 Wow! You get FREE delivery";
-msg.style.color = "green";
+
+let total = subtotal + delivery - discount;
+total = Math.max(0,total);
+
+subtotalEl.innerText="₹"+subtotal;
+discountRow.innerText="-₹"+discount;
+deliveryEl.innerText=delivery===0?"FREE":"₹"+delivery;
+totalEl.innerText="₹"+total;
+}
+
+/* COUPON */
+function applyCoupon(){
+
+if(couponUsed) return;
+
+let code=coupon.value.toUpperCase();
+let subtotal=cart.reduce((s,i)=>s+(i.price*(i.qty||1)),0);
+
+if(code==="SAVE50" && subtotal>=1000){
+discount=50;
+couponMsg.innerText="Applied SAVE50";
+couponUsed=true;
+}
+else if(code==="FIRST100" && subtotal>=1500){
+discount=100;
+couponMsg.innerText="Applied FIRST100";
+couponUsed=true;
 }
 else{
-let remaining = 500 - subtotal;
-msg.innerText = `Add ₹${remaining} more to get FREE delivery`;
-msg.style.color = "#0A84FF";
+couponMsg.innerText="Invalid coupon";
 }
 
-document.getElementById("subtotal").innerText = "₹"+subtotal;
-document.getElementById("handling").innerText = handling===0?"FREE":"₹"+handling;
-document.getElementById("delivery").innerText = delivery===0?"FREE":"₹"+delivery;
-document.getElementById("total").innerText = "₹"+total;
+updateTotals(subtotal);
 }
 
 /* QTY */
-function inc(i){cart[i].qty++;save();}
+function inc(i){cart[i].qty=(cart[i].qty||1)+1;save();}
 function dec(i){
 cart[i].qty--;
 if(cart[i].qty<=0) cart.splice(i,1);
@@ -263,104 +246,37 @@ save();
 }
 
 /* REMOVE */
-function removeItem(i){
-cart.splice(i,1);
-save();
-}
+function removeItem(i){cart.splice(i,1);save();}
 
 /* SAVE */
 function save(){
-localStorage.setItem("cart", JSON.stringify(cart));
+localStorage.setItem("cart",JSON.stringify(cart));
 showCart();
-}
-
-/* CLEAR */
-function clearCart(){
-if(confirm("Clear cart?")){
-localStorage.removeItem("cart");
-cart=[];
-showCart();
-}
 }
 
 /* ORDER */
 function order(){
 
-if(cart.length===0){
-alert("Cart empty");
+let phone=document.getElementById("phone").value;
+
+if(!/^[0-9]{10}$/.test(phone)){
+alert("Enter valid 10-digit phone");
 return;
 }
 
-let name = document.getElementById("name").value;
-let phone = document.getElementById("phone").value;
-let address = document.getElementById("address").value;
-let pay = document.querySelector('input[name="pay"]:checked').value;
+let subtotal=cart.reduce((s,i)=>s+(i.price*(i.qty||1)),0);
+let delivery=subtotal>=500?0:20;
+let total=Math.max(0,subtotal+delivery-discount);
 
-if(!name||!phone||!address){
-alert("Fill all details");
-return;
-}
+let items=cart.map(i=>`${i.name} x${i.qty}`).join(", ");
 
-/* Bijnor check */
-let addr = address.toLowerCase();
-if(!addr.includes("bijnor")){
-alert("❌ Delivery only in Bijnor");
-return;
-}
-
-let subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
-let handling = firstOrder ? 9 : 0;
-let delivery = subtotal >= 500 ? 0 : 20;
-let total = subtotal + handling + delivery;
-
-let orderID = "HE-" + Date.now();
-
-/* SAVE ORDER */
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-orders.push({
-id:orderID,
-name,phone,address,
-items:cart,
-total,
-payment:pay,
-date:new Date().toLocaleDateString(),
-status:"Pending"
-});
-localStorage.setItem("orders", JSON.stringify(orders));
-localStorage.setItem("firstOrderDone","yes");
-
-/* WhatsApp */
-let msg = `Order ID: ${orderID}\nTotal: ₹${total}`;
+let msg=`Order\nItems: ${items}\nTotal: ₹${total}`;
 window.open("https://wa.me/919639228237?text="+encodeURIComponent(msg));
 
 localStorage.removeItem("cart");
 
-/* SUCCESS */
-document.body.innerHTML = `
-<div class="success-box">
-<div class="success-icon">✅</div>
-<h2>Order Placed</h2>
-<p>ID: <b>${orderID}</b></p>
-<p>Payment: <b>${pay}</b></p>
-
-<button onclick="location.href='index.html'">Go Home</button>
-</div>
-`;
+document.body.innerHTML=`<h2 style="text-align:center;">✅ Order Placed</h2>`;
 }
-
-/* COUNT */
-function updateCartCount(){
-let total = cart.reduce((s,p)=>s+(p.qty||1),0);
-document.getElementById("cartCount").innerText = total;
-}
-
-/* UPI */
-document.querySelectorAll('input[name="pay"]').forEach(r=>{
-r.addEventListener("change",()=>{
-document.getElementById("upiBox").style.display =
-(r.value==="UPI" && r.checked)?"block":"none";
-});
-});
 
 /* INIT */
 showCart();
@@ -368,4 +284,4 @@ showCart();
 </script>
 
 </body>
-  </html>
+                                              </html>
