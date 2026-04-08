@@ -115,6 +115,24 @@ background:#FFD700;
 color:#000;
 }
 
+/* ✅ FLOATING CART */
+.floating-cart{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#FFD700;
+width:60px;
+height:60px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+cursor:pointer;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+z-index:3000;
+}
+
 </style>
 </head>
 
@@ -160,10 +178,13 @@ color:#000;
 <button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
+<!-- ✅ FLOATING CART BUTTON -->
+<div class="floating-cart" onclick="toggleCart()">🛒</div>
+
 <script>
 
 /* ========================= */
-/* LOAD PRODUCTS (FIXED) */
+/* LOAD PRODUCTS */
 /* ========================= */
 
 let defaultProducts = [
@@ -203,26 +224,15 @@ let defaultProducts = [
 
 ];
 
-/* ADD IDS */
 let defaultWithId = defaultProducts.map((p,i)=>({...p,id:i}));
-
-/* ✅ LOAD ADMIN PRODUCTS */
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
-
-/* COMBINE */
 let products = [...defaultWithId, ...adminProducts];
 
-/* ========================= */
 /* STATE */
-/* ========================= */
-
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-/* ========================= */
 /* SHOW PRODUCTS */
-/* ========================= */
-
 function showProducts(list=products){
 
 document.getElementById("products").innerHTML = list.map(p=>{
@@ -235,7 +245,7 @@ return `
 
 <div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish(${p.id})">❤</div>
 
-<img src="${p.img}" onclick="viewProduct(${p.id})">
+<img src="${p.img}" onerror="this.src='images/default.jpg'" onclick="viewProduct(${p.id})">
 
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
@@ -252,10 +262,7 @@ ${inCart ? "✅ Added" : "Add to Cart"}
 }).join("");
 }
 
-/* ========================= */
-/* ADD TO CART (FIXED) */
-/* ========================= */
-
+/* ADD TO CART */
 function addToCart(id){
 
 let item = products.find(p=>p.id===id);
@@ -274,20 +281,14 @@ showProducts();
 playSound();
 }
 
-/* ========================= */
-/* VIEW PRODUCT */
-/* ========================= */
-
+/* VIEW */
 function viewProduct(id){
 let item = products.find(p=>p.id===id);
 localStorage.setItem("viewProduct", JSON.stringify(item));
 location.href="product-view.html";
 }
 
-/* ========================= */
-/* FILTER (FIXED) */
-/* ========================= */
-
+/* FILTER */
 function filter(){
 
 let s=document.getElementById("search").value.toLowerCase();
@@ -301,10 +302,7 @@ p.name.toLowerCase().includes(s) &&
 showProducts(filtered);
 }
 
-/* ========================= */
 /* CART */
-/* ========================= */
-
 function saveCart(){
 localStorage.setItem("cart", JSON.stringify(cart));
 }
@@ -328,6 +326,7 @@ let total=0;
 if(cart.length===0){
 div.innerHTML="Cart is empty";
 document.getElementById("total").innerText="";
+updateCartCount();
 return;
 }
 
@@ -336,7 +335,8 @@ total += p.price * p.qty;
 return `<p>${p.name} x${p.qty} <button onclick="removeItem(${i})">❌</button></p>`;
 }).join("");
 
-document.getElementById("total").innerText="Total: ₹"+total;
+document.getElementById("total").innerText="Total: ₹"+total.toLocaleString("en-IN");
+updateCartCount();
 }
 
 function removeItem(i){
@@ -346,10 +346,7 @@ updateCartCount();
 renderCart();
 }
 
-/* ========================= */
 /* WISHLIST */
-/* ========================= */
-
 function toggleWish(id){
 if(wishlist.includes(id)){
 wishlist = wishlist.filter(x=>x!==id);
@@ -360,20 +357,14 @@ localStorage.setItem("wishlist", JSON.stringify(wishlist));
 showProducts();
 }
 
-/* ========================= */
 /* SOUND */
-/* ========================= */
-
 function playSound(){
 let s=document.getElementById("cartSound");
 s.currentTime=0;
 s.play().catch(()=>{});
 }
 
-/* ========================= */
 /* INIT */
-/* ========================= */
-
 showProducts();
 updateCartCount();
 
