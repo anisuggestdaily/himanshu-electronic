@@ -63,7 +63,6 @@ text-decoration:none;
 }
 nav a:hover{color:#FFD700;}
 
-/* CART BUTTON */
 .cart-btn{
 cursor:pointer;
 font-size:20px;
@@ -77,7 +76,7 @@ padding:3px 7px;
 font-size:12px;
 }
 
-/* 🚨 DELIVERY BANNER */
+/* DELIVERY */
 .delivery-banner{
 background:#FFD700;
 color:#000;
@@ -99,6 +98,7 @@ background:#FFD700;
 padding:10px 20px;
 border:none;
 border-radius:6px;
+cursor:pointer;
 }
 
 /* FEATURES */
@@ -117,6 +117,17 @@ border-radius:10px;
 width:250px;
 text-align:center;
 box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* FEATURE BUTTON */
+.feature a{
+display:inline-block;
+margin-top:10px;
+padding:8px 15px;
+background:#FFD700;
+border-radius:6px;
+text-decoration:none;
+color:#000;
 }
 
 /* PRODUCTS */
@@ -143,7 +154,17 @@ object-fit:cover;
 border-radius:8px;
 }
 
-/* FLOATING CART (FIXED ✅) */
+.view-btn{
+margin-top:10px;
+padding:8px 15px;
+background:#111;
+color:#fff;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* FLOATING CART */
 .floating-cart{
 position:fixed;
 bottom:20px;
@@ -170,7 +191,7 @@ width:300px;
 height:100%;
 background:#fff;
 padding:15px;
-transition:.3s;
+transition:right 0.3s ease;
 z-index:3000;
 overflow-y:auto;
 }
@@ -231,7 +252,7 @@ to{background-position:200% center;}
 </div>
 
 <div class="hero">
-<h2>Best Bulbs, Fans & Lights</h2>
+<h2>Smart Products For Smart Home</h2>
 <p>High-quality electrical products at affordable prices.</p>
 <button onclick="location.href='product.html'">Shop Now</button>
 </div>
@@ -239,12 +260,16 @@ to{background-position:200% center;}
 <div class="features">
 <div class="feature">⚡ Fast Delivery</div>
 <div class="feature">💰 Best Prices</div>
-<div class="feature">📞 Support</div>
+<div class="feature">
+📞 Support <br>
+<a href="contact.html">Contact Us</a>
 </div>
+</div>
+
+<h2 style="text-align:center;margin-top:20px;">Featured Products</h2>
 
 <div class="products-grid" id="featured"></div>
 
-<!-- FLOATING CART BUTTON -->
 <div class="floating-cart" onclick="toggleCart()">🛒</div>
 
 <div class="cart-overlay" id="overlay" onclick="toggleCart()"></div>
@@ -258,29 +283,35 @@ to{background-position:200% center;}
 
 <footer>
 <p>📞 +91 9639228237</p>
+<p>📧 himanshuelectronics@gmail.com</p>
 <p>&copy; 2026 Himanshu Electronics</p>
 </footer>
 
 <script>
 
 /* LOADER */
-window.onload = ()=>{
+window.addEventListener("load", ()=>{
 document.getElementById("loader").style.display="none";
-renderCart(); // FIX ✅
-};
+renderCart();
+});
 
-/* PRODUCTS */
+/* PRODUCTS (6 ITEMS) */
 const featuredProducts = [
 {name:"LED Bulb 9W",price:40,img:"images/led9w.jpg"},
-{name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"}
+{name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"},
+{name:"Ceiling Fan",price:1500,img:"images/fan.jpg"},
+{name:"LED Tube Light",price:300,img:"images/tube.jpg"},
+{name:"Wall Light",price:250,img:"images/wall.jpg"},
+{name:"Extension Board",price:200,img:"images/board.jpg"}
 ];
 
 document.getElementById("featured").innerHTML =
 featuredProducts.map((p,i)=>`
 <div class="card">
-<img src="${p.img}" onclick="viewProduct(${i})">
+<img src="${p.img}" onerror="this.src='images/default.jpg'">
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
+<button class="view-btn" onclick="viewProduct(${i})">View</button>
 </div>`).join("");
 
 function viewProduct(i){
@@ -306,13 +337,21 @@ document.getElementById("overlay").classList.toggle("show");
 renderCart();
 }
 
+function removeItem(i){
+cart.splice(i,1);
+saveCart();
+renderCart();
+}
+
 function renderCart(){
 let div=document.getElementById("miniItems");
 let totalDiv=document.getElementById("cartTotal");
 
 if(cart.length===0){
-div.innerHTML="Cart is empty";
+div.innerHTML=`Cart is empty 😔 <br><br>
+<button onclick="location.href='product.html'">Shop Now</button>`;
 totalDiv.innerText="";
+updateCartCount();
 return;
 }
 
@@ -321,10 +360,11 @@ let total=0;
 div.innerHTML = cart.map((p,i)=>{
 let qty=p.qty||1;
 total+=p.price*qty;
-return `${p.name} x${qty} ❌`;
+return `${p.name} x${qty} 
+<button onclick="removeItem(${i})">❌</button>`;
 }).join("<br>");
 
-totalDiv.innerText="Total ₹"+total;
+totalDiv.innerText="Total ₹"+total.toLocaleString("en-IN");
 updateCartCount();
 }
 
