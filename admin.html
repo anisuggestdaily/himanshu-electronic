@@ -60,7 +60,7 @@ margin:10px 0;
 <input id="pass" type="password" placeholder="Password">
 
 <br><br>
-<button class="primary" onclick="login()">Login</button>
+<button onclick="login()">Login</button>
 </div>
 
 <!-- ADMIN PANEL -->
@@ -70,7 +70,7 @@ margin:10px 0;
 
 <h2 style="text-align:center;">📊 Admin Dashboard</h2>
 
-<button class="danger" onclick="logout()">Logout</button>
+<button onclick="logout()">Logout</button>
 
 <!-- ADD PRODUCT -->
 <div class="admin-card">
@@ -79,7 +79,9 @@ margin:10px 0;
 
 <input id="name" placeholder="Product Name">
 <input id="price" type="number" placeholder="Price">
-<input id="img" placeholder="Image Path">
+
+<!-- ✅ IMAGE UPLOAD -->
+<input id="imgFile" type="file" accept="image/*">
 
 <select id="cat">
 <option value="bulb">Bulb</option>
@@ -88,7 +90,7 @@ margin:10px 0;
 </select>
 
 <br>
-<button class="primary" onclick="addProduct()">Add Product</button>
+<button onclick="addProduct()">Add Product</button>
 
 </div>
 
@@ -168,24 +170,29 @@ showOrders();
 
 let products = JSON.parse(localStorage.getItem("adminProducts")) || [];
 
+/* ADD PRODUCT WITH IMAGE */
 function addProduct(){
 
 let name=document.getElementById("name").value.trim();
 let price=document.getElementById("price").value;
-let img=document.getElementById("img").value.trim();
+let file=document.getElementById("imgFile").files[0];
 let cat=document.getElementById("cat").value;
 
-if(!name || !price || !img){
+if(!name || !price || !file){
 alert("Fill all fields");
 return;
 }
 
-/* ✅ FIX: ADD UNIQUE ID */
+/* CONVERT IMAGE TO BASE64 */
+let reader = new FileReader();
+
+reader.onload = function(e){
+
 products.push({
-id: Date.now(),
+id: Date.now(), // ✅ IMPORTANT
 name,
 price:Number(price),
-img,
+img:e.target.result,
 cat
 });
 
@@ -193,10 +200,14 @@ localStorage.setItem("adminProducts", JSON.stringify(products));
 
 showProducts();
 
-/* CLEAR INPUTS */
+/* CLEAR */
 document.getElementById("name").value="";
 document.getElementById("price").value="";
-document.getElementById("img").value="";
+document.getElementById("imgFile").value="";
+
+};
+
+reader.readAsDataURL(file);
 }
 
 /* SHOW PRODUCTS */
@@ -211,7 +222,9 @@ return;
 div.innerHTML = products.map((p,i)=>`
 <div class="product">
 <b>${p.name}</b> - ₹${p.price}
-<br><small>Category: ${p.cat}</small>
+<br><small>${p.cat}</small>
+<br>
+<img src="${p.img}" width="60">
 <br>
 <button onclick="deleteProduct(${i})">Delete</button>
 </div>
@@ -281,7 +294,7 @@ return `
 <p><b>Status:</b> ${o.status || "Pending"}</p>
 
 <button onclick="markDelivered(${i})">Mark Delivered</button>
-<button class="danger" onclick="deleteOrder(${i})">Delete</button>
+<button onclick="deleteOrder(${i})">Delete</button>
 
 </div>
 `;
@@ -311,4 +324,4 @@ showOrders();
 </script>
 
 </body>
-</html>
+  </html>
