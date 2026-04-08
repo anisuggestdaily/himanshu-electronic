@@ -140,6 +140,11 @@ color:#000;
 <input id="phone" placeholder="Phone Number">
 <textarea id="address" placeholder="Full Address"></textarea>
 
+<!-- ✅ DELIVERY NOTE -->
+<p style="color:red;font-size:14px;">
+🚚 Delivery available only in Bijnor
+</p>
+
 <div style="text-align:center;margin-top:20px;">
 <button onclick="clearCart()">Clear Cart</button>
 <button onclick="order()">Confirm Order</button>
@@ -185,21 +190,20 @@ ${i.qty}
 updateTotals(subtotal);
 }
 
-/* TOTAL + FREE DELIVERY MESSAGE */
+/* TOTAL + MESSAGE */
 function updateTotals(subtotal){
 
 let handling = firstOrder ? 9 : 0;
 let delivery = subtotal >= 500 ? 0 : 20;
 let total = subtotal + handling + delivery;
 
-/* MESSAGE */
 let msg = document.getElementById("freeMsg");
 
 if(subtotal === 0){
 msg.innerText = "";
 }
 else if(subtotal >= 500){
-msg.innerText = "🎉 Wow! You get FREE delivery on orders above ₹500";
+msg.innerText = "🎉 Wow! You get FREE delivery on order above ₹500";
 msg.style.color = "green";
 }
 else{
@@ -208,7 +212,6 @@ msg.innerText = `Add ₹${remaining} more to get FREE delivery`;
 msg.style.color = "#0A84FF";
 }
 
-/* TOTAL UI */
 document.getElementById("subtotal").innerText = "₹"+subtotal;
 document.getElementById("handling").innerText = handling===0?"FREE":"₹"+handling;
 document.getElementById("delivery").innerText = delivery===0?"FREE":"₹"+delivery;
@@ -257,6 +260,17 @@ let pay = document.querySelector('input[name="pay"]:checked').value;
 
 if(!name||!phone||!address){
 alert("Fill all details");
+return;
+}
+
+/* ✅ BIJNOR RESTRICTION */
+let addr = address.toLowerCase();
+let allowed = ["bijnor","bijnor up","bijnor uttar pradesh"];
+
+let isValid = allowed.some(a => addr.includes(a));
+
+if(!isValid){
+alert("❌ Sorry! We deliver only in Bijnor.\nPlease enter a valid Bijnor address.");
 return;
 }
 
@@ -332,7 +346,7 @@ ${o.items.map(i=>`${i.name} x${i.qty}`).join("<br>")}
 `;
 }
 
-/* UPI TOGGLE */
+/* UPI */
 document.querySelectorAll('input[name="pay"]').forEach(r=>{
 r.addEventListener("change",()=>{
 document.getElementById("upiBox").style.display =
@@ -346,4 +360,4 @@ showCart();
 </script>
 
 </body>
-  </html>
+</html>
