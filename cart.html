@@ -84,6 +84,36 @@ background:#FFD700;
 color:#000;
 }
 
+/* ✅ FLOATING CART */
+.cart-icon{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#fb641b;
+color:#fff;
+width:55px;
+height:55px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+box-shadow:0 5px 15px rgba(0,0,0,.2);
+cursor:pointer;
+z-index:1000;
+}
+
+.cart-count{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
+color:#fff;
+font-size:12px;
+padding:3px 7px;
+border-radius:50%;
+}
+
 </style>
 
 </head>
@@ -103,7 +133,6 @@ color:#000;
 
 <h2 style="text-align:center;">My Cart</h2>
 
-<!-- FREE DELIVERY MESSAGE -->
 <p id="freeMsg"></p>
 
 <table>
@@ -140,7 +169,6 @@ color:#000;
 <input id="phone" placeholder="Phone Number">
 <textarea id="address" placeholder="Full Address"></textarea>
 
-<!-- ✅ DELIVERY NOTE -->
 <p style="color:red;font-size:14px;">
 🚚 Delivery available only in Bijnor
 </p>
@@ -152,6 +180,11 @@ color:#000;
 
 </div>
 
+<!-- ✅ FLOATING CART -->
+<div class="cart-icon">
+🛒 <span id="cartCount" class="cart-count">0</span>
+</div>
+
 <script>
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -159,6 +192,9 @@ let firstOrder = localStorage.getItem("firstOrderDone");
 
 /* SHOW CART */
 function showCart(){
+
+updateCartCount(); // ✅ FIX
+
 if(cart.length===0){
 document.getElementById("list").innerHTML =
 `<tr><td colspan="5">Cart Empty</td></tr>`;
@@ -190,7 +226,7 @@ ${i.qty}
 updateTotals(subtotal);
 }
 
-/* TOTAL + MESSAGE */
+/* TOTAL */
 function updateTotals(subtotal){
 
 let handling = firstOrder ? 9 : 0;
@@ -203,7 +239,7 @@ if(subtotal === 0){
 msg.innerText = "";
 }
 else if(subtotal >= 500){
-msg.innerText = "🎉 Wow! You get FREE delivery on order above ₹500";
+msg.innerText = "🎉 Wow! You get FREE delivery";
 msg.style.color = "green";
 }
 else{
@@ -240,9 +276,11 @@ showCart();
 
 /* CLEAR */
 function clearCart(){
+if(confirm("Clear cart?")){
 localStorage.removeItem("cart");
 cart=[];
 showCart();
+}
 }
 
 /* ORDER */
@@ -263,14 +301,10 @@ alert("Fill all details");
 return;
 }
 
-/* ✅ BIJNOR RESTRICTION */
+/* Bijnor check */
 let addr = address.toLowerCase();
-let allowed = ["bijnor","bijnor up","bijnor uttar pradesh"];
-
-let isValid = allowed.some(a => addr.includes(a));
-
-if(!isValid){
-alert("❌ Sorry! We deliver only in Bijnor.\nPlease enter a valid Bijnor address.");
+if(!addr.includes("bijnor")){
+alert("❌ Delivery only in Bijnor");
 return;
 }
 
@@ -295,19 +329,8 @@ status:"Pending"
 localStorage.setItem("orders", JSON.stringify(orders));
 localStorage.setItem("firstOrderDone","yes");
 
-/* WHATSAPP */
-let msg = `🧾 New Order\n\nOrder ID: ${orderID}\n\n`;
-
-cart.forEach(i=>{
-msg += `${i.name} x${i.qty} = ₹${i.price*i.qty}\n`;
-});
-
-msg += `\nTotal: ₹${total}`;
-msg += `\nPayment: ${pay}`;
-msg += `\nName: ${name}`;
-msg += `\nPhone: ${phone}`;
-msg += `\nAddress: ${address}`;
-
+/* WhatsApp */
+let msg = `Order ID: ${orderID}\nTotal: ₹${total}`;
 window.open("https://wa.me/919639228237?text="+encodeURIComponent(msg));
 
 localStorage.removeItem("cart");
@@ -321,29 +344,14 @@ document.body.innerHTML = `
 <p>Payment: <b>${pay}</b></p>
 
 <button onclick="location.href='index.html'">Go Home</button>
-<button onclick="viewOrders()">View Orders</button>
 </div>
 `;
 }
 
-/* VIEW ORDERS */
-function viewOrders(){
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-
-document.body.innerHTML = `
-<div class="container">
-<h2>Your Orders</h2>
-${orders.map(o=>`
-<div style="border:1px solid #ccc;padding:10px;margin:10px;">
-<b>${o.id}</b> (${o.status})<br>
-${o.items.map(i=>`${i.name} x${i.qty}`).join("<br>")}
-<br>Total: ₹${o.total}
-</div>
-`).join("")}
-
-<button onclick="location.href='index.html'">Back Home</button>
-</div>
-`;
+/* COUNT */
+function updateCartCount(){
+let total = cart.reduce((s,p)=>s+(p.qty||1),0);
+document.getElementById("cartCount").innerText = total;
 }
 
 /* UPI */
@@ -360,4 +368,4 @@ showCart();
 </script>
 
 </body>
-</html>
+  </html>
