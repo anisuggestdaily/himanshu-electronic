@@ -21,7 +21,7 @@ background:#111;
 color:#fff;
 }
 
-/* LOGO */
+/* LOGO ANIMATION */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -41,15 +41,6 @@ margin:0 10px;
 text-decoration:none;
 }
 
-/* 🚨 DELIVERY BANNER */
-.delivery-banner{
-background:#FFD700;
-color:#000;
-text-align:center;
-padding:8px;
-font-weight:600;
-}
-
 /* SEARCH */
 .controls{
 max-width:900px;
@@ -65,7 +56,9 @@ border:1px solid #ccc;
 }
 
 /* CARD */
-.card{position:relative;}
+.card{
+position:relative;
+}
 
 /* WISHLIST */
 .wish-btn{
@@ -81,24 +74,6 @@ cursor:pointer;
 
 .rating{color:#f5a623;font-size:14px;}
 
-/* FLOATING CART (NEW ✅) */
-.floating-cart{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#FFD700;
-width:60px;
-height:60px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:24px;
-cursor:pointer;
-box-shadow:0 5px 15px rgba(0,0,0,0.2);
-z-index:3000;
-}
-
 /* CART */
 .mini-cart{
 position:fixed;
@@ -110,7 +85,7 @@ background:#fff;
 padding:15px;
 box-shadow:-5px 0 15px rgba(0,0,0,0.2);
 transition:.3s;
-z-index:4000;
+z-index:2000;
 overflow:auto;
 }
 .mini-cart.open{right:0;}
@@ -123,7 +98,7 @@ width:100%;
 height:100%;
 background:rgba(0,0,0,0.5);
 display:none;
-z-index:3500;
+z-index:1500;
 }
 .overlay.show{display:block;}
 
@@ -158,11 +133,6 @@ color:#000;
 </div>
 </header>
 
-<!-- 🚨 DELIVERY BANNER -->
-<div class="delivery-banner">
-🚚 Delivery Available Only in Bijnor
-</div>
-
 <audio id="cartSound">
 <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3">
 </audio>
@@ -181,9 +151,6 @@ color:#000;
 
 <div class="products-grid" id="products"></div>
 
-<!-- FLOATING CART -->
-<div class="floating-cart" onclick="toggleCart()">🛒</div>
-
 <div class="overlay" id="overlay" onclick="toggleCart()"></div>
 
 <div class="mini-cart" id="miniCart">
@@ -195,8 +162,12 @@ color:#000;
 
 <script>
 
-/* PRODUCTS */
+/* ===================== */
+/* DEFAULT PRODUCTS */
+/* ===================== */
+
 let defaultProducts = [
+
 {name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg"},
 {name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},
 {name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg"},
@@ -229,34 +200,66 @@ let defaultProducts = [
 {name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},
 {name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg"},
 {name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}
+
 ];
 
-let products = defaultProducts.map((p,i)=>({...p,id:i}));
+/* ===================== */
+/* MERGE ADMIN PRODUCTS */
+/* ===================== */
+
+let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+
+adminProducts = adminProducts.map((p,i)=>({
+id: p.id || ("admin_"+i),
+name: p.name,
+price: p.price,
+img: p.img,
+cat: p.cat || "other"
+}));
+
+let defaultWithId = defaultProducts.map((p,i)=>({
+...p,
+id: "default_"+i
+}));
+
+let products = [...defaultWithId, ...adminProducts];
+
+/* ===================== */
+/* CART + WISHLIST */
+/* ===================== */
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-/* SHOW */
+/* SHOW PRODUCTS */
 function showProducts(list=products){
 document.getElementById("products").innerHTML = list.map(p=>{
+
 let inCart = cart.find(c=>c.id===p.id);
 let inWish = wishlist.includes(p.id);
 
 return `
 <div class="card">
-<div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish(${p.id})">❤</div>
-<img src="${p.img}" onclick="viewProduct(${p.id})">
+
+<div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish('${p.id}')">❤</div>
+
+<img src="${p.img}" onclick="viewProduct('${p.id}')">
+
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
+
 <p class="rating">⭐ ${(Math.random()*0.8+4.1).toFixed(1)}</p>
-<button onclick="addToCart(${p.id})">
+
+<button onclick="addToCart('${p.id}')">
 ${inCart ? "✅ Added" : "Add to Cart"}
 </button>
-</div>`;
+
+</div>
+`;
 }).join("");
 }
 
-/* ADD */
+/* ADD TO CART */
 function addToCart(id){
 let item = products.find(p=>p.id===id);
 let existing = cart.find(p=>p.id===id);
@@ -269,6 +272,13 @@ updateCartCount();
 renderCart();
 showProducts();
 playSound();
+}
+
+/* VIEW */
+function viewProduct(id){
+let item = products.find(p=>p.id===id);
+localStorage.setItem("viewProduct", JSON.stringify(item));
+location.href="product-view.html";
 }
 
 /* FILTER */
@@ -346,7 +356,6 @@ s.play().catch(()=>{});
 /* INIT */
 showProducts();
 updateCartCount();
-renderCart(); // FIX ✅
 
 </script>
 
