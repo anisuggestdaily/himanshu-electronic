@@ -96,6 +96,15 @@ font-size:12px;
 margin-left:5px;
 }
 
+/* 🚨 DELIVERY BANNER (NEW) */
+.delivery-banner{
+background:#FFD700;
+color:#000;
+text-align:center;
+padding:8px;
+font-weight:600;
+}
+
 /* HERO */
 .hero{
 text-align:center;
@@ -273,6 +282,11 @@ font-size:22px;
 </div>
 </header>
 
+<!-- 🚨 DELIVERY BANNER -->
+<div class="delivery-banner">
+🚚 Delivery Available Only in Bijnor
+</div>
+
 <!-- HERO -->
 <div class="hero">
 <h2>Best Bulbs, Fans & Lights</h2>
@@ -341,7 +355,7 @@ localStorage.setItem("viewProduct", JSON.stringify(featuredProducts[i]));
 location.href="product-view.html";
 }
 
-/* CART SYSTEM (FIXED PROPERLY) */
+/* CART SYSTEM */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function saveCart(){
@@ -399,4 +413,4 @@ updateCartCount();
 </script>
 
 </body>
-  </html>
+</html>
