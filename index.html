@@ -21,7 +21,7 @@ body{
 font-family:'Poppins',sans-serif;
 background:#f5f6fa;
 color:#111;
-animation:fadePage .5s ease;
+animation:fadePage .4s ease;
 }
 
 /* LOADER */
@@ -47,7 +47,6 @@ top:0;
 z-index:1000;
 }
 
-/* LOGO (SYNCED ANIMATION) */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -66,16 +65,26 @@ text-decoration:none;
 nav a:hover{color:#FFD700;}
 
 /* CART BUTTON */
-.cart-btn{cursor:pointer;font-size:20px;}
-.cart-count{
-background:red;color:#fff;border-radius:50%;
-padding:3px 7px;font-size:12px;
+.cart-btn{
+cursor:pointer;
+font-size:20px;
 }
 
-/* DELIVERY */
+.cart-count{
+background:red;
+color:#fff;
+border-radius:50%;
+padding:3px 7px;
+font-size:12px;
+}
+
+/* DELIVERY BANNER */
 .delivery-banner{
-background:#FFD700;color:#000;
-text-align:center;padding:8px;font-weight:600;
+background:#FFD700;
+color:#000;
+text-align:center;
+padding:8px;
+font-weight:600;
 }
 
 /* HERO */
@@ -85,23 +94,29 @@ padding:60px 20px;
 background:#222;
 color:#fff;
 }
+
 .hero button{
 background:#FFD700;
 padding:10px 20px;
 border:none;
 border-radius:6px;
-cursor:pointer;
 }
 
 /* FEATURES */
 .features{
-display:flex;flex-wrap:wrap;
-justify-content:center;gap:20px;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:20px;
 padding:30px 20px;
 }
+
 .feature{
-background:#fff;padding:20px;border-radius:10px;
-width:250px;text-align:center;
+background:#fff;
+padding:20px;
+border-radius:10px;
+width:250px;
+text-align:center;
 box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
@@ -109,64 +124,86 @@ box-shadow:0 5px 15px rgba(0,0,0,0.1);
 .products-grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:20px;padding:20px;
-max-width:1100px;margin:auto;
+gap:20px;
+padding:20px;
+max-width:1100px;
+margin:auto;
 }
 
 .card{
-background:#fff;padding:15px;border-radius:10px;text-align:center;
-transition:.3s;
+background:#fff;
+padding:15px;
+border-radius:10px;
+text-align:center;
 }
-.card:hover{transform:translateY(-5px);}
 
 .card img{
-width:100%;height:150px;
-object-fit:cover;border-radius:8px;
+width:100%;
+height:150px;
+object-fit:cover;
+border-radius:8px;
 }
 
 /* FLOATING CART */
 .floating-cart{
-position:fixed;bottom:20px;right:20px;
-background:#FFD700;width:60px;height:60px;
-border-radius:50%;display:flex;align-items:center;
-justify-content:center;font-size:24px;cursor:pointer;
+position:fixed;
+bottom:20px;
+right:20px;
+background:#FFD700;
+width:60px;
+height:60px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+cursor:pointer;
 box-shadow:0 5px 15px rgba(0,0,0,0.2);
 z-index:2000;
-animation:bounce 2s infinite;
 }
 
 /* MINI CART */
 .mini-cart{
-position:fixed;right:-320px;top:0;
-width:300px;height:100%;
-background:#fff;padding:15px;
-transition:.3s;z-index:3000;overflow-y:auto;
+position:fixed;
+right:-320px;
+top:0;
+width:300px;
+height:100%;
+background:#fff;
+padding:15px;
+transition:.3s;
+z-index:3000;
+overflow-y:auto;
 }
+
 .mini-cart.open{right:0;}
 
 .cart-overlay{
-position:fixed;top:0;left:0;
+position:fixed;
+top:0;left:0;
 width:100%;height:100%;
 background:rgba(0,0,0,0.5);
-display:none;z-index:2500;
+display:none;
+z-index:2500;
 }
 .cart-overlay.show{display:block;}
 
 /* FOOTER */
 footer{
-text-align:center;padding:20px;
-background:#111;color:#fff;margin-top:30px;
+text-align:center;
+padding:20px;
+background:#111;
+color:#fff;
+margin-top:30px;
 }
 
-/* BUTTON ANIMATION */
-button:active{transform:scale(.95);}
-
 /* ANIMATION */
-@keyframes fadePage{from{opacity:0;}to{opacity:1;}}
-@keyframes shine{to{background-position:200% center;}}
-@keyframes bounce{
-0%,100%{transform:translateY(0);}
-50%{transform:translateY(-5px);}
+@keyframes fadePage{
+from{opacity:0;}
+to{opacity:1;}
+}
+@keyframes shine{
+to{background-position:200% center;}
 }
 
 </style>
@@ -204,11 +241,11 @@ button:active{transform:scale(.95);}
 <div class="feature">⚡ Fast Delivery</div>
 <div class="feature">💰 Best Prices</div>
 <div class="feature">
-<button onclick="location.href='contact.html'">Support</button>
+<button onclick="location.href='contact.html'">📞 Support</button>
 </div>
 </div>
 
-<h2 style="text-align:center;">Featured Products</h2>
+<h2 style="text-align:center;">⭐ Featured Products</h2>
 <div class="products-grid" id="featured"></div>
 
 <div class="floating-cart" onclick="toggleCart()">🛒</div>
@@ -224,86 +261,97 @@ button:active{transform:scale(.95);}
 
 <footer>
 <p>📞 +91 9639228237</p>
-<p>📧 himanshu@gmail.com</p>
+<p>📧 anisuggestdaily@gmail.com</p>
 <p>&copy; 2026 Himanshu Electronics</p>
 </footer>
 
 <script>
 
-/* LOADER */
-window.onload = ()=>{
-loader.style.display="none";
-renderCart();
+/* SAFE LOADER */
+window.addEventListener("load", ()=>{
+setTimeout(()=>{
+let loader=document.getElementById("loader");
+if(loader) loader.style.display="none";
+},300);
+});
+
+window.onerror=function(){
+let loader=document.getElementById("loader");
+if(loader) loader.style.display="none";
 };
 
-/* PRODUCTS (DEFAULT + ADMIN) */
+/* SAFE PRODUCTS */
 let defaultProducts = [
 {name:"LED Bulb 9W",price:40,img:"images/led9w.jpg"},
-{name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"}
+{name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"},
+{name:"LED Bulb 15W",price:120,img:"images/led15w.jpg"},
+{name:"LED Bulb 18W",price:150,img:"images/led18w.jpg"},
+{name:"LED Bulb 20W",price:170,img:"images/led20w.jpg"},
+{name:"LED Bulb 30W",price:230,img:"images/led30w.jpg"}
 ];
 
-let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+let products=[];
+try{
+products=JSON.parse(localStorage.getItem("adminProducts"))||[];
+}catch(e){products=[];}
 
-let products = [
-...defaultProducts.map((p,i)=>({...p,id:"d-"+i})),
-...adminProducts
-];
+let allProducts=[];
+try{
+allProducts=[...defaultProducts,...products];
+}catch(e){allProducts=defaultProducts;}
 
-/* SHOW FEATURED (6 ITEMS) */
-featured.innerHTML = products.slice(0,6).map(p=>`
+try{
+document.getElementById("featured").innerHTML =
+allProducts.slice(0,6).map((p,i)=>`
 <div class="card">
-<img src="${p.img}" onerror="this.src='images/default.jpg'">
+<img src="${p.img}" onclick="viewProduct(${i})">
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
-<button onclick="viewProduct('${p.id}')">View</button>
+<button onclick="viewProduct(${i})">View</button>
 </div>
 `).join("");
+}catch(e){}
 
-function viewProduct(id){
-let p = products.find(x=>x.id==id);
-localStorage.setItem("viewProduct", JSON.stringify(p));
+/* VIEW */
+function viewProduct(i){
+localStorage.setItem("viewProduct", JSON.stringify(allProducts[i]));
 location.href="product-view.html";
 }
 
 /* CART */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-function saveCart(){
-localStorage.setItem("cart", JSON.stringify(cart));
-}
-
 function updateCartCount(){
-cartCount.innerText = cart.reduce((s,p)=>s+(p.qty||1),0);
+document.getElementById("cartCount").innerText =
+cart.reduce((s,p)=>s+(p.qty||1),0);
 }
 
 function toggleCart(){
-miniCart.classList.toggle("open");
-overlay.classList.toggle("show");
+document.getElementById("miniCart").classList.toggle("open");
+document.getElementById("overlay").classList.toggle("show");
 renderCart();
 }
 
 function renderCart(){
+let div=document.getElementById("miniItems");
+let totalDiv=document.getElementById("cartTotal");
+
 if(cart.length===0){
-miniItems.innerHTML="Cart is empty";
-cartTotal.innerText="";
+div.innerHTML="Cart is empty";
+totalDiv.innerText="";
 return;
 }
 
 let total=0;
 
-miniItems.innerHTML = cart.map((p,i)=>{
-total+=p.price*(p.qty||1);
-return `${p.name} x${p.qty||1} <button onclick="removeItem(${i})">❌</button>`;
+div.innerHTML = cart.map(p=>{
+let qty=p.qty||1;
+total+=p.price*qty;
+return `${p.name} x${qty}`;
 }).join("<br>");
 
-cartTotal.innerText="Total ₹"+total;
+totalDiv.innerText="Total ₹"+total;
 updateCartCount();
-}
-
-function removeItem(i){
-cart.splice(i,1);
-saveCart();
-renderCart();
 }
 
 updateCartCount();
@@ -311,4 +359,4 @@ updateCartCount();
 </script>
 
 </body>
-  </html>
+</html>
