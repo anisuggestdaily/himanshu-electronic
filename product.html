@@ -162,9 +162,9 @@ color:#000;
 
 <script>
 
-/* ============================= */
-/* 🔥 LOAD PRODUCTS (CONNECTED) */
-/* ============================= */
+/* ========================= */
+/* LOAD PRODUCTS (FIXED) */
+/* ========================= */
 
 let defaultProducts = [
 
@@ -203,27 +203,25 @@ let defaultProducts = [
 
 ];
 
-/* ✅ ADMIN PRODUCTS */
+/* ADD IDS */
+let defaultWithId = defaultProducts.map((p,i)=>({...p,id:i}));
+
+/* ✅ LOAD ADMIN PRODUCTS */
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
 
-/* ✅ MERGE */
-let allProducts = [...defaultProducts, ...adminProducts];
+/* COMBINE */
+let products = [...defaultWithId, ...adminProducts];
 
-/* ✅ UNIQUE ID */
-let products = allProducts.map((p,i)=>({...p,id:i}));
-
-
-/* ============================= */
-/* CART + WISHLIST */
-/* ============================= */
+/* ========================= */
+/* STATE */
+/* ========================= */
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-
-/* ============================= */
+/* ========================= */
 /* SHOW PRODUCTS */
-/* ============================= */
+/* ========================= */
 
 function showProducts(list=products){
 
@@ -250,17 +248,24 @@ ${inCart ? "✅ Added" : "Add to Cart"}
 
 </div>
 `;
+
 }).join("");
 }
 
+/* ========================= */
+/* ADD TO CART (FIXED) */
+/* ========================= */
 
-/* ADD TO CART */
 function addToCart(id){
+
 let item = products.find(p=>p.id===id);
 let existing = cart.find(p=>p.id===id);
 
-if(existing){existing.qty++;}
-else{cart.push({...item, qty:1});}
+if(existing){
+existing.qty++;
+}else{
+cart.push({...item, qty:1});
+}
 
 saveCart();
 updateCartCount();
@@ -269,15 +274,22 @@ showProducts();
 playSound();
 }
 
-/* VIEW */
+/* ========================= */
+/* VIEW PRODUCT */
+/* ========================= */
+
 function viewProduct(id){
 let item = products.find(p=>p.id===id);
 localStorage.setItem("viewProduct", JSON.stringify(item));
 location.href="product-view.html";
 }
 
-/* FILTER */
+/* ========================= */
+/* FILTER (FIXED) */
+/* ========================= */
+
 function filter(){
+
 let s=document.getElementById("search").value.toLowerCase();
 let c=document.getElementById("cat").value;
 
@@ -289,7 +301,10 @@ p.name.toLowerCase().includes(s) &&
 showProducts(filtered);
 }
 
+/* ========================= */
 /* CART */
+/* ========================= */
+
 function saveCart(){
 localStorage.setItem("cart", JSON.stringify(cart));
 }
@@ -306,6 +321,7 @@ renderCart();
 }
 
 function renderCart(){
+
 let div=document.getElementById("miniItems");
 let total=0;
 
@@ -330,7 +346,10 @@ updateCartCount();
 renderCart();
 }
 
+/* ========================= */
 /* WISHLIST */
+/* ========================= */
+
 function toggleWish(id){
 if(wishlist.includes(id)){
 wishlist = wishlist.filter(x=>x!==id);
@@ -341,14 +360,20 @@ localStorage.setItem("wishlist", JSON.stringify(wishlist));
 showProducts();
 }
 
+/* ========================= */
 /* SOUND */
+/* ========================= */
+
 function playSound(){
 let s=document.getElementById("cartSound");
 s.currentTime=0;
 s.play().catch(()=>{});
 }
 
+/* ========================= */
 /* INIT */
+/* ========================= */
+
 showProducts();
 updateCartCount();
 
