@@ -162,9 +162,9 @@ color:#000;
 
 <script>
 
-/* ===================== */
-/* DEFAULT PRODUCTS */
-/* ===================== */
+/* ============================= */
+/* 🔥 LOAD PRODUCTS (CONNECTED) */
+/* ============================= */
 
 let defaultProducts = [
 
@@ -203,36 +203,30 @@ let defaultProducts = [
 
 ];
 
-/* ===================== */
-/* MERGE ADMIN PRODUCTS */
-/* ===================== */
-
+/* ✅ ADMIN PRODUCTS */
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
 
-adminProducts = adminProducts.map((p,i)=>({
-id: p.id || ("admin_"+i),
-name: p.name,
-price: p.price,
-img: p.img,
-cat: p.cat || "other"
-}));
+/* ✅ MERGE */
+let allProducts = [...defaultProducts, ...adminProducts];
 
-let defaultWithId = defaultProducts.map((p,i)=>({
-...p,
-id: "default_"+i
-}));
+/* ✅ UNIQUE ID */
+let products = allProducts.map((p,i)=>({...p,id:i}));
 
-let products = [...defaultWithId, ...adminProducts];
 
-/* ===================== */
+/* ============================= */
 /* CART + WISHLIST */
-/* ===================== */
+/* ============================= */
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
+
+/* ============================= */
 /* SHOW PRODUCTS */
+/* ============================= */
+
 function showProducts(list=products){
+
 document.getElementById("products").innerHTML = list.map(p=>{
 
 let inCart = cart.find(c=>c.id===p.id);
@@ -241,16 +235,16 @@ let inWish = wishlist.includes(p.id);
 return `
 <div class="card">
 
-<div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish('${p.id}')">❤</div>
+<div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish(${p.id})">❤</div>
 
-<img src="${p.img}" onclick="viewProduct('${p.id}')">
+<img src="${p.img}" onclick="viewProduct(${p.id})">
 
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
 
 <p class="rating">⭐ ${(Math.random()*0.8+4.1).toFixed(1)}</p>
 
-<button onclick="addToCart('${p.id}')">
+<button onclick="addToCart(${p.id})">
 ${inCart ? "✅ Added" : "Add to Cart"}
 </button>
 
@@ -258,6 +252,7 @@ ${inCart ? "✅ Added" : "Add to Cart"}
 `;
 }).join("");
 }
+
 
 /* ADD TO CART */
 function addToCart(id){
