@@ -82,7 +82,7 @@ background:#FFD700;
 color:#000;
 }
 
-/* CART */
+/* MINI CART */
 .mini-cart{
 position:fixed;
 right:-320px;
@@ -109,6 +109,36 @@ display:none;
 z-index:1500;
 }
 .overlay.show{display:block;}
+
+/* ✅ FLOATING CART (FIX ADDED) */
+.cart-icon{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#fb641b;
+color:#fff;
+width:55px;
+height:55px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+box-shadow:0 5px 15px rgba(0,0,0,.2);
+cursor:pointer;
+z-index:2100;
+}
+
+.cart-count{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
+color:#fff;
+font-size:12px;
+padding:3px 7px;
+border-radius:50%;
+}
 
 </style>
 
@@ -144,14 +174,20 @@ z-index:1500;
 <button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
+<!-- ✅ FLOATING CART BUTTON -->
+<div class="cart-icon" onclick="toggleCart()">
+🛒
+<span id="floatingCount" class="cart-count">0</span>
+</div>
+
 <script>
 
 /* GET PRODUCT */
 let p = JSON.parse(localStorage.getItem("viewProduct"));
 
-/* ADD ID SAFETY */
+/* SAFETY */
 if(p && p.id === undefined){
-p.id = Date.now(); // fallback safety
+p.id = Date.now();
 }
 
 /* DATA */
@@ -218,6 +254,7 @@ localStorage.setItem("cart", JSON.stringify(cart));
 function updateCartCount(){
 let total = cart.reduce((s,p)=>s+(p.qty||1),0);
 document.getElementById("cartCount").innerText=total;
+document.getElementById("floatingCount").innerText=total;
 }
 
 function toggleCart(){
@@ -231,7 +268,7 @@ let div=document.getElementById("miniItems");
 let total=0;
 
 if(cart.length===0){
-div.innerHTML="Cart empty";
+div.innerHTML="Cart is empty";
 document.getElementById("total").innerText="";
 return;
 }
@@ -260,6 +297,7 @@ s.play().catch(()=>{});
 
 /* INIT */
 updateCartCount();
+renderCart(); // ✅ FIX: show cart immediately
 
 </script>
 
