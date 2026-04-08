@@ -1,71 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>Product Details - Himanshu Electronics</title>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
 <style>
 
-/* PAGE LOAD */
-body{animation:fadePage .5s ease;}
-@keyframes fadePage{from{opacity:0;}to{opacity:1;}}
+/* HEADER */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+background:#111;
+color:#fff;
+}
 
-/* CARD */
-.card{
+/* LOGO */
+.logo{
+font-size:22px;
+font-weight:700;
+background:linear-gradient(90deg,#fff,#FFD700,#fff);
+background-size:200% auto;
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:shine 3s linear infinite;
+}
+@keyframes shine{
+to{background-position:200% center;}
+}
+
+/* PRODUCT */
+.container{
+max-width:900px;
+margin:40px auto;
 text-align:center;
-animation:fadeUp .6s ease;
-}
-@keyframes fadeUp{
-from{transform:translateY(40px);opacity:0;}
-to{transform:translateY(0);opacity:1;}
 }
 
-/* IMAGE HOVER */
 #productImg{
+width:250px;
 transition:.3s;
-cursor:pointer;
 }
 #productImg:hover{
 transform:scale(1.1);
 }
 
+.price{
+font-size:24px;
+color:#0A84FF;
+font-weight:600;
+margin:10px 0;
+}
+
 /* QTY */
 .qty-box{
 display:flex;
-align-items:center;
 justify-content:center;
 gap:10px;
-margin:15px 0;
+margin:20px 0;
+}
+.qty-box button{
+padding:8px 12px;
 }
 
-/* PRICE */
-.price{
-font-size:22px;
-color:#0A84FF;
-font-weight:600;
+/* BUTTONS */
+button{
+padding:10px 15px;
+border:none;
+background:#111;
+color:#fff;
+cursor:pointer;
+border-radius:5px;
+}
+button:hover{
+background:#FFD700;
+color:#000;
 }
 
-/* MINI CART FIX */
+/* CART */
 .mini-cart{
-display:none;
+position:fixed;
+right:-320px;
+top:0;
+width:300px;
+height:100%;
+background:#fff;
+padding:15px;
+box-shadow:-5px 0 15px rgba(0,0,0,0.2);
+transition:.3s;
 z-index:2000;
+overflow:auto;
 }
+.mini-cart.open{right:0;}
 
-.cart-overlay{
+.overlay{
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
-background:rgba(0,0,0,.4);
+background:rgba(0,0,0,0.5);
 display:none;
 z-index:1500;
 }
+.overlay.show{display:block;}
 
 </style>
 
@@ -74,66 +117,53 @@ z-index:1500;
 <body>
 
 <header>
-<h2>Himanshu Electronics</h2>
+<h2 class="logo">Himanshu Electronics</h2>
 
 <div>
 <a href="index.html">Home</a>
 <a href="product.html">Products</a>
 </div>
 
-<div class="cart-icon" onclick="toggleCart()">
-🛒
-<span id="cartCount" class="cart-count">0</span>
+<div onclick="toggleCart()" style="cursor:pointer;">
+🛒 <span id="cartCount">0</span>
 </div>
 </header>
 
-<!-- SOUND -->
-<audio id="cartSound" preload="auto">
+<audio id="cartSound">
 <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3">
 </audio>
 
 <div class="container" id="view"></div>
 
-<!-- OVERLAY -->
-<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="overlay" id="overlay" onclick="toggleCart()"></div>
 
-<!-- MINI CART -->
 <div class="mini-cart" id="miniCart">
-
-<div style="display:flex;justify-content:space-between;">
 <h3>Your Cart</h3>
-<button onclick="toggleCart()">❌</button>
-</div>
-
 <div id="miniItems"></div>
-
-<button class="primary" onclick="location.href='cart.html'">Checkout</button>
-<button style="margin-top:10px;background:#ccc;" onclick="toggleCart()">Continue Shopping</button>
-
+<p id="total"></p>
+<button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
 <script>
 
-/* SOUND FIX */
-function playSound(){
-let s=document.getElementById("cartSound");
-if(!s) return;
-s.currentTime=0;
-s.play().catch(()=>{});
-}
-
 /* GET PRODUCT */
 let p = JSON.parse(localStorage.getItem("viewProduct"));
 
+/* ADD ID SAFETY */
+if(p && p.id === undefined){
+p.id = Date.now(); // fallback safety
+}
+
+/* DATA */
+let quantity = 1;
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+/* RENDER */
 if(!p){
-document.getElementById("view").innerHTML = "<h2>No Product Found</h2>";
+document.getElementById("view").innerHTML="<h2>No Product Found</h2>";
 }else{
-
-document.getElementById("view").innerHTML = `
-<div class="card">
-
+document.getElementById("view").innerHTML=`
 <img src="${p.img}" id="productImg">
-
 <h2>${p.name}</h2>
 <p class="price">₹${p.price}</p>
 
@@ -143,103 +173,89 @@ document.getElementById("view").innerHTML = `
 <button onclick="changeQty(1)">+</button>
 </div>
 
-<button class="add" onclick="addToCart()">Add to Cart</button>
-
+<button onclick="addToCart()">Add to Cart</button>
 <br><br>
-
-<button class="primary" onclick="buyNow()">Buy Now</button>
-
+<button onclick="buyNow()">Buy Now</button>
 <br><br>
-
-<button class="back" onclick="goBack()">⬅ Back</button>
-
-</div>
+<button onclick="history.back()">⬅ Back</button>
 `;
 }
-
-/* DATA */
-let quantity = 1;
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 /* QTY */
 function changeQty(x){
 quantity += x;
-if(quantity < 1) quantity = 1;
-document.getElementById("qty").innerText = quantity;
+if(quantity<1) quantity=1;
+document.getElementById("qty").innerText=quantity;
 }
 
 /* ADD */
 function addToCart(){
-
-let existing = cart.find(i=>i.name===p.name);
+let existing = cart.find(i=>i.id===p.id);
 
 if(existing){
 existing.qty += quantity;
 }else{
-cart.push({...p, qty: quantity});
+cart.push({...p, qty:quantity});
 }
 
-localStorage.setItem("cart", JSON.stringify(cart));
-
+saveCart();
 updateCartCount();
-showMiniCart();
-
-/* SOUND */
+renderCart();
 playSound();
-
-/* UX */
-alert("Added to Cart 🛒");
 }
 
 /* BUY */
 function buyNow(){
 addToCart();
-setTimeout(()=>{ location.href="cart.html"; },400);
+setTimeout(()=>location.href="cart.html",300);
 }
 
-/* BACK */
-function goBack(){
-window.history.back();
+/* CART */
+function saveCart(){
+localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-/* MINI CART */
-function showMiniCart(){
+function updateCartCount(){
+let total = cart.reduce((s,p)=>s+(p.qty||1),0);
+document.getElementById("cartCount").innerText=total;
+}
+
+function toggleCart(){
+document.getElementById("miniCart").classList.toggle("open");
+document.getElementById("overlay").classList.toggle("show");
+renderCart();
+}
+
+function renderCart(){
 let div=document.getElementById("miniItems");
+let total=0;
 
 if(cart.length===0){
-div.innerHTML="Cart is empty";
+div.innerHTML="Cart empty";
+document.getElementById("total").innerText="";
 return;
 }
 
-let total=0;
+div.innerHTML = cart.map((p,i)=>{
+total += p.price*p.qty;
+return `<p>${p.name} x${p.qty} <button onclick="removeItem(${i})">❌</button></p>`;
+}).join("");
 
-div.innerHTML=cart.map(p=>{
-let sub=p.price*p.qty;
-total+=sub;
-return `<p>${p.name} x${p.qty} = ₹${sub}</p>`;
-}).join("") + `<h3>Total: ₹${total}</h3>`;
+document.getElementById("total").innerText="Total: ₹"+total;
 }
 
-/* COUNT */
-function updateCartCount(){
-document.getElementById("cartCount").innerText =
-cart.reduce((s,p)=>s+p.qty,0);
+function removeItem(i){
+cart.splice(i,1);
+saveCart();
+updateCartCount();
+renderCart();
 }
 
-/* TOGGLE FIX */
-function toggleCart(){
-let c=document.getElementById("miniCart");
-let o=document.getElementById("cartOverlay");
-
-if(c.style.display==="block"){
-c.style.display="none";
-o.style.display="none";
-}else{
-c.style.display="block";
-o.style.display="block";
-}
-
-showMiniCart();
+/* SOUND */
+function playSound(){
+let s=document.getElementById("cartSound");
+s.currentTime=0;
+s.play().catch(()=>{});
 }
 
 /* INIT */
