@@ -7,9 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
 
 <style>
+
+body{font-family:Poppins;}
 
 /* HEADER */
 header{
@@ -21,7 +22,6 @@ background:#111;
 color:#fff;
 }
 
-/* LOGO */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -57,18 +57,13 @@ font-weight:600;
 margin:10px 0;
 }
 
-/* QTY */
 .qty-box{
 display:flex;
 justify-content:center;
 gap:10px;
 margin:20px 0;
 }
-.qty-box button{
-padding:8px 12px;
-}
 
-/* BUTTONS */
 button{
 padding:10px 15px;
 border:none;
@@ -76,10 +71,6 @@ background:#111;
 color:#fff;
 cursor:pointer;
 border-radius:5px;
-}
-button:hover{
-background:#FFD700;
-color:#000;
 }
 
 /* MINI CART */
@@ -91,57 +82,39 @@ width:300px;
 height:100%;
 background:#fff;
 padding:15px;
-box-shadow:-5px 0 15px rgba(0,0,0,0.2);
 transition:.3s;
-z-index:2000;
-overflow:auto;
+z-index:3000;
 }
 .mini-cart.open{right:0;}
 
 .overlay{
 position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
+top:0;left:0;
+width:100%;height:100%;
 background:rgba(0,0,0,0.5);
 display:none;
-z-index:1500;
+z-index:2500;
 }
 .overlay.show{display:block;}
 
-/* ✅ FLOATING CART (FIX ADDED) */
-.cart-icon{
+/* FLOATING CART (SYNCED) */
+.floating-cart{
 position:fixed;
 bottom:20px;
 right:20px;
-background:#fb641b;
-color:#fff;
-width:55px;
-height:55px;
+background:#FFD700;
+width:60px;
+height:60px;
 border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:22px;
-box-shadow:0 5px 15px rgba(0,0,0,.2);
+font-size:24px;
 cursor:pointer;
-z-index:2100;
-}
-
-.cart-count{
-position:absolute;
-top:-5px;
-right:-5px;
-background:red;
-color:#fff;
-font-size:12px;
-padding:3px 7px;
-border-radius:50%;
+z-index:3500;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -159,10 +132,6 @@ border-radius:50%;
 </div>
 </header>
 
-<audio id="cartSound">
-<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1c77.mp3">
-</audio>
-
 <div class="container" id="view"></div>
 
 <div class="overlay" id="overlay" onclick="toggleCart()"></div>
@@ -174,32 +143,28 @@ border-radius:50%;
 <button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
-<!-- ✅ FLOATING CART BUTTON -->
-<div class="cart-icon" onclick="toggleCart()">
-🛒
-<span id="floatingCount" class="cart-count">0</span>
-</div>
+<!-- FLOATING CART -->
+<div class="floating-cart" onclick="toggleCart()">🛒</div>
 
 <script>
 
 /* GET PRODUCT */
 let p = JSON.parse(localStorage.getItem("viewProduct"));
 
-/* SAFETY */
-if(p && p.id === undefined){
-p.id = Date.now();
-}
-
-/* DATA */
 let quantity = 1;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+/* CHECK IN CART */
+function isInCart(){
+return cart.find(i=>i.id===p.id);
+}
+
 /* RENDER */
 if(!p){
-document.getElementById("view").innerHTML="<h2>No Product Found</h2>";
+view.innerHTML="<h2>No Product Found</h2>";
 }else{
-document.getElementById("view").innerHTML=`
-<img src="${p.img}" id="productImg">
+view.innerHTML=`
+<img src="${p.img}" id="productImg" onerror="this.src='images/default.jpg'">
 <h2>${p.name}</h2>
 <p class="price">₹${p.price}</p>
 
@@ -209,7 +174,9 @@ document.getElementById("view").innerHTML=`
 <button onclick="changeQty(1)">+</button>
 </div>
 
-<button onclick="addToCart()">Add to Cart</button>
+<button id="addBtn" onclick="addToCart()">
+${isInCart() ? "✅ Added" : "Add to Cart"}
+</button>
 <br><br>
 <button onclick="buyNow()">Buy Now</button>
 <br><br>
@@ -221,11 +188,14 @@ document.getElementById("view").innerHTML=`
 function changeQty(x){
 quantity += x;
 if(quantity<1) quantity=1;
-document.getElementById("qty").innerText=quantity;
+qty.innerText=quantity;
 }
 
 /* ADD */
 function addToCart(){
+
+let btn=document.getElementById("addBtn");
+
 let existing = cart.find(i=>i.id===p.id);
 
 if(existing){
@@ -237,7 +207,12 @@ cart.push({...p, qty:quantity});
 saveCart();
 updateCartCount();
 renderCart();
-playSound();
+
+/* ANIMATION */
+btn.innerText="Added ✔";
+setTimeout(()=>{
+btn.innerText="✅ Added";
+},1000);
 }
 
 /* BUY */
@@ -253,32 +228,30 @@ localStorage.setItem("cart", JSON.stringify(cart));
 
 function updateCartCount(){
 let total = cart.reduce((s,p)=>s+(p.qty||1),0);
-document.getElementById("cartCount").innerText=total;
-document.getElementById("floatingCount").innerText=total;
+cartCount.innerText=total;
 }
 
 function toggleCart(){
-document.getElementById("miniCart").classList.toggle("open");
-document.getElementById("overlay").classList.toggle("show");
+miniCart.classList.toggle("open");
+overlay.classList.toggle("show");
 renderCart();
 }
 
 function renderCart(){
-let div=document.getElementById("miniItems");
 let total=0;
 
 if(cart.length===0){
-div.innerHTML="Cart is empty";
-document.getElementById("total").innerText="";
+miniItems.innerHTML="Cart is empty";
+totalEl.innerText="";
 return;
 }
 
-div.innerHTML = cart.map((p,i)=>{
+miniItems.innerHTML = cart.map((p,i)=>{
 total += p.price*p.qty;
-return `<p>${p.name} x${p.qty} <button onclick="removeItem(${i})">❌</button></p>`;
-}).join("");
+return `${p.name} x${p.qty} <button onclick="removeItem(${i})">❌</button>`;
+}).join("<br>");
 
-document.getElementById("total").innerText="Total: ₹"+total;
+total.innerText="Total: ₹"+total;
 }
 
 function removeItem(i){
@@ -288,16 +261,9 @@ updateCartCount();
 renderCart();
 }
 
-/* SOUND */
-function playSound(){
-let s=document.getElementById("cartSound");
-s.currentTime=0;
-s.play().catch(()=>{});
-}
-
 /* INIT */
 updateCartCount();
-renderCart(); // ✅ FIX: show cart immediately
+renderCart();
 
 </script>
 
