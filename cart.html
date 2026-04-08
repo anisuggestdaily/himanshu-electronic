@@ -51,7 +51,7 @@ margin:8px 0;
 padding:10px;
 }
 
-/* SUCCESS POPUP */
+/* POPUP */
 .popup{
 position:fixed;
 top:20px;
@@ -70,6 +70,19 @@ z-index:3000;
 90%{opacity:1;}
 100%{opacity:0;}
 }
+
+/* SUCCESS BOX */
+.success-box{
+max-width:400px;
+margin:80px auto;
+background:#fff;
+padding:25px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+animation:pop .5s ease;
+}
+@keyframes pop{from{transform:scale(.8);}to{transform:scale(1);}}
 
 /* COUPON */
 .coupon-box{
@@ -137,7 +150,6 @@ border-radius:50%;
 
 <header>
 <h2 class="logo">Himanshu Electronics</h2>
-
 <div>
 <a href="index.html">Home</a>
 <a href="product.html">Products</a>
@@ -147,8 +159,6 @@ border-radius:50%;
 <div class="container">
 
 <h2 style="text-align:center;">My Cart</h2>
-
-<p id="freeMsg"></p>
 
 <table>
 <thead>
@@ -181,30 +191,22 @@ border-radius:50%;
 </div>
 
 <h3>Payment Method</h3>
-<label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
+<label><input type="radio" name="pay" value="COD" checked> COD</label>
 <label><input type="radio" name="pay" value="UPI"> UPI</label>
-
-<div id="upiBox" style="display:none;">
-<p>UPI ID: <b>paytm.s1ktca0@pty</b></p>
-</div>
 
 <h3>Your Details</h3>
 <input id="name" placeholder="Your Name">
 <input id="phone" placeholder="Phone Number">
 <textarea id="address" placeholder="Full Address"></textarea>
 
-<p style="color:red;font-size:14px;">
-🚚 Delivery available only in Bijnor
-</p>
-
-<div style="text-align:center;margin-top:20px;">
+<div style="text-align:center;">
 <button onclick="clearCart()">Clear Cart</button>
 <button onclick="order()">Confirm Order</button>
 </div>
 
 </div>
 
-<!-- FLOATING CART (GO TO PRODUCT PAGE) -->
+<!-- FLOATING CART -->
 <div class="cart-icon" onclick="location.href='product.html'">
 🛒 <span id="cartCount" class="cart-count">0</span>
 </div>
@@ -213,6 +215,7 @@ border-radius:50%;
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let discount = 0;
+let popupShown = false;
 
 /* SHOW CART */
 function showCart(){
@@ -254,11 +257,11 @@ function updateTotals(subtotal){
 
 let handling = 0;
 let delivery = subtotal >= 500 ? 0 : 20;
-
 let total = subtotal + handling + delivery - discount;
 
-/* FREE DELIVERY POPUP */
-if(subtotal >= 500 && !document.querySelector('.popup')){
+/* POPUP ONCE */
+if(subtotal >= 500 && !popupShown){
+popupShown = true;
 let p=document.createElement("div");
 p.className="popup";
 p.innerText="🎉 You got FREE Delivery!";
@@ -275,21 +278,20 @@ totalEl.innerText = "₹"+total;
 
 /* COUPON */
 function applyCoupon(){
-
 let code = coupon.value.toUpperCase();
 let subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
 
 if(code==="SAVE50" && subtotal>=1000){
 discount = 50;
-couponMsg.innerText="₹50 discount applied!";
+couponMsg.innerText="₹50 applied";
 }
 else if(code==="FIRST100" && subtotal>=1500){
 discount = 100;
-couponMsg.innerText="₹100 discount applied!";
+couponMsg.innerText="₹100 applied";
 }
 else{
 discount = 0;
-couponMsg.innerText="Invalid or not eligible";
+couponMsg.innerText="Invalid";
 }
 
 showCart();
@@ -319,6 +321,7 @@ showCart();
 
 /* ORDER */
 function order(){
+
 if(cart.length===0){alert("Cart empty");return;}
 
 let name = nameEl.value;
@@ -326,19 +329,51 @@ let phone = phoneEl.value;
 let address = addressEl.value;
 let pay = document.querySelector('input[name="pay"]:checked').value;
 
-if(!name||!phone||!address){alert("Fill all details");return;}
-
-if(!address.toLowerCase().includes("bijnor")){
-alert("Delivery only in Bijnor");return;
+if(!name||!phone||!address){
+alert("Fill all details");
+return;
 }
 
-let total = totalEl.innerText;
+if(!address.toLowerCase().includes("bijnor")){
+alert("Delivery only in Bijnor");
+return;
+}
 
-window.open("https://wa.me/919639228237?text="+encodeURIComponent("Order Total: "+total));
+let subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+let delivery = subtotal >= 500 ? 0 : 20;
+let total = subtotal + delivery - discount;
+
+let orderID = "HE-" + Date.now();
+
+/* SAVE ORDER */
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+orders.push({
+id:orderID,
+name,phone,address,
+items:cart,
+total,
+payment:pay,
+discount,
+date:new Date().toLocaleDateString(),
+status:"Pending"
+});
+localStorage.setItem("orders", JSON.stringify(orders));
+
+/* WHATSAPP */
+let msg = `Order ID: ${orderID}\nTotal: ₹${total}`;
+window.open("https://wa.me/919639228237?text="+encodeURIComponent(msg));
 
 localStorage.removeItem("cart");
 
-document.body.innerHTML=`<h2 style="text-align:center;margin-top:50px;">✅ Order Placed</h2>`;
+/* SUCCESS UI */
+document.body.innerHTML = `
+<div class="success-box">
+<h2>✅ Order Placed</h2>
+<p>ID: <b>${orderID}</b></p>
+<p>Payment: <b>${pay}</b></p>
+<button onclick="location.href='index.html'">Go Home</button>
+</div>
+`;
 }
 
 /* COUNT */
@@ -346,7 +381,7 @@ function updateCartCount(){
 cartCount.innerText = cart.reduce((s,p)=>s+(p.qty||1),0);
 }
 
-/* FIX DOM */
+/* DOM */
 let list=document.getElementById("list");
 let subtotalEl=document.getElementById("subtotal");
 let handlingEl=document.getElementById("handling");
@@ -365,4 +400,4 @@ showCart();
 </script>
 
 </body>
-  </html>
+</html>
