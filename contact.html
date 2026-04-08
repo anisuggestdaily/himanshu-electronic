@@ -188,13 +188,10 @@ alert("Please fill all fields");
 return;
 }
 
-/* FORMAT MESSAGE */
 let text = `📩 New Contact Message:\n\nName: ${name}\nEmail: ${email}\nMessage: ${msg}`;
 
-/* OPEN WHATSAPP */
 window.open("https://wa.me/919639228237?text=" + encodeURIComponent(text));
 
-/* CLEAR FORM */
 document.getElementById("name").value="";
 document.getElementById("email").value="";
 document.getElementById("message").value="";
