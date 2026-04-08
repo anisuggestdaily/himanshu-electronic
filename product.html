@@ -21,7 +21,7 @@ background:#111;
 color:#fff;
 }
 
-/* LOGO ANIMATION */
+/* LOGO (SYNCED) */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -31,9 +31,7 @@ background-size:200% auto;
 -webkit-text-fill-color:transparent;
 animation:shine 3s linear infinite;
 }
-@keyframes shine{
-to{background-position:200% center;}
-}
+@keyframes shine{to{background-position:200% center;}}
 
 nav a{
 color:#fff;
@@ -58,7 +56,9 @@ border:1px solid #ccc;
 /* CARD */
 .card{
 position:relative;
+transition:.3s;
 }
+.card:hover{transform:translateY(-5px);}
 
 /* WISHLIST */
 .wish-btn{
@@ -74,7 +74,7 @@ cursor:pointer;
 
 .rating{color:#f5a623;font-size:14px;}
 
-/* CART */
+/* MINI CART */
 .mini-cart{
 position:fixed;
 right:-320px;
@@ -115,7 +115,7 @@ background:#FFD700;
 color:#000;
 }
 
-/* ✅ FLOATING CART */
+/* FLOATING CART */
 .floating-cart{
 position:fixed;
 bottom:20px;
@@ -129,8 +129,25 @@ align-items:center;
 justify-content:center;
 font-size:24px;
 cursor:pointer;
-box-shadow:0 5px 15px rgba(0,0,0,0.2);
 z-index:3000;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+animation:bounce 2s infinite;
+}
+
+.cart-count{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
+color:#fff;
+font-size:12px;
+padding:3px 7px;
+border-radius:50%;
+}
+
+@keyframes bounce{
+0%,100%{transform:translateY(0);}
+50%{transform:translateY(-5px);}
 }
 
 </style>
@@ -144,6 +161,7 @@ z-index:3000;
 <nav>
 <a href="index.html">Home</a>
 <a href="product.html">Products</a>
+<a href="contact.html">Contact</a>
 </nav>
 
 <div onclick="toggleCart()" style="cursor:pointer;">
@@ -178,13 +196,15 @@ z-index:3000;
 <button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
-<!-- ✅ FLOATING CART BUTTON -->
-<div class="floating-cart" onclick="toggleCart()">🛒</div>
+<!-- FLOATING CART -->
+<div class="floating-cart" onclick="toggleCart()">
+🛒 <span id="floatingCount" class="cart-count">0</span>
+</div>
 
 <script>
 
 /* ========================= */
-/* LOAD PRODUCTS */
+/* PRODUCTS */
 /* ========================= */
 
 let defaultProducts = [
@@ -224,15 +244,24 @@ let defaultProducts = [
 
 ];
 
-let defaultWithId = defaultProducts.map((p,i)=>({...p,id:i}));
+/* ✅ FIX: UNIQUE IDS */
+let defaultWithId = defaultProducts.map((p,i)=>({...p,id:"d-"+i}));
+
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+
 let products = [...defaultWithId, ...adminProducts];
 
+/* ========================= */
 /* STATE */
+/* ========================= */
+
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
+/* ========================= */
 /* SHOW PRODUCTS */
+/* ========================= */
+
 function showProducts(list=products){
 
 document.getElementById("products").innerHTML = list.map(p=>{
@@ -243,16 +272,16 @@ let inWish = wishlist.includes(p.id);
 return `
 <div class="card">
 
-<div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish(${p.id})">❤</div>
+<div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish('${p.id}')">❤</div>
 
-<img src="${p.img}" onerror="this.src='images/default.jpg'" onclick="viewProduct(${p.id})">
+<img src="${p.img}" onclick="viewProduct('${p.id}')">
 
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
 
 <p class="rating">⭐ ${(Math.random()*0.8+4.1).toFixed(1)}</p>
 
-<button onclick="addToCart(${p.id})">
+<button onclick="addToCart('${p.id}')">
 ${inCart ? "✅ Added" : "Add to Cart"}
 </button>
 
@@ -265,8 +294,8 @@ ${inCart ? "✅ Added" : "Add to Cart"}
 /* ADD TO CART */
 function addToCart(id){
 
-let item = products.find(p=>p.id===id);
-let existing = cart.find(p=>p.id===id);
+let item = products.find(p=>p.id==id);
+let existing = cart.find(p=>p.id==id);
 
 if(existing){
 existing.qty++;
@@ -281,9 +310,9 @@ showProducts();
 playSound();
 }
 
-/* VIEW */
+/* VIEW PRODUCT */
 function viewProduct(id){
-let item = products.find(p=>p.id===id);
+let item = products.find(p=>p.id==id);
 localStorage.setItem("viewProduct", JSON.stringify(item));
 location.href="product-view.html";
 }
@@ -310,6 +339,7 @@ localStorage.setItem("cart", JSON.stringify(cart));
 function updateCartCount(){
 let total = cart.reduce((s,p)=>s+(p.qty||1),0);
 document.getElementById("cartCount").innerText = total;
+document.getElementById("floatingCount").innerText = total;
 }
 
 function toggleCart(){
@@ -326,7 +356,6 @@ let total=0;
 if(cart.length===0){
 div.innerHTML="Cart is empty";
 document.getElementById("total").innerText="";
-updateCartCount();
 return;
 }
 
@@ -335,8 +364,7 @@ total += p.price * p.qty;
 return `<p>${p.name} x${p.qty} <button onclick="removeItem(${i})">❌</button></p>`;
 }).join("");
 
-document.getElementById("total").innerText="Total: ₹"+total.toLocaleString("en-IN");
-updateCartCount();
+document.getElementById("total").innerText="Total: ₹"+total;
 }
 
 function removeItem(i){
@@ -344,17 +372,6 @@ cart.splice(i,1);
 saveCart();
 updateCartCount();
 renderCart();
-}
-
-/* WISHLIST */
-function toggleWish(id){
-if(wishlist.includes(id)){
-wishlist = wishlist.filter(x=>x!==id);
-}else{
-wishlist.push(id);
-}
-localStorage.setItem("wishlist", JSON.stringify(wishlist));
-showProducts();
 }
 
 /* SOUND */
@@ -371,4 +388,4 @@ updateCartCount();
 </script>
 
 </body>
-</html>
+                          </html>
