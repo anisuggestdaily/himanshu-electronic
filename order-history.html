@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Order History - Himanshu Electronics</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+/* HEADER SAME AS CONTACT */
+header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:15px;
+background:#111;
+color:#fff;
+}
+
+.left{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.menu-btn{
+font-size:22px;
+cursor:pointer;
+}
+
+.logo{
+font-size:22px;
+font-weight:700;
+background:linear-gradient(90deg,#fff,#FFD700,#fff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:shine 3s linear infinite;
+}
+
+@keyframes shine{
+to{background-position:200% center;}
+}
+
+nav a{
+color:#fff;
+margin:0 10px;
+text-decoration:none;
+}
+
+.active{
+color:#FFD700;
+font-weight:600;
+}
+
+/* MENU OVERLAY */
+.menu-overlay{
+position:fixed;
+top:0;
+left:-260px;
+width:250px;
+height:100%;
+background:#fff;
+box-shadow:2px 0 10px rgba(0,0,0,.2);
+padding:20px;
+transition:.3s;
+z-index:2000;
+}
+
+.menu-overlay.open{left:0;}
+
+.menu-overlay a{
+display:block;
+margin:15px 0;
+color:#111;
+text-decoration:none;
+font-weight:500;
+}
+
+/* PAGE */
+.container{
+max-width:900px;
+margin:auto;
+padding:15px;
+}
+
+/* ORDER CARD */
+.order{
+background:#fff;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.order h4{
+margin-bottom:10px;
+}
+
+/* EMPTY */
+.empty{
+text-align:center;
+margin-top:50px;
+font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+
+<div class="left">
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+<h2 class="logo">Himanshu Electronics</h2>
+</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="product.html">Products</a>
+<a href="contact.html">Contact</a>
+</nav>
+
+</header>
+
+<!-- SIDE MENU -->
+<div id="menu" class="menu-overlay">
+<a href="order-history.html">📦 Order History</a>
+<a href="#" onclick="toggleMode()">🌙 Toggle Mode</a>
+<a href="contact.html">📞 Contact</a>
+</div>
+
+<!-- PAGE -->
+<div class="container">
+
+<h2 style="text-align:center;">📦 My Orders</h2>
+
+<div id="orders"></div>
+
+</div>
+
+<script>
+
+/* MENU */
+function toggleMenu(){
+document.getElementById("menu").classList.toggle("open");
+}
+
+/* DARK MODE */
+function toggleMode(){
+document.body.classList.toggle("dark");
+}
+
+/* LOAD ORDERS */
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+function showOrders(){
+
+let div = document.getElementById("orders");
+
+if(orders.length===0){
+div.innerHTML = `
+<div class="empty">
+<h3>No Orders Yet</h3>
+<p>🛒 Place your first order</p>
+<button onclick="location.href='product.html'">Shop Now</button>
+</div>
+`;
+return;
+}
+
+div.innerHTML = orders.map(o=>{
+
+let items = o.items.map(p=>`${p.name} x${p.qty}`).join(", ");
+
+return `
+<div class="order">
+<h4>Order ID: ${o.id}</h4>
+<p><b>Products:</b> ${items}</p>
+<p><b>Total:</b> ₹${o.total}</p>
+<p><b>Payment:</b> ${o.payment}</p>
+<p><b>Status:</b> ${o.status || "Pending"}</p>
+</div>
+`;
+
+}).join("");
+
+}
+
+showOrders();
+
+</script>
+
+</body>
+</html>
