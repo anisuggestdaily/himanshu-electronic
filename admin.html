@@ -129,8 +129,8 @@ margin:10px 0;
 
 /* LOGIN */
 function login(){
-let u=document.getElementById("user").value;
-let p=document.getElementById("pass").value;
+let u=document.getElementById("user").value.trim();
+let p=document.getElementById("pass").value.trim();
 
 if(u==="admin" && p==="1234"){
 localStorage.setItem("adminLogin","true");
@@ -164,27 +164,36 @@ showProducts();
 showOrders();
 }
 
+/* ===================== */
 /* PRODUCTS */
+/* ===================== */
+
 let products = JSON.parse(localStorage.getItem("adminProducts")) || [];
 
 function addProduct(){
 
-let name=document.getElementById("name").value;
+let name=document.getElementById("name").value.trim();
 let price=document.getElementById("price").value;
-let img=document.getElementById("img").value;
+let img=document.getElementById("img").value.trim();
 let cat=document.getElementById("cat").value;
 
-if(!name||!price||!img){
+if(!name || !price || !img){
 alert("Fill all fields");
 return;
 }
 
-products.push({name,price:Number(price),img,cat});
+products.push({
+name,
+price:Number(price),
+img,
+cat
+});
+
 localStorage.setItem("adminProducts", JSON.stringify(products));
 
 showProducts();
 
-/* CLEAR */
+/* CLEAR INPUTS */
 document.getElementById("name").value="";
 document.getElementById("price").value="";
 document.getElementById("img").value="";
@@ -194,9 +203,15 @@ document.getElementById("img").value="";
 function showProducts(){
 let div=document.getElementById("list");
 
+if(products.length===0){
+div.innerHTML="<p>No products added yet</p>";
+return;
+}
+
 div.innerHTML = products.map((p,i)=>`
 <div class="product">
-${p.name} - ₹${p.price}
+<b>${p.name}</b> - ₹${p.price}
+<br><small>Category: ${p.cat}</small>
 <br>
 <button onclick="deleteProduct(${i})">Delete</button>
 </div>
@@ -205,9 +220,11 @@ ${p.name} - ₹${p.price}
 
 /* DELETE */
 function deleteProduct(i){
+if(confirm("Delete this product?")){
 products.splice(i,1);
 localStorage.setItem("adminProducts", JSON.stringify(products));
 showProducts();
+}
 }
 
 /* ===================== */
