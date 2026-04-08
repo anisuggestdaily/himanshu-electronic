@@ -1,22 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>Himanshu Electronics</title>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- SEO -->
+<meta name="description" content="Buy bulbs, fans, and lights at best prices. Fast delivery and trusted quality.">
+
+<!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- CSS -->
 <link rel="stylesheet" href="style.css">
 
 <style>
 
-/* GLOBAL */
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+/* BODY */
 body{
 font-family:'Poppins',sans-serif;
-margin:0;
 background:#f5f6fa;
-animation:pageFade .5s ease;
+color:#111;
+animation:fadePage .4s ease;
 }
 
 /* LOADER */
@@ -31,8 +44,8 @@ color:#fff;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:22px;
-z-index:2000;
+font-size:20px;
+z-index:9999;
 }
 
 /* HEADER */
@@ -45,7 +58,16 @@ background:#111;
 color:#fff;
 position:sticky;
 top:0;
-z-index:100;
+z-index:1000;
+}
+
+.logo{
+font-size:22px;
+font-weight:700;
+background:linear-gradient(90deg,#fff,#FFD700,#fff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:shine 3s linear infinite;
 }
 
 nav a{
@@ -53,19 +75,25 @@ margin:0 10px;
 color:#fff;
 text-decoration:none;
 font-weight:500;
+transition:.3s;
 }
 nav a:hover{
 color:#FFD700;
 }
 
-/* LOGO */
-.logo{
-font-size:24px;
-font-weight:700;
-background:linear-gradient(90deg,#fff,#FFD700,#fff);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-animation:shine 3s linear infinite;
+/* CART ICON */
+.cart-btn{
+cursor:pointer;
+font-size:20px;
+}
+
+.cart-count{
+background:red;
+color:#fff;
+border-radius:50%;
+padding:3px 7px;
+font-size:12px;
+margin-left:5px;
 }
 
 /* HERO */
@@ -74,28 +102,39 @@ text-align:center;
 padding:60px 20px;
 background:#222;
 color:#fff;
+animation:fadeIn 1s ease;
+}
+.hero h2{
+font-size:28px;
+margin-bottom:10px;
 }
 .hero button{
 padding:10px 20px;
 border:none;
 background:#FFD700;
 cursor:pointer;
-border-radius:5px;
+border-radius:6px;
 font-weight:600;
+transition:.3s;
+}
+.hero button:hover{
+background:#fff;
 }
 
 /* FEATURES */
 .features{
 display:flex;
-justify-content:space-around;
-padding:30px;
-text-align:center;
+flex-wrap:wrap;
+justify-content:center;
+gap:20px;
+padding:30px 20px;
 }
 .feature{
 background:#fff;
 padding:20px;
 border-radius:10px;
-width:30%;
+width:250px;
+text-align:center;
 box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
@@ -105,6 +144,8 @@ display:grid;
 grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
 gap:20px;
 padding:20px;
+max-width:1100px;
+margin:auto;
 }
 
 .card{
@@ -115,7 +156,7 @@ text-align:center;
 transition:.3s;
 }
 .card:hover{
-transform:translateY(-5px);
+transform:translateY(-6px);
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
@@ -124,6 +165,7 @@ width:100%;
 height:150px;
 object-fit:cover;
 border-radius:8px;
+cursor:pointer;
 }
 
 button{
@@ -133,6 +175,7 @@ background:#111;
 color:#fff;
 cursor:pointer;
 border-radius:5px;
+transition:.3s;
 }
 button:hover{
 background:#FFD700;
@@ -142,22 +185,35 @@ color:#000;
 /* MINI CART */
 .mini-cart{
 position:fixed;
-right:0;
+right:-320px;
 top:0;
 width:300px;
 height:100%;
 background:#fff;
 padding:15px;
 box-shadow:-5px 0 15px rgba(0,0,0,0.2);
+transition:.3s;
+z-index:2000;
 overflow-y:auto;
 }
 
-.cart-count{
-background:red;
-color:#fff;
-border-radius:50%;
-padding:3px 7px;
-font-size:12px;
+.mini-cart.open{
+right:0;
+}
+
+.cart-overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+display:none;
+z-index:1500;
+}
+
+.cart-overlay.show{
+display:block;
 }
 
 /* FOOTER */
@@ -166,7 +222,32 @@ text-align:center;
 padding:20px;
 background:#111;
 color:#fff;
-margin-top:20px;
+margin-top:30px;
+}
+
+footer a{
+color:#FFD700;
+text-decoration:none;
+}
+
+/* ANIMATIONS */
+@keyframes fadePage{
+from{opacity:0;}
+to{opacity:1;}
+}
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
+}
+@keyframes shine{
+to{background-position:200% center;}
+}
+
+/* MOBILE */
+@media(max-width:600px){
+.hero h2{
+font-size:22px;
+}
 }
 
 </style>
@@ -174,8 +255,10 @@ margin-top:20px;
 
 <body>
 
+<!-- LOADER -->
 <div id="loader">Loading...</div>
 
+<!-- HEADER -->
 <header>
 <h1 class="logo">Himanshu Electronics</h1>
 
@@ -185,7 +268,7 @@ margin-top:20px;
 <a href="contact.html">Contact</a>
 </nav>
 
-<div onclick="toggleCart()" style="cursor:pointer;">
+<div class="cart-btn" onclick="toggleCart()">
 🛒 <span id="cartCount" class="cart-count">0</span>
 </div>
 </header>
@@ -199,34 +282,31 @@ margin-top:20px;
 
 <!-- FEATURES -->
 <div class="features">
-
-<div class="feature">
-<h3>⚡ Fast Delivery</h3>
-<p>Quick & reliable service</p>
-</div>
-
-<div class="feature">
-<h3>💰 Best Prices</h3>
-<p>Affordable & genuine</p>
-</div>
-
-<div class="feature">
-<h3>📞 Support</h3>
-<p>WhatsApp anytime</p>
-</div>
-
+<div class="feature"><h3>⚡ Fast Delivery</h3><p>Quick & reliable</p></div>
+<div class="feature"><h3>💰 Best Prices</h3><p>Affordable & genuine</p></div>
+<div class="feature"><h3>📞 Support</h3><p>WhatsApp anytime</p></div>
 </div>
 
 <!-- PRODUCTS -->
 <div class="products-grid" id="featured"></div>
 
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="overlay" onclick="toggleCart()"></div>
+
 <!-- MINI CART -->
-<div class="mini-cart" id="miniCart" style="display:none;">
+<div class="mini-cart" id="miniCart">
 <h3>Your Cart</h3>
 <div id="miniItems"></div>
 <p id="cartTotal"></p>
 <button onclick="location.href='cart.html'">Checkout</button>
 </div>
+
+<!-- FOOTER -->
+<footer>
+<p>📧 <a href="mailto:anisuggestdaily@gmail.com">anisuggestdaily@gmail.com</a></p>
+<p>📞 +91 9639228237</p>
+<p>&copy; 2026 Himanshu Electronics</p>
+</footer>
 
 <script>
 
@@ -236,7 +316,7 @@ document.getElementById("loader").style.display="none";
 };
 
 /* PRODUCTS */
-let featuredProducts = [
+const featuredProducts = [
 {name:"LED Bulb 9W",price:40,img:"images/led9w.jpg"},
 {name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"},
 {name:"Master Fan 48 inch",price:1250,img:"images/fan_master48.jpg"},
@@ -245,67 +325,78 @@ let featuredProducts = [
 {name:"Fybros Panel Light 6W",price:80,img:"images/panel_fybros6.jpg"}
 ];
 
-let featuredDiv = document.getElementById("featured");
+const featuredDiv = document.getElementById("featured");
 
 featuredDiv.innerHTML = featuredProducts.map((p,i)=>`
 <div class="card">
-<img src="${p.img}" alt="${p.name}" onclick="viewFeatured(${i})">
+<img src="${p.img}" alt="${p.name}" onclick="viewProduct(${i})">
 <h3>${p.name}</h3>
 <p><b>₹${p.price}</b></p>
-<button onclick="viewFeatured(${i})">View</button>
+<button onclick="viewProduct(${i})">View</button>
 </div>
 `).join("");
 
-function viewFeatured(i){
+function viewProduct(i){
 localStorage.setItem("viewProduct", JSON.stringify(featuredProducts[i]));
-location.href = "product-view.html";
+location.href="product-view.html";
 }
 
-/* CART */
+/* CART SYSTEM (FIXED PROPERLY) */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+function saveCart(){
+localStorage.setItem("cart", JSON.stringify(cart));
+}
+
 function updateCartCount(){
-let total = cart.reduce((s,p)=>s+(p.qty||1),0);
+const total = cart.reduce((sum,p)=>sum+(p.qty||1),0);
 document.getElementById("cartCount").innerText = total;
 }
 
 function toggleCart(){
-let c = document.getElementById("miniCart");
-c.style.display = c.style.display==="block" ? "none":"block";
-showMiniCart();
+document.getElementById("miniCart").classList.toggle("open");
+document.getElementById("overlay").classList.toggle("show");
+renderCart();
 }
 
-function showMiniCart(){
-let div = document.getElementById("miniItems");
-let total = 0;
+function renderCart(){
+const div = document.getElementById("miniItems");
+const totalDiv = document.getElementById("cartTotal");
 
 if(cart.length===0){
 div.innerHTML="Cart is empty";
-document.getElementById("cartTotal").innerText="";
+totalDiv.innerText="";
 return;
 }
 
+let total = 0;
+
 div.innerHTML = cart.map((p,i)=>{
-total += p.price * (p.qty||1);
+let qty = p.qty || 1;
+total += p.price * qty;
+
 return `
-<p>${p.name} x${p.qty||1} 
-<button onclick="removeItem(${i})">❌</button></p>
+<p>
+${p.name} x${qty} 
+<button onclick="removeItem(${i})">❌</button>
+</p>
 `;
 }).join("");
 
-document.getElementById("cartTotal").innerText = "Total: ₹"+total;
+totalDiv.innerText = "Total: ₹"+total;
 }
 
 function removeItem(i){
 cart.splice(i,1);
-localStorage.setItem("cart", JSON.stringify(cart));
+saveCart();
 updateCartCount();
-showMiniCart();
+renderCart();
 }
 
+/* INIT */
 updateCartCount();
 
 </script>
 
 </body>
-</html>
+  </html>
