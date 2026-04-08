@@ -10,8 +10,6 @@
 
 <style>
 
-body{font-family:Poppins;}
-
 /* HEADER */
 header{
 display:flex;
@@ -22,6 +20,7 @@ background:#111;
 color:#fff;
 }
 
+/* LOGO */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -31,16 +30,57 @@ background-size:200% auto;
 -webkit-text-fill-color:transparent;
 animation:shine 3s linear infinite;
 }
-@keyframes shine{
-to{background-position:200% center;}
+@keyframes shine{to{background-position:200% center;}}
+
+/* TABLE */
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+td,th{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
 }
 
+/* INPUT */
 input,textarea{
 width:100%;
 margin:8px 0;
 padding:10px;
 }
 
+/* SUCCESS POPUP */
+.popup{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:#28a745;
+color:#fff;
+padding:10px 20px;
+border-radius:6px;
+animation:fadeInOut 3s ease forwards;
+z-index:3000;
+}
+@keyframes fadeInOut{
+0%{opacity:0;top:0;}
+10%{opacity:1;top:20px;}
+90%{opacity:1;}
+100%{opacity:0;}
+}
+
+/* COUPON */
+.coupon-box{
+margin:20px 0;
+padding:10px;
+background:#fff;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+/* BUTTON */
 button{
 padding:10px 15px;
 border:none;
@@ -50,66 +90,67 @@ cursor:pointer;
 border-radius:5px;
 margin:5px;
 }
+button:hover{
+background:#FFD700;
+color:#000;
+}
 
-/* FLOATING CART (MATCHED) */
-.floating-cart{
+/* FLOATING CART */
+.cart-icon{
 position:fixed;
 bottom:20px;
 right:20px;
 background:#FFD700;
-width:60px;
-height:60px;
+color:#000;
+width:55px;
+height:55px;
 border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:24px;
+font-size:22px;
 cursor:pointer;
-z-index:1000;
+z-index:2000;
+animation:bounce 2s infinite;
+}
+@keyframes bounce{
+0%,100%{transform:translateY(0);}
+50%{transform:translateY(-5px);}
 }
 
-/* POPUP */
-#popup{
-position:fixed;
-top:20px;
-left:50%;
-transform:translateX(-50%) scale(0);
-background:#28a745;
+.cart-count{
+position:absolute;
+top:-5px;
+right:-5px;
+background:red;
 color:#fff;
-padding:12px 20px;
-border-radius:8px;
-transition:.4s;
-z-index:5000;
+font-size:12px;
+padding:3px 7px;
+border-radius:50%;
 }
 
 </style>
+
 </head>
 
 <body>
 
 <header>
 <h2 class="logo">Himanshu Electronics</h2>
+
 <div>
 <a href="index.html">Home</a>
 <a href="product.html">Products</a>
 </div>
 </header>
 
+<div class="container">
+
 <h2 style="text-align:center;">My Cart</h2>
 
 <p id="freeMsg"></p>
 
-<!-- COUPON -->
-<div style="text-align:center;">
-<input id="coupon" placeholder="Enter Coupon">
-<button onclick="applyCoupon()">Apply</button>
-<p id="couponMsg"></p>
-</div>
-
-<!-- POPUP -->
-<div id="popup">🎉 Free Delivery Unlocked!</div>
-
-<table border="1" width="100%">
+<table>
 <thead>
 <tr>
 <th>Product</th>
@@ -124,42 +165,59 @@ z-index:5000;
 
 <tfoot>
 <tr><td>Subtotal</td><td id="subtotal"></td></tr>
-<tr><td>Discount</td><td id="discountRow">₹0</td></tr>
+<tr><td>Handling</td><td id="handling"></td></tr>
 <tr><td>Delivery</td><td id="delivery"></td></tr>
+<tr><td>Discount</td><td id="discount">₹0</td></tr>
 <tr><td><b>Total</b></td><td id="total"></td></tr>
 </tfoot>
 </table>
 
-<h3>Payment</h3>
-<label><input type="radio" name="pay" value="COD" checked> COD</label>
+<!-- COUPON -->
+<div class="coupon-box">
+<h3>Apply Coupon</h3>
+<input id="coupon" placeholder="Enter coupon code">
+<button onclick="applyCoupon()">Apply</button>
+<p id="couponMsg"></p>
+</div>
+
+<h3>Payment Method</h3>
+<label><input type="radio" name="pay" value="COD" checked> Cash on Delivery</label>
 <label><input type="radio" name="pay" value="UPI"> UPI</label>
 
 <div id="upiBox" style="display:none;">
-UPI: paytm.s1ktca0@pty
+<p>UPI ID: <b>paytm.s1ktca0@pty</b></p>
 </div>
 
 <h3>Your Details</h3>
-<input id="name" placeholder="Name">
-<input id="phone" placeholder="Phone">
-<textarea id="address" placeholder="Address"></textarea>
+<input id="name" placeholder="Your Name">
+<input id="phone" placeholder="Phone Number">
+<textarea id="address" placeholder="Full Address"></textarea>
 
-<div style="text-align:center;">
+<p style="color:red;font-size:14px;">
+🚚 Delivery available only in Bijnor
+</p>
+
+<div style="text-align:center;margin-top:20px;">
 <button onclick="clearCart()">Clear Cart</button>
 <button onclick="order()">Confirm Order</button>
 </div>
 
-<!-- FLOATING CART -->
-<div class="floating-cart" onclick="location.href='product.html'">🛒</div>
+</div>
+
+<!-- FLOATING CART (GO TO PRODUCT PAGE) -->
+<div class="cart-icon" onclick="location.href='product.html'">
+🛒 <span id="cartCount" class="cart-count">0</span>
+</div>
 
 <script>
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let discount = 0;
-let couponUsed = false;
-let popupShown = false;
 
-/* SHOW */
+/* SHOW CART */
 function showCart(){
+
+updateCartCount();
 
 if(cart.length===0){
 list.innerHTML=`<tr><td colspan="5">Cart Empty</td></tr>`;
@@ -167,24 +225,25 @@ updateTotals(0);
 return;
 }
 
-let subtotal=0;
+let subtotal = 0;
 
-list.innerHTML = cart.map((i,idx)=>{
-let qty=i.qty||1;
-let sub=i.price*qty;
-subtotal+=sub;
+list.innerHTML = cart.map((i,index)=>{
+let sub = i.price * i.qty;
+subtotal += sub;
 
-return `<tr>
+return `
+<tr>
 <td>${i.name}</td>
 <td>₹${i.price}</td>
 <td>
-<button onclick="dec(${idx})">-</button>
-${qty}
-<button onclick="inc(${idx})">+</button>
+<button onclick="dec(${index})">-</button>
+${i.qty}
+<button onclick="inc(${index})">+</button>
 </td>
 <td>₹${sub}</td>
-<td><button onclick="removeItem(${idx})">❌</button></td>
-</tr>`;
+<td><button onclick="removeItem(${index})">❌</button></td>
+</tr>
+`;
 }).join("");
 
 updateTotals(subtotal);
@@ -193,90 +252,112 @@ updateTotals(subtotal);
 /* TOTAL */
 function updateTotals(subtotal){
 
-let delivery = subtotal>=500?0:20;
+let handling = 0;
+let delivery = subtotal >= 500 ? 0 : 20;
 
-/* POPUP ONCE */
-if(subtotal>=500 && !popupShown){
-popupShown=true;
-let p=document.getElementById("popup");
-p.style.transform="translateX(-50%) scale(1)";
-setTimeout(()=>p.style.transform="translateX(-50%) scale(0)",2000);
+let total = subtotal + handling + delivery - discount;
+
+/* FREE DELIVERY POPUP */
+if(subtotal >= 500 && !document.querySelector('.popup')){
+let p=document.createElement("div");
+p.className="popup";
+p.innerText="🎉 You got FREE Delivery!";
+document.body.appendChild(p);
+setTimeout(()=>p.remove(),3000);
 }
 
-let total = subtotal + delivery - discount;
-total = Math.max(0,total);
-
-subtotalEl.innerText="₹"+subtotal;
-discountRow.innerText="-₹"+discount;
-deliveryEl.innerText=delivery===0?"FREE":"₹"+delivery;
-totalEl.innerText="₹"+total;
+subtotalEl.innerText = "₹"+subtotal;
+handlingEl.innerText = "FREE";
+deliveryEl.innerText = delivery===0?"FREE":"₹"+delivery;
+discountEl.innerText = "₹"+discount;
+totalEl.innerText = "₹"+total;
 }
 
 /* COUPON */
 function applyCoupon(){
 
-if(couponUsed) return;
-
-let code=coupon.value.toUpperCase();
-let subtotal=cart.reduce((s,i)=>s+(i.price*(i.qty||1)),0);
+let code = coupon.value.toUpperCase();
+let subtotal = cart.reduce((s,i)=>s+(i.price*i.qty),0);
 
 if(code==="SAVE50" && subtotal>=1000){
-discount=50;
-couponMsg.innerText="Applied SAVE50";
-couponUsed=true;
+discount = 50;
+couponMsg.innerText="₹50 discount applied!";
 }
 else if(code==="FIRST100" && subtotal>=1500){
-discount=100;
-couponMsg.innerText="Applied FIRST100";
-couponUsed=true;
+discount = 100;
+couponMsg.innerText="₹100 discount applied!";
 }
 else{
-couponMsg.innerText="Invalid coupon";
+discount = 0;
+couponMsg.innerText="Invalid or not eligible";
 }
 
-updateTotals(subtotal);
+showCart();
 }
 
 /* QTY */
-function inc(i){cart[i].qty=(cart[i].qty||1)+1;save();}
-function dec(i){
-cart[i].qty--;
-if(cart[i].qty<=0) cart.splice(i,1);
-save();
-}
+function inc(i){cart[i].qty++;save();}
+function dec(i){cart[i].qty--; if(cart[i].qty<=0) cart.splice(i,1); save();}
 
 /* REMOVE */
 function removeItem(i){cart.splice(i,1);save();}
 
 /* SAVE */
 function save(){
-localStorage.setItem("cart",JSON.stringify(cart));
+localStorage.setItem("cart", JSON.stringify(cart));
 showCart();
+}
+
+/* CLEAR */
+function clearCart(){
+if(confirm("Clear cart?")){
+localStorage.removeItem("cart");
+cart=[];
+showCart();
+}
 }
 
 /* ORDER */
 function order(){
+if(cart.length===0){alert("Cart empty");return;}
 
-let phone=document.getElementById("phone").value;
+let name = nameEl.value;
+let phone = phoneEl.value;
+let address = addressEl.value;
+let pay = document.querySelector('input[name="pay"]:checked').value;
 
-if(!/^[0-9]{10}$/.test(phone)){
-alert("Enter valid 10-digit phone");
-return;
+if(!name||!phone||!address){alert("Fill all details");return;}
+
+if(!address.toLowerCase().includes("bijnor")){
+alert("Delivery only in Bijnor");return;
 }
 
-let subtotal=cart.reduce((s,i)=>s+(i.price*(i.qty||1)),0);
-let delivery=subtotal>=500?0:20;
-let total=Math.max(0,subtotal+delivery-discount);
+let total = totalEl.innerText;
 
-let items=cart.map(i=>`${i.name} x${i.qty}`).join(", ");
-
-let msg=`Order\nItems: ${items}\nTotal: ₹${total}`;
-window.open("https://wa.me/919639228237?text="+encodeURIComponent(msg));
+window.open("https://wa.me/919639228237?text="+encodeURIComponent("Order Total: "+total));
 
 localStorage.removeItem("cart");
 
-document.body.innerHTML=`<h2 style="text-align:center;">✅ Order Placed</h2>`;
+document.body.innerHTML=`<h2 style="text-align:center;margin-top:50px;">✅ Order Placed</h2>`;
 }
+
+/* COUNT */
+function updateCartCount(){
+cartCount.innerText = cart.reduce((s,p)=>s+(p.qty||1),0);
+}
+
+/* FIX DOM */
+let list=document.getElementById("list");
+let subtotalEl=document.getElementById("subtotal");
+let handlingEl=document.getElementById("handling");
+let deliveryEl=document.getElementById("delivery");
+let discountEl=document.getElementById("discount");
+let totalEl=document.getElementById("total");
+let coupon=document.getElementById("coupon");
+let couponMsg=document.getElementById("couponMsg");
+let nameEl=document.getElementById("name");
+let phoneEl=document.getElementById("phone");
+let addressEl=document.getElementById("address");
 
 /* INIT */
 showCart();
@@ -284,4 +365,4 @@ showCart();
 </script>
 
 </body>
-                                              </html>
+  </html>
