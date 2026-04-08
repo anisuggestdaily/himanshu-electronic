@@ -46,11 +46,28 @@ gap:10px;
 margin:10px 0;
 }
 
+/* POPUP */
+.popup{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%) scale(0);
+background:#111;
+color:#fff;
+padding:10px 20px;
+border-radius:8px;
+transition:.3s;
+z-index:5000;
+}
+.popup.show{transform:translateX(-50%) scale(1);}
+
 </style>
 
 </head>
 
 <body>
+
+<div id="popup" class="popup"></div>
 
 <!-- LOGIN -->
 <div id="loginPage" class="login-box">
@@ -70,6 +87,8 @@ margin:10px 0;
 
 <h2 style="text-align:center;">📊 Admin Dashboard</h2>
 
+<p id="productCount"></p>
+
 <button onclick="logout()">Logout</button>
 
 <!-- ADD PRODUCT -->
@@ -80,7 +99,6 @@ margin:10px 0;
 <input id="name" placeholder="Product Name">
 <input id="price" type="number" placeholder="Price">
 
-<!-- ✅ IMAGE UPLOAD -->
 <input id="imgFile" type="file" accept="image/*">
 
 <select id="cat">
@@ -127,12 +145,24 @@ margin:10px 0;
 
 <script>
 
+/* LOGIN CONFIG */
+const ADMIN_USER="admin";
+const ADMIN_PASS="1234";
+
+/* POPUP */
+function showPopup(msg){
+let p=document.getElementById("popup");
+p.innerText=msg;
+p.classList.add("show");
+setTimeout(()=>p.classList.remove("show"),2000);
+}
+
 /* LOGIN */
 function login(){
-let u=document.getElementById("user").value.trim();
-let p=document.getElementById("pass").value.trim();
+let u=user.value.trim();
+let p=pass.value.trim();
 
-if(u==="admin" && p==="1234"){
+if(u===ADMIN_USER && p===ADMIN_PASS){
 localStorage.setItem("adminLogin","true");
 showAdmin();
 }else{
@@ -147,8 +177,8 @@ showAdmin();
 
 /* SHOW ADMIN */
 function showAdmin(){
-document.getElementById("loginPage").style.display="none";
-document.getElementById("adminPage").style.display="block";
+loginPage.style.display="none";
+adminPage.style.display="block";
 init();
 }
 
@@ -170,56 +200,85 @@ showOrders();
 
 let products = JSON.parse(localStorage.getItem("adminProducts")) || [];
 
-/* ADD PRODUCT WITH IMAGE */
-function addProduct(){
+/* IMAGE COMPRESS */
+function compressImage(file,callback){
+let reader=new FileReader();
 
-let name=document.getElementById("name").value.trim();
-let price=document.getElementById("price").value;
-let file=document.getElementById("imgFile").files[0];
-let cat=document.getElementById("cat").value;
+reader.onload=e=>{
+let img=new Image();
+img.src=e.target.result;
 
-if(!name || !price || !file){
-alert("Fill all fields");
-return;
-}
+img.onload=()=>{
+let canvas=document.createElement("canvas");
+let ctx=canvas.getContext("2d");
 
-/* CONVERT IMAGE TO BASE64 */
-let reader = new FileReader();
+canvas.width=300;
+canvas.height=300;
 
-reader.onload = function(e){
+ctx.drawImage(img,0,0,300,300);
 
-products.push({
-id: Date.now(), // ✅ IMPORTANT
-name,
-price:Number(price),
-img:e.target.result,
-cat
-});
-
-localStorage.setItem("adminProducts", JSON.stringify(products));
-
-showProducts();
-
-/* CLEAR */
-document.getElementById("name").value="";
-document.getElementById("price").value="";
-document.getElementById("imgFile").value="";
-
+callback(canvas.toDataURL("image/jpeg",0.7));
+};
 };
 
 reader.readAsDataURL(file);
 }
 
-/* SHOW PRODUCTS */
-function showProducts(){
-let div=document.getElementById("list");
+/* ADD PRODUCT */
+function addProduct(){
 
-if(products.length===0){
-div.innerHTML="<p>No products added yet</p>";
+let nameVal=name.value.trim();
+let priceVal=price.value;
+let file=imgFile.files[0];
+let catVal=cat.value;
+
+/* VALIDATION */
+if(!nameVal || !priceVal || !file){
+alert("Fill all fields");
 return;
 }
 
-div.innerHTML = products.map((p,i)=>`
+/* DUPLICATE CHECK */
+if(products.find(p=>p.name.toLowerCase()===nameVal.toLowerCase())){
+alert("Product already exists");
+return;
+}
+
+/* COMPRESS + SAVE */
+compressImage(file,(imgData)=>{
+
+products.push({
+id:"admin-"+Date.now(),   // ✅ FIXED ID SYSTEM
+name:nameVal,
+price:Number(priceVal),
+img:imgData,
+cat:catVal
+});
+
+localStorage.setItem("adminProducts", JSON.stringify(products));
+
+showProducts();
+showPopup("Product Added ✅");
+
+/* CLEAR */
+name.value="";
+price.value="";
+imgFile.value="";
+
+});
+}
+
+/* SHOW PRODUCTS */
+function showProducts(){
+
+productCount.innerText="Total Products: "+products.length;
+
+if(products.length===0){
+list.innerHTML="<p>No products added yet</p>";
+return;
+}
+
+list.innerHTML = products.map((p,i)=>`
 <div class="product">
 <b>${p.name}</b> - ₹${p.price}
 <br><small>${p.cat}</small>
@@ -237,6 +296,7 @@ if(confirm("Delete this product?")){
 products.splice(i,1);
 localStorage.setItem("adminProducts", JSON.stringify(products));
 showProducts();
+showPopup("Product Deleted ❌");
 }
 }
 
@@ -250,8 +310,8 @@ function showOrders(){
 
 let div=document.getElementById("orders");
 
-let search=document.getElementById("searchOrder").value.toLowerCase();
-let filter=document.getElementById("filterStatus").value;
+let search=searchOrder.value.toLowerCase();
+let filter=filterStatus.value;
 
 let filtered = orders.filter(o=>{
 
@@ -291,7 +351,11 @@ return `
 <p><b>Total:</b> ₹${o.total}</p>
 <p><b>Payment:</b> ${o.payment}</p>
 
-<p><b>Status:</b> ${o.status || "Pending"}</p>
+<p><b>Status:</b> 
+<span style="color:${(o.status||"Pending")==="Delivered"?"green":"orange"}">
+${o.status || "Pending"}
+</span>
+</p>
 
 <button onclick="markDelivered(${i})">Mark Delivered</button>
 <button onclick="deleteOrder(${i})">Delete</button>
@@ -312,6 +376,7 @@ function deleteOrder(i){
 if(confirm("Delete this order?")){
 orders.splice(i,1);
 saveOrders();
+showPopup("Order Deleted ❌");
 }
 }
 
@@ -324,4 +389,4 @@ showOrders();
 </script>
 
 </body>
-  </html>
+</html>
