@@ -19,8 +19,8 @@
 /* BODY */
 body{
 font-family:'Poppins',sans-serif;
-background:#f5f6fa;
-color:#111;
+background:#0f1111;
+color:#fff;
 animation:fadePage .4s ease;
 }
 
@@ -29,9 +29,11 @@ animation:fadePage .4s ease;
 position:fixed;
 top:0;left:0;
 width:100%;height:100%;
-background:#111;color:#fff;
+background:#000;
+color:#FFD700;
 display:flex;align-items:center;justify-content:center;
 z-index:9999;
+font-size:20px;
 }
 
 /* HEADER */
@@ -40,13 +42,21 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 padding:15px 20px;
-background:#111;
+background:#000;
 color:#fff;
 position:sticky;
 top:0;
 z-index:1000;
 }
 
+/* MENU BUTTON */
+.menu-btn{
+font-size:22px;
+cursor:pointer;
+margin-right:10px;
+}
+
+/* LOGO */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -57,6 +67,7 @@ background-size:200% auto;
 animation:shine 3s linear infinite;
 }
 
+/* NAV */
 nav a{
 margin:0 10px;
 color:#fff;
@@ -78,7 +89,7 @@ padding:3px 7px;
 font-size:12px;
 }
 
-/* DELIVERY BANNER */
+/* DELIVERY */
 .delivery-banner{
 background:#FFD700;
 color:#000;
@@ -91,7 +102,7 @@ font-weight:600;
 .hero{
 text-align:center;
 padding:60px 20px;
-background:#222;
+background:#1a1a1a;
 color:#fff;
 }
 
@@ -100,6 +111,7 @@ background:#FFD700;
 padding:10px 20px;
 border:none;
 border-radius:6px;
+cursor:pointer;
 }
 
 /* FEATURES */
@@ -112,12 +124,12 @@ padding:30px 20px;
 }
 
 .feature{
-background:#fff;
+background:#1f1f1f;
 padding:20px;
 border-radius:10px;
 width:250px;
 text-align:center;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
 }
 
 /* PRODUCTS */
@@ -131,10 +143,15 @@ margin:auto;
 }
 
 .card{
-background:#fff;
+background:#1f1f1f;
 padding:15px;
 border-radius:10px;
 text-align:center;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
 }
 
 .card img{
@@ -158,7 +175,7 @@ align-items:center;
 justify-content:center;
 font-size:24px;
 cursor:pointer;
-box-shadow:0 5px 15px rgba(0,0,0,0.2);
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
 z-index:2000;
 }
 
@@ -169,7 +186,8 @@ right:-320px;
 top:0;
 width:300px;
 height:100%;
-background:#fff;
+background:#1a1a1a;
+color:#fff;
 padding:15px;
 transition:.3s;
 z-index:3000;
@@ -182,17 +200,39 @@ overflow-y:auto;
 position:fixed;
 top:0;left:0;
 width:100%;height:100%;
-background:rgba(0,0,0,0.5);
+background:rgba(0,0,0,0.6);
 display:none;
 z-index:2500;
 }
 .cart-overlay.show{display:block;}
 
+/* SIDE MENU */
+.side-menu{
+position:fixed;
+left:-260px;
+top:0;
+width:250px;
+height:100%;
+background:#1a1a1a;
+padding:20px;
+transition:.3s;
+z-index:4000;
+}
+
+.side-menu.open{left:0;}
+
+.side-menu a{
+display:block;
+margin:15px 0;
+color:#fff;
+text-decoration:none;
+}
+
 /* FOOTER */
 footer{
 text-align:center;
 padding:20px;
-background:#111;
+background:#000;
 color:#fff;
 margin-top:30px;
 }
@@ -213,8 +253,20 @@ to{background-position:200% center;}
 
 <div id="loader">Loading...</div>
 
+<!-- SIDE MENU -->
+<div class="side-menu" id="menu">
+<h3>Menu</h3>
+<a href="order-history.html">📦 Orders</a>
+<a href="contact.html">📞 Contact</a>
+<a onclick="toggleTheme()">🌙 Toggle Theme</a>
+</div>
+
 <header>
+
+<div style="display:flex;align-items:center;">
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
 <h1 class="logo">Himanshu Electronics</h1>
+</div>
 
 <nav>
 <a href="index.html">Home</a>
@@ -250,7 +302,7 @@ to{background-position:200% center;}
 
 <div class="floating-cart" onclick="toggleCart()">🛒</div>
 
-<div class="cart-overlay" id="overlay" onclick="toggleCart()"></div>
+<div class="cart-overlay" id="overlay" onclick="closeAll()"></div>
 
 <div class="mini-cart" id="miniCart">
 <h3>Your Cart</h3>
@@ -267,7 +319,7 @@ to{background-position:200% center;}
 
 <script>
 
-/* SAFE LOADER */
+/* LOADER FIX */
 window.addEventListener("load", ()=>{
 setTimeout(()=>{
 let loader=document.getElementById("loader");
@@ -275,13 +327,26 @@ if(loader) loader.style.display="none";
 },300);
 });
 
-window.onerror=function(){
-let loader=document.getElementById("loader");
-if(loader) loader.style.display="none";
-};
+/* MENU */
+function toggleMenu(){
+document.getElementById("menu").classList.toggle("open");
+document.getElementById("overlay").classList.toggle("show");
+}
 
-/* SAFE PRODUCTS */
-let defaultProducts = [
+/* CLOSE ALL */
+function closeAll(){
+document.getElementById("miniCart").classList.remove("open");
+document.getElementById("menu").classList.remove("open");
+document.getElementById("overlay").classList.remove("show");
+}
+
+/* THEME */
+function toggleTheme(){
+document.body.classList.toggle("light");
+}
+
+/* PRODUCTS */
+let defaultProducts=[
 {name:"LED Bulb 9W",price:40,img:"images/led9w.jpg"},
 {name:"LED Bulb 12W",price:90,img:"images/led12w.jpg"},
 {name:"LED Bulb 15W",price:120,img:"images/led15w.jpg"},
@@ -290,18 +355,10 @@ let defaultProducts = [
 {name:"LED Bulb 30W",price:230,img:"images/led30w.jpg"}
 ];
 
-let products=[];
-try{
-products=JSON.parse(localStorage.getItem("adminProducts"))||[];
-}catch(e){products=[];}
+let products=JSON.parse(localStorage.getItem("adminProducts"))||[];
+let allProducts=[...defaultProducts,...products];
 
-let allProducts=[];
-try{
-allProducts=[...defaultProducts,...products];
-}catch(e){allProducts=defaultProducts;}
-
-try{
-document.getElementById("featured").innerHTML =
+document.getElementById("featured").innerHTML=
 allProducts.slice(0,6).map((p,i)=>`
 <div class="card">
 <img src="${p.img}" onclick="viewProduct(${i})">
@@ -310,19 +367,17 @@ allProducts.slice(0,6).map((p,i)=>`
 <button onclick="viewProduct(${i})">View</button>
 </div>
 `).join("");
-}catch(e){}
 
-/* VIEW */
 function viewProduct(i){
 localStorage.setItem("viewProduct", JSON.stringify(allProducts[i]));
 location.href="product-view.html";
 }
 
 /* CART */
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
 
 function updateCartCount(){
-document.getElementById("cartCount").innerText =
+document.getElementById("cartCount").innerText=
 cart.reduce((s,p)=>s+(p.qty||1),0);
 }
 
@@ -344,7 +399,7 @@ return;
 
 let total=0;
 
-div.innerHTML = cart.map(p=>{
+div.innerHTML=cart.map(p=>{
 let qty=p.qty||1;
 total+=p.price*qty;
 return `${p.name} x${qty}`;
