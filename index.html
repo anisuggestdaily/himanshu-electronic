@@ -22,6 +22,7 @@ font-family:'Poppins',sans-serif;
 background:#f1f3f6;
 color:#212121;
 animation:fadePage .4s ease;
+transition:.3s;
 }
 
 /* LOADER */
@@ -36,14 +37,14 @@ z-index:9999;
 font-size:20px;
 }
 
-/* HEADER */
+/* HEADER (FIXED BLACK) */
 header{
 display:flex;
 justify-content:space-between;
 align-items:center;
 padding:15px 20px;
-background:#2874f0;
-color:#fff;
+background:#000;
+color:#FFD700;
 position:sticky;
 top:0;
 z-index:1000;
@@ -53,6 +54,7 @@ z-index:1000;
 font-size:22px;
 cursor:pointer;
 margin-right:10px;
+color:#FFD700;
 }
 
 .logo{
@@ -71,7 +73,7 @@ margin:0 10px;
 color:#fff;
 text-decoration:none;
 }
-nav a:hover{opacity:.8;}
+nav a:hover{color:#FFD700;}
 
 .cart-btn{
 cursor:pointer;
@@ -240,6 +242,28 @@ color:#fff;
 margin-top:30px;
 }
 
+/* DARK MODE */
+.dark{
+background:#111;
+color:#fff;
+}
+
+.dark .hero,
+.dark .feature,
+.dark .card{
+background:#1a1a1a;
+color:#fff;
+}
+
+.dark .mini-cart{
+background:#111;
+color:#fff;
+}
+
+.dark footer{
+background:#000;
+}
+
 /* ANIMATION */
 @keyframes fadePage{
 from{opacity:0;}
@@ -256,7 +280,8 @@ to{opacity:1;}
 <!-- SIDE MENU -->
 <div class="side-menu" id="menu">
 <h3>Menu</h3>
-<a href="order-history.html">📦 Orders</a>
+<a href="order-history.html">📦 Order History</a>
+<a href="#" onclick="toggleDark()">🌙 Toggle Mode</a>
 <a href="contact.html">📞 Contact</a>
 </div>
 
@@ -330,6 +355,11 @@ if(loader) loader.style.display="none";
 function toggleMenu(){
 document.getElementById("menu").classList.toggle("open");
 document.getElementById("overlay").classList.toggle("show");
+}
+
+/* DARK MODE */
+function toggleDark(){
+document.body.classList.toggle("dark");
 }
 
 /* CLOSE ALL */
