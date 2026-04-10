@@ -16,10 +16,10 @@
 /* RESET */
 *{margin:0;padding:0;box-sizing:border-box;}
 
-/* BODY (✅ LIGHT FIX) */
+/* BODY */
 body{
 font-family:'Poppins',sans-serif;
-background:#f1f3f6; /* ✅ WHITE BACK */
+background:#f1f3f6;
 color:#212121;
 animation:fadePage .4s ease;
 }
@@ -49,26 +49,23 @@ top:0;
 z-index:1000;
 }
 
-/* MENU BUTTON */
 .menu-btn{
 font-size:22px;
 cursor:pointer;
 margin-right:10px;
 }
 
-/* LOGO */
 .logo{
 font-size:22px;
 font-weight:700;
 }
 
-/* ✅ HOME PAGE BIG LOGO */
+/* HOME BIG LOGO */
 .home-logo{
 font-size:28px;
 font-weight:800;
 }
 
-/* NAV */
 nav a{
 margin:0 10px;
 color:#fff;
@@ -76,7 +73,6 @@ text-decoration:none;
 }
 nav a:hover{opacity:.8;}
 
-/* CART BUTTON */
 .cart-btn{
 cursor:pointer;
 font-size:20px;
@@ -262,14 +258,12 @@ to{opacity:1;}
 <h3>Menu</h3>
 <a href="order-history.html">📦 Orders</a>
 <a href="contact.html">📞 Contact</a>
-<a onclick="toggleTheme()">🌙 Toggle Theme</a>
 </div>
 
 <header>
 
 <div style="display:flex;align-items:center;">
 <div class="menu-btn" onclick="toggleMenu()">☰</div>
-<!-- ✅ ONLY HOME PAGE BIG -->
 <h1 class="logo home-logo">Himanshu Electronics</h1>
 </div>
 
@@ -313,8 +307,6 @@ to{opacity:1;}
 <h3>Your Cart</h3>
 <div id="miniItems"></div>
 <p id="cartTotal"></p>
-
-<!-- ✅ ORDER SAVE ON CHECKOUT -->
 <button onclick="checkout()">Checkout</button>
 </div>
 
@@ -357,7 +349,11 @@ let defaultProducts=[
 {name:"LED Bulb 30W",price:230,img:"images/led30w.jpg"}
 ];
 
-let products=JSON.parse(localStorage.getItem("adminProducts"))||[];
+let products=[];
+try{
+products=JSON.parse(localStorage.getItem("adminProducts"))||[];
+}catch(e){products=[];}
+
 let allProducts=[...defaultProducts,...products];
 
 document.getElementById("featured").innerHTML=
@@ -376,7 +372,10 @@ location.href="product-view.html";
 }
 
 /* CART */
-let cart=JSON.parse(localStorage.getItem("cart"))||[];
+let cart=[];
+try{
+cart=JSON.parse(localStorage.getItem("cart"))||[];
+}catch(e){cart=[];}
 
 function updateCartCount(){
 document.getElementById("cartCount").innerText=
@@ -411,7 +410,7 @@ totalDiv.innerText="Total ₹"+total;
 updateCartCount();
 }
 
-/* ✅ FINAL CHECKOUT + ORDER SAVE */
+/* CHECKOUT */
 function checkout(){
 
 if(cart.length===0){
@@ -419,12 +418,18 @@ alert("Cart is empty!");
 return;
 }
 
-let orders=JSON.parse(localStorage.getItem("orders"))||[];
+let orders=[];
+try{
+orders=JSON.parse(localStorage.getItem("orders"))||[];
+}catch(e){orders=[];}
+
+let total=cart.reduce((s,p)=>s+p.price*(p.qty||1),0);
 
 let newOrder={
 id:"ORD"+Date.now(),
 items:cart,
-total:cart.reduce((s,p)=>s+p.price*(p.qty||1),0),
+total:total,
+payment:"COD",
 date:new Date().toLocaleString(),
 status:"Placed"
 };
