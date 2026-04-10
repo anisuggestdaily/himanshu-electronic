@@ -16,11 +16,11 @@
 /* RESET */
 *{margin:0;padding:0;box-sizing:border-box;}
 
-/* BODY */
+/* BODY (✅ LIGHT FIX) */
 body{
 font-family:'Poppins',sans-serif;
-background:#0f1111;
-color:#fff;
+background:#f1f3f6; /* ✅ WHITE BACK */
+color:#212121;
 animation:fadePage .4s ease;
 }
 
@@ -42,7 +42,7 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 padding:15px 20px;
-background:#000;
+background:#2874f0;
 color:#fff;
 position:sticky;
 top:0;
@@ -60,11 +60,12 @@ margin-right:10px;
 .logo{
 font-size:22px;
 font-weight:700;
-background:linear-gradient(90deg,#fff,#FFD700,#fff);
-background-size:200% auto;
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-animation:shine 3s linear infinite;
+}
+
+/* ✅ HOME PAGE BIG LOGO */
+.home-logo{
+font-size:28px;
+font-weight:800;
 }
 
 /* NAV */
@@ -73,7 +74,7 @@ margin:0 10px;
 color:#fff;
 text-decoration:none;
 }
-nav a:hover{color:#FFD700;}
+nav a:hover{opacity:.8;}
 
 /* CART BUTTON */
 .cart-btn{
@@ -102,12 +103,16 @@ font-weight:600;
 .hero{
 text-align:center;
 padding:60px 20px;
-background:#1a1a1a;
-color:#fff;
+background:#fff;
+color:#212121;
+border-radius:12px;
+margin:15px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
 }
 
 .hero button{
-background:#FFD700;
+background:#fb641b;
+color:#fff;
 padding:10px 20px;
 border:none;
 border-radius:6px;
@@ -124,12 +129,12 @@ padding:30px 20px;
 }
 
 .feature{
-background:#1f1f1f;
+background:#fff;
 padding:20px;
 border-radius:10px;
 width:250px;
 text-align:center;
-box-shadow:0 5px 15px rgba(0,0,0,0.4);
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
 /* PRODUCTS */
@@ -143,11 +148,12 @@ margin:auto;
 }
 
 .card{
-background:#1f1f1f;
+background:#fff;
 padding:15px;
 border-radius:10px;
 text-align:center;
 transition:.3s;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
 .card:hover{
@@ -166,7 +172,8 @@ border-radius:8px;
 position:fixed;
 bottom:20px;
 right:20px;
-background:#FFD700;
+background:#fb641b;
+color:#fff;
 width:60px;
 height:60px;
 border-radius:50%;
@@ -175,7 +182,7 @@ align-items:center;
 justify-content:center;
 font-size:24px;
 cursor:pointer;
-box-shadow:0 5px 15px rgba(0,0,0,0.4);
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
 z-index:2000;
 }
 
@@ -186,8 +193,8 @@ right:-320px;
 top:0;
 width:300px;
 height:100%;
-background:#1a1a1a;
-color:#fff;
+background:#fff;
+color:#000;
 padding:15px;
 transition:.3s;
 z-index:3000;
@@ -213,7 +220,7 @@ left:-260px;
 top:0;
 width:250px;
 height:100%;
-background:#1a1a1a;
+background:#fff;
 padding:20px;
 transition:.3s;
 z-index:4000;
@@ -224,7 +231,7 @@ z-index:4000;
 .side-menu a{
 display:block;
 margin:15px 0;
-color:#fff;
+color:#000;
 text-decoration:none;
 }
 
@@ -232,7 +239,7 @@ text-decoration:none;
 footer{
 text-align:center;
 padding:20px;
-background:#000;
+background:#172337;
 color:#fff;
 margin-top:30px;
 }
@@ -241,9 +248,6 @@ margin-top:30px;
 @keyframes fadePage{
 from{opacity:0;}
 to{opacity:1;}
-}
-@keyframes shine{
-to{background-position:200% center;}
 }
 
 </style>
@@ -265,7 +269,8 @@ to{background-position:200% center;}
 
 <div style="display:flex;align-items:center;">
 <div class="menu-btn" onclick="toggleMenu()">☰</div>
-<h1 class="logo">Himanshu Electronics</h1>
+<!-- ✅ ONLY HOME PAGE BIG -->
+<h1 class="logo home-logo">Himanshu Electronics</h1>
 </div>
 
 <nav>
@@ -308,7 +313,9 @@ to{background-position:200% center;}
 <h3>Your Cart</h3>
 <div id="miniItems"></div>
 <p id="cartTotal"></p>
-<button onclick="location.href='cart.html'">Checkout</button>
+
+<!-- ✅ ORDER SAVE ON CHECKOUT -->
+<button onclick="checkout()">Checkout</button>
 </div>
 
 <footer>
@@ -319,7 +326,7 @@ to{background-position:200% center;}
 
 <script>
 
-/* LOADER FIX */
+/* LOADER */
 window.addEventListener("load", ()=>{
 setTimeout(()=>{
 let loader=document.getElementById("loader");
@@ -338,11 +345,6 @@ function closeAll(){
 document.getElementById("miniCart").classList.remove("open");
 document.getElementById("menu").classList.remove("open");
 document.getElementById("overlay").classList.remove("show");
-}
-
-/* THEME */
-function toggleTheme(){
-document.body.classList.toggle("light");
 }
 
 /* PRODUCTS */
@@ -406,6 +408,37 @@ return `${p.name} x${qty}`;
 }).join("<br>");
 
 totalDiv.innerText="Total ₹"+total;
+updateCartCount();
+}
+
+/* ✅ FINAL CHECKOUT + ORDER SAVE */
+function checkout(){
+
+if(cart.length===0){
+alert("Cart is empty!");
+return;
+}
+
+let orders=JSON.parse(localStorage.getItem("orders"))||[];
+
+let newOrder={
+id:"ORD"+Date.now(),
+items:cart,
+total:cart.reduce((s,p)=>s+p.price*(p.qty||1),0),
+date:new Date().toLocaleString(),
+status:"Placed"
+};
+
+orders.push(newOrder);
+
+localStorage.setItem("orders", JSON.stringify(orders));
+
+cart=[];
+localStorage.setItem("cart", JSON.stringify(cart));
+
+alert("Order Placed Successfully!");
+
+renderCart();
 updateCartCount();
 }
 
