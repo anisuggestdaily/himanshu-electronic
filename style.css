@@ -25,8 +25,8 @@ border-radius:10px;
 body{
 margin:0;
 font-family:'Poppins',sans-serif;
-background:#0f1111;
-color:#e4e6eb;
+background:#f1f3f6; /* FIXED LIGHT THEME */
+color:#212121;
 }
 
 /* HEADER */
@@ -38,7 +38,7 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 padding:12px 20px;
-background:#0f1111;
+background:#000;
 color:#FFD700;
 box-shadow:0 2px 8px rgba(0,0,0,.5);
 }
@@ -50,11 +50,12 @@ color:#FFD700;
 }
 
 header a{
-color:#e4e6eb;
+color:#fff;
 text-decoration:none;
 margin:0 10px;
 font-size:14px;
 }
+header a:hover{color:#FFD700;}
 
 /* DELIVERY BANNER */
 .delivery-banner{
@@ -68,32 +69,13 @@ font-size:14px;
 
 /* HERO */
 .hero{
-background:#1c1c1c;
+background:#111;
 text-align:center;
 padding:50px 20px;
 margin:15px;
 border-radius:16px;
-box-shadow:0 5px 20px rgba(0,0,0,.5);
-}
-
-.hero h2{
-font-size:26px;
-margin-bottom:10px;
+box-shadow:0 5px 20px rgba(0,0,0,.3);
 color:#fff;
-}
-
-.hero p{
-color:#bbb;
-}
-
-.hero button{
-background:#FFD700;
-color:#000;
-border:none;
-padding:12px 25px;
-border-radius:8px;
-font-weight:600;
-cursor:pointer;
 }
 
 /* GRID */
@@ -106,25 +88,25 @@ padding:15px;
 
 /* CARD */
 .card{
-background:#1c1c1c;
+background:#fff; /* FIXED WHITE PRODUCT BOX */
 border-radius:12px;
 padding:15px;
 text-align:center;
-transition:.2s;
-box-shadow:0 3px 12px rgba(0,0,0,.5);
+transition:.3s;
+box-shadow:0 3px 12px rgba(0,0,0,.15);
 position:relative;
 }
 
 .card:hover{
-transform:translateY(-5px);
-box-shadow:0 8px 25px rgba(0,0,0,.7);
+transform:translateY(-5px) scale(1.02);
+box-shadow:0 8px 25px rgba(0,0,0,.2);
 }
 
 .card img{
 width:100%;
 height:150px;
-object-fit:contain;
-background:#111;
+object-fit:cover; /* FIXED CONSISTENCY */
+background:#fff;
 border-radius:8px;
 }
 
@@ -132,13 +114,13 @@ border-radius:8px;
 font-size:15px;
 margin:10px 0;
 min-height:40px;
-color:#fff;
+color:#000;
 }
 
 .card p{
 font-size:16px;
 font-weight:600;
-color:#4caf50;
+color:#2e7d32;
 }
 
 /* BADGE */
@@ -157,17 +139,22 @@ border-radius:5px;
 button{
 border:none;
 border-radius:6px;
-padding:8px 14px;
+padding:10px 18px; /* IMPROVED */
 cursor:pointer;
 font-size:14px;
-transition:.2s;
+font-weight:600;
+transition:all .2s ease; /* ADDED */
 }
 
 button:hover{
 opacity:.9;
 }
 
-.add{background:#ff9f00;color:#000;}
+button:active{
+transform:scale(.95); /* ACTION EFFECT */
+}
+
+.add{background:#fb641b;color:#fff;}
 .primary{background:#FFD700;color:#000;}
 .danger{background:#d32f2f;color:#fff;}
 .back{background:#555;color:#fff;}
@@ -177,11 +164,18 @@ input,textarea,select{
 width:100%;
 padding:10px;
 border-radius:6px;
-border:1px solid #333;
+border:1px solid #ccc;
 margin:8px 0;
 font-size:14px;
-background:#111;
-color:#fff;
+background:#fff;
+color:#000;
+transition:all .2s ease; /* ADDED */
+}
+
+input:focus,textarea:focus,select:focus{
+border-color:#FFD700;
+outline:none;
+box-shadow:0 0 5px rgba(255,215,0,0.5);
 }
 
 /* CONTAINER */
@@ -194,10 +188,10 @@ padding:15px;
 /* TABLE */
 table{
 width:100%;
-background:#1c1c1c;
+background:#fff;
 border-radius:10px;
 overflow:hidden;
-box-shadow:0 2px 10px rgba(0,0,0,.5);
+box-shadow:0 2px 10px rgba(0,0,0,.2);
 }
 
 th{
@@ -208,8 +202,8 @@ color:#000;
 td,th{
 padding:10px;
 text-align:center;
-border-bottom:1px solid #333;
-color:#ddd;
+border-bottom:1px solid #ddd;
+color:#000;
 }
 
 /* MINI CART */
@@ -219,11 +213,12 @@ right:-320px;
 top:0;
 width:300px;
 height:100%;
-background:#1c1c1c;
+background:#FFD700; /* FIXED YELLOW */
+color:#000;
 padding:20px;
 box-shadow:-5px 0 20px rgba(0,0,0,.7);
 overflow-y:auto;
-z-index:1002;
+z-index:3000; /* FIXED */
 transition:.3s;
 }
 
@@ -238,7 +233,7 @@ left:0;
 width:100%;
 height:100%;
 background:rgba(0,0,0,.7);
-z-index:1001;
+z-index:2000; /* FIXED */
 display:none;
 }
 
@@ -253,8 +248,8 @@ display:block;
 position:fixed;
 bottom:20px;
 right:20px;
-background:#FFD700;
-color:#000;
+background:#fb641b;
+color:#fff;
 width:55px;
 height:55px;
 border-radius:50%;
@@ -264,7 +259,7 @@ justify-content:center;
 font-size:22px;
 box-shadow:0 5px 15px rgba(0,0,0,.5);
 cursor:pointer;
-z-index:1000;
+z-index:2000;
 }
 
 /* CART COUNT */
@@ -282,7 +277,7 @@ border-radius:50%;
 /* FOOTER */
 footer{
 background:#000;
-color:#aaa;
+color:#fff;
 text-align:center;
 padding:25px;
 margin-top:40px;
@@ -306,11 +301,11 @@ margin-top:50px;
 
 /* ADMIN */
 .product{
-background:#1c1c1c;
+background:#fff;
 padding:10px;
 margin:10px 0;
 border-radius:8px;
-box-shadow:0 2px 8px rgba(0,0,0,.5);
+box-shadow:0 2px 8px rgba(0,0,0,.2);
 }
 
 /* MOBILE */
