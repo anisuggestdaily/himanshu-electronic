@@ -1,7 +1,16 @@
-<!DOCTYPE html>  <html lang="en">    <head>    
-<title>Himanshu Electronics</title>  <meta charset="UTF-8">    
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  <meta name="description" content="Buy bulbs, fans, and lights at best prices. Fast delivery and trusted quality.">  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">    
-<link rel="stylesheet" href="style.css">  <style>    /* RESET */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Himanshu Electronics</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Buy bulbs, fans, and lights at best prices. Fast delivery and trusted quality.">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<style>
+/* RESET */
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
@@ -48,7 +57,6 @@ transition:.2s;
 }
 .menu-btn:active{transform:scale(.9);}
 
-/* LOGO WITH ANIMATION */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -299,52 +307,84 @@ opacity:1;
 transform:translateY(0);
 }
 }
+</style>
+</head>
 
-</style>  </head>  <body>  <div id="loader">Loading...</div>  <!-- SIDE MENU -->  <div class="side-menu" id="menu">
+<body>
 
-<h3>Menu</h3>    
-<a href="order-history.html">📦 Order History</a>    
-<a href="#" onclick="toggleDark()">🌙 Toggle Mode</a>    
-<a href="contact.html">📞 Contact</a>    
-</div>  <header>    
-<div style="display:flex;align-items:center;">    
-<div class="menu-btn" onclick="toggleMenu()">☰</div>    
-<h1 class="logo home-logo">Himanshu Electronics</h1>    
-</div>  <nav>    
-<a href="index.html">Home</a>    
-<a href="product.html">Products</a>    
-<a href="contact.html">Contact</a>    
-</nav>  <div class="cart-btn" onclick="toggleCart()">    
-🛒 <span id="cartCount" class="cart-count">0</span>    
-</div>    
-</header>  <div class="delivery-banner">    
-🚚 Delivery Available Only in Bijnor    
-</div>  <div class="hero">    
-<h2>Smart Products For Smart Home</h2>    
-<p>High-quality electrical products at affordable prices.</p>    
-<button onclick="location.href='product.html'">Shop Now</button>    
-</div>  <div class="features">    
-<div class="feature">⚡ Fast Delivery</div>    
-<div class="feature">💰 Best Prices</div>    
-<div class="feature">    
-<button onclick="location.href='contact.html'">📞 Support</button>    
-</div>    
-</div>  <h2 style="text-align:center;">⭐ Featured Products</h2>    
-<div class="products-grid" id="featured"></div>  <div class="floating-cart" onclick="toggleCart()">🛒</div>  <div class="cart-overlay" id="overlay" onclick="closeAll()"></div>  <div class="mini-cart" id="miniCart">    
-<h3>Your Cart</h3>    
-<div id="miniItems"></div>    
-<p id="cartTotal"></p>    
-<button onclick="checkout()">Checkout</button>    
-</div>  <footer>    
-<p>📞 +91 9639228237</p>    
-<p>📧 anisuggestdaily@gmail.com</p>    
-<p>&copy; 2026 Himanshu Electronics</p>    
-</footer>  <script>    /* LOADER */
-window.addEventListener("load", ()=>{
-setTimeout(()=>{
-document.getElementById("loader").style.display="none";
-},300);
-});
+<div id="loader">Loading...</div>
+
+<div class="side-menu" id="menu">
+<h3>Menu</h3>
+<a href="order-history.html">📦 Order History</a>
+<a href="#" onclick="toggleDark()">🌙 Toggle Mode</a>
+<a href="contact.html">📞 Contact</a>
+</div>
+
+<header>
+<div style="display:flex;align-items:center;">
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+<h1 class="logo home-logo">Himanshu Electronics</h1>
+</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="product.html">Products</a>
+<a href="contact.html">Contact</a>
+</nav>
+
+<div class="cart-btn" onclick="toggleCart()">
+🛒 <span id="cartCount" class="cart-count">0</span>
+</div>
+</header>
+
+<div class="delivery-banner">
+🚚 Delivery Available Only in Bijnor
+</div>
+
+<div class="hero">
+<h2>Smart Products For Smart Home</h2>
+<p>High-quality electrical products at affordable prices.</p>
+<button onclick="location.href='product.html'">Shop Now</button>
+</div>
+
+<div class="features">
+<div class="feature">⚡ Fast Delivery</div>
+<div class="feature">💰 Best Prices</div>
+<div class="feature">
+<button onclick="location.href='contact.html'">📞 Support</button>
+</div>
+</div>
+
+<h2 style="text-align:center;">⭐ Featured Products</h2>
+<div class="products-grid" id="featured"></div>
+
+<div class="floating-cart" onclick="toggleCart()">🛒</div>
+
+<div class="cart-overlay" id="overlay" onclick="closeAll()"></div>
+
+<div class="mini-cart" id="miniCart">
+<h3>Your Cart</h3>
+<div id="miniItems"></div>
+<p id="cartTotal"></p>
+<button onclick="checkout()">Checkout</button>
+</div>
+
+<footer>
+<p>📞 +91 9639228237</p>
+<p>📧 anisuggestdaily@gmail.com</p>
+<p>&copy; 2026 Himanshu Electronics</p>
+</footer>
+
+<script>
+
+/* FIXED LOADER */
+function hideLoader(){
+let loader=document.getElementById("loader");
+if(loader){ loader.style.display="none"; }
+}
+window.addEventListener("DOMContentLoaded", hideLoader);
+window.addEventListener("load", hideLoader);
 
 /* SCROLL ANIMATION */
 let observer=new IntersectionObserver(entries=>{
@@ -394,14 +434,15 @@ let allProducts=[...defaultProducts,...products];
 
 document.getElementById("featured").innerHTML=
 allProducts.slice(0,6).map((p,i)=>`
+<div class="card">
+<img src="${p.img}" onclick="viewProduct(${i})">
+<h3>${p.name}</h3>
+<p>₹${p.price}</p>
+<button onclick="viewProduct(${i})">View</button>
+</div>
+`).join("");
 
-<div class="card">    
-<img src="${p.img}" onclick="viewProduct(${i})">    
-<h3>${p.name}</h3>    
-<p>₹${p.price}</p>    
-<button onclick="viewProduct(${i})">View</button>    
-</div>    
-`).join("");    function viewProduct(i){
+function viewProduct(i){
 localStorage.setItem("viewProduct", JSON.stringify(allProducts[i]));
 location.href="product-view.html";
 }
@@ -420,6 +461,7 @@ document.getElementById("overlay").classList.toggle("show");
 renderCart();
 }
 
+/* FIXED BUG HERE */
 function renderCart(){
 let div=document.getElementById("miniItems");
 let totalDiv=document.getElementById("cartTotal");
@@ -435,7 +477,7 @@ let total=0;
 div.innerHTML=cart.map(p=>{
 let qty=p.qty||1;
 total+=p.price*qty;
-return ${p.name} x${qty};
+return `${p.name} x${qty}`;
 }).join("<br>");
 
 totalDiv.innerText="Total ₹"+total;
@@ -478,6 +520,7 @@ updateCartCount();
 
 updateCartCount();
 
-</script>  </body>
+</script>
 
-</html>
+</body>
+  </html>
