@@ -11,7 +11,7 @@
 
 <style>
 
-/* SAME YOUR STYLE (NO CHANGE) */
+/* HEADER */
 header{
 display:flex;
 justify-content:space-between;
@@ -21,6 +21,7 @@ background:#111;
 color:#fff;
 }
 
+/* LOGO (SYNCED) */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -38,6 +39,7 @@ margin:0 10px;
 text-decoration:none;
 }
 
+/* SEARCH */
 .controls{
 max-width:900px;
 margin:20px auto;
@@ -51,12 +53,14 @@ border-radius:5px;
 border:1px solid #ccc;
 }
 
+/* CARD */
 .card{
 position:relative;
 transition:.3s;
 }
 .card:hover{transform:translateY(-5px);}
 
+/* WISHLIST */
 .wish-btn{
 position:absolute;
 top:10px;
@@ -70,6 +74,7 @@ cursor:pointer;
 
 .rating{color:#f5a623;font-size:14px;}
 
+/* MINI CART */
 .mini-cart{
 position:fixed;
 right:-320px;
@@ -110,6 +115,7 @@ background:#FFD700;
 color:#000;
 }
 
+/* FLOATING CART */
 .floating-cart{
 position:fixed;
 bottom:20px;
@@ -149,20 +155,9 @@ border-radius:50%;
 
 <body>
 
-<!-- ✅ MENU ADDED -->
-<div class="side-menu" id="menu">
-<h3>Menu</h3>
-<a href="order-history.html">📦 Order History</a>
-<a href="#">🌙 Toggle Mode</a>
-<a href="contact.html">📞 Contact</a>
-</div>
-
 <header>
 
-<div style="display:flex;align-items:center;">
-<div onclick="toggleMenu()" style="cursor:pointer;font-size:22px;">☰</div>
 <h2 class="logo">Himanshu Electronics</h2>
-</div>
 
 <nav>
 <a href="index.html">Home</a>
@@ -194,7 +189,7 @@ border-radius:50%;
 
 <div class="products-grid" id="products"></div>
 
-<div class="overlay" id="overlay" onclick="closeAll()"></div>
+<div class="overlay" id="overlay" onclick="toggleCart()"></div>
 
 <div class="mini-cart" id="miniCart">
 <h3>Your Cart</h3>
@@ -203,38 +198,62 @@ border-radius:50%;
 <button onclick="location.href='cart.html'">Checkout</button>
 </div>
 
+<!-- FLOATING CART -->
 <div class="floating-cart" onclick="toggleCart()">
 🛒 <span id="floatingCount" class="cart-count">0</span>
 </div>
 
 <script>
 
-/* MENU */
-function toggleMenu(){
-menu.classList.toggle("open");
-overlay.classList.toggle("show");
-}
-function closeAll(){
-miniCart.classList.remove("open");
-menu.classList.remove("open");
-overlay.classList.remove("show");
-}
-
 /* PRODUCTS */
-let defaultProducts = [/* SAME YOUR FULL LIST */];
+let defaultProducts = [
+{name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg"},
+{name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},
+{name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg"},
+{name:"LED Bulb 18W",cat:"bulb",price:150,img:"images/led18w.jpg"},
+{name:"LED Bulb 20W",cat:"bulb",price:170,img:"images/led20w.jpg"},
+{name:"LED Bulb 30W",cat:"bulb",price:230,img:"images/led30w.jpg"},
+{name:"LED Bulb 50W",cat:"bulb",price:400,img:"images/led50w.jpg"},
 
+{name:"Master Fan 48 inch",cat:"fan",price:1250,img:"images/fan_master48.jpg"},
+{name:"Mysore Fan 48 inch",cat:"fan",price:1250,img:"images/fan_mysore48.jpg"},
+{name:"Orient Fan 48 inch",cat:"fan",price:1550,img:"images/fan_orient48.jpg"},
+{name:"Fybros Fan 48 inch",cat:"fan",price:1450,img:"images/fan_fybros48.jpg"},
+{name:"Havells Fan 48 inch",cat:"fan",price:1800,img:"images/fan_havells48.jpg"},
+{name:"Anchor Fan 48 inch",cat:"fan",price:1500,img:"images/fan_anchor48.jpg"},
+{name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"images/fan_kent48.jpg"},
+{name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg"},
+{name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg"},
+
+{name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg"},
+{name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg"},
+
+{name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg"},
+{name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg"},
+
+{name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg"},
+{name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg"},
+{name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg"},
+
+{name:"Havells Panel Light 6W",cat:"light",price:120,img:"images/panel_havells6.jpg"},
+{name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},
+{name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg"},
+{name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}
+];
+
+/* FIX ID */
 let defaultWithId = defaultProducts.map((p,i)=>({...p,id:"d-"+i}));
 
-/* ✅ FIX ADMIN PRODUCTS */
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
 adminProducts = adminProducts.map((p,i)=>({...p,id:p.id || "a-"+i}));
 
-let products = [...defaultWithId,...adminProducts];
+let products = [...defaultWithId, ...adminProducts];
 
+/* STATE */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-/* SHOW */
+/* SHOW PRODUCTS */
 function showProducts(list=products){
 document.getElementById("products").innerHTML = list.map(p=>{
 let inCart = cart.find(c=>c.id===p.id);
@@ -243,14 +262,10 @@ let inWish = wishlist.includes(p.id);
 return `
 <div class="card">
 <div class="wish-btn ${inWish?'wish-active':''}" onclick="toggleWish('${p.id}')">❤</div>
-
 <img src="${p.img}" onclick="viewProduct('${p.id}')">
-
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
-
 <p class="rating">⭐ ${(Math.random()*0.8+4.1).toFixed(1)}</p>
-
 <button onclick="addToCart('${p.id}')">
 ${inCart ? "✅ Added" : "Add to Cart"}
 </button>
@@ -258,89 +273,77 @@ ${inCart ? "✅ Added" : "Add to Cart"}
 }).join("");
 }
 
-/* CART WITH QUANTITY */
+/* ADD TO CART */
+function addToCart(id){
+let item = products.find(p=>p.id==id);
+let existing = cart.find(p=>p.id==id);
+if(existing){existing.qty++;} else{cart.push({...item, qty:1});}
+saveCart(); updateCartCount(); renderCart(); showProducts(); playSound();
+}
+
+/* FILTER */
+function filter(){
+let s=document.getElementById("search").value.toLowerCase();
+let c=document.getElementById("cat").value;
+let filtered = products.filter(p =>
+p.name.toLowerCase().includes(s) &&
+(c==="all" || p.cat===c)
+);
+showProducts(filtered);
+}
+
+/* CART */
+function saveCart(){localStorage.setItem("cart", JSON.stringify(cart));}
+
+function updateCartCount(){
+let total = cart.reduce((s,p)=>s+(p.qty||1),0);
+document.getElementById("cartCount").innerText = total;
+document.getElementById("floatingCount").innerText = total;
+}
+
+function toggleCart(){
+document.getElementById("miniCart").classList.toggle("open");
+document.getElementById("overlay").classList.toggle("show");
+renderCart();
+}
+
 function renderCart(){
 let div=document.getElementById("miniItems");
 let total=0;
 
 if(cart.length===0){
 div.innerHTML="Cart is empty";
-totalDiv.innerText="";
+document.getElementById("total").innerText="";
 return;
 }
 
-div.innerHTML = cart.map(p=>{
-total+=p.price*p.qty;
-return `
-<p>
-${p.name}<br>
-<button onclick="changeQty('${p.id}',-1)">➖</button>
-${p.qty}
-<button onclick="changeQty('${p.id}',1)">➕</button>
-<button onclick="removeItem('${p.id}')">❌</button>
-</p>`;
+div.innerHTML = cart.map((p,i)=>{
+total += p.price * p.qty;
+return `<p>${p.name} x${p.qty} <button onclick="removeItem(${i})">❌</button></p>`;
 }).join("");
 
-totalDiv.innerText="Total: ₹"+total;
+document.getElementById("total").innerText="Total: ₹"+total;
 }
 
-function changeQty(id,val){
-let item=cart.find(p=>p.id==id);
-item.qty+=val;
-if(item.qty<=0) cart=cart.filter(p=>p.id!==id);
+function removeItem(i){
+cart.splice(i,1);
 saveCart();
-renderCart();
 updateCartCount();
+renderCart();
 }
 
-function removeItem(id){
-cart=cart.filter(p=>p.id!==id);
-saveCart();
-renderCart();
-updateCartCount();
-}
-
-/* REST SAME */
-function saveCart(){localStorage.setItem("cart",JSON.stringify(cart));}
-function updateCartCount(){
-let t=cart.reduce((s,p)=>s+(p.qty||1),0);
-cartCount.innerText=t;
-floatingCount.innerText=t;
-}
-function toggleCart(){
-miniCart.classList.toggle("open");
-overlay.classList.toggle("show");
-renderCart();
-}
-function addToCart(id){
-let item=products.find(p=>p.id==id);
-let ex=cart.find(p=>p.id==id);
-if(ex) ex.qty++; else cart.push({...item,qty:1});
-saveCart();updateCartCount();renderCart();showProducts();playSound();
-}
-function toggleWish(id){
-if(wishlist.includes(id)) wishlist=wishlist.filter(w=>w!==id);
-else wishlist.push(id);
-localStorage.setItem("wishlist",JSON.stringify(wishlist));
-showProducts();
-}
-function playSound(){let s=cartSound;s.currentTime=0;s.play().catch(()=>{});}
-function viewProduct(id){
-localStorage.setItem("viewProduct",JSON.stringify(products.find(p=>p.id==id)));
-location.href="product-view.html";
-}
-function filter(){
-let s=search.value.toLowerCase();
-let c=cat.value;
-showProducts(products.filter(p=>p.name.toLowerCase().includes(s)&&(c==="all"||p.cat===c)));
+/* SOUND */
+function playSound(){
+let s=document.getElementById("cartSound");
+s.currentTime=0;
+s.play().catch(()=>{});
 }
 
 /* INIT */
-let totalDiv=document.getElementById("total");
 showProducts();
 updateCartCount();
 
 </script>
 
 </body>
-                          </html>
+  </html>
