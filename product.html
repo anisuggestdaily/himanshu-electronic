@@ -7,13 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
 
 <style>
 
-/* 🔥 FIX LEFT WHITE SPACE */
+/* RESET + FIX */
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{overflow-x:hidden;width:100%;}
+html,body{overflow-x:hidden;width:100%;font-family:Poppins;}
 
 /* DARK MODE */
 .dark{background:#111;color:#fff;}
@@ -36,22 +35,28 @@ z-index:1000;
 font-size:22px;
 font-weight:700;
 background:linear-gradient(90deg,#fff,#FFD700,#fff);
-background-size:200% auto;
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
-animation:shine 3s linear infinite;
 }
-@keyframes shine{to{background-position:200% center;}}
 
+/* NAV */
 nav a{
 color:#fff;
 margin:0 10px;
 text-decoration:none;
 }
 
-/* MENU */
-.menu-btn{font-size:22px;cursor:pointer;margin-right:10px;}
+/* 3 DOT MENU BUTTON */
+.menu-btn{
+font-size:24px;
+cursor:pointer;
+padding:5px 10px;
+border-radius:8px;
+transition:.3s;
+}
+.menu-btn:hover{background:#333;}
 
+/* MENU BOX */
 .menu-box{
 position:fixed;
 left:-260px;
@@ -62,12 +67,17 @@ background:#fff;
 padding:20px;
 transition:.3s;
 z-index:3000;
+box-shadow:0 5px 20px rgba(0,0,0,.2);
 }
 .menu-box.open{left:0;}
 
 .menu-box a,.menu-box button{
 display:block;
 margin:15px 0;
+font-size:16px;
+background:none;
+border:none;
+cursor:pointer;
 }
 
 /* SEARCH */
@@ -77,6 +87,12 @@ margin:20px auto;
 display:flex;
 gap:10px;
 padding:0 10px;
+}
+.controls input,.controls select{
+padding:10px;
+width:100%;
+border-radius:6px;
+border:1px solid #ccc;
 }
 
 /* GRID */
@@ -94,7 +110,9 @@ padding:10px;
 border-radius:10px;
 box-shadow:0 5px 10px rgba(0,0,0,0.1);
 position:relative;
+transition:.3s;
 }
+.card:hover{transform:translateY(-5px);}
 .dark .card{background:#222;}
 
 .card img{
@@ -115,7 +133,7 @@ cursor:pointer;
 
 .rating{color:#f5a623;}
 
-/* MINI CART */
+/* CART */
 .mini-cart{
 position:fixed;
 right:-320px;
@@ -151,19 +169,20 @@ border-radius:5px;
 cursor:pointer;
 }
 
-/* 🔥 FLOATING CART FIX */
+/* FLOATING CART */
 .floating-cart{
-position:fixed !important;
-bottom:20px !important;
-right:20px !important;
+position:fixed;
+bottom:20px;
+right:20px;
 width:60px;
 height:60px;
 background:#FFD700;
 border-radius:50%;
-display:flex !important;
+display:flex;
 align-items:center;
 justify-content:center;
-z-index:99999 !important;
+z-index:9999;
+cursor:pointer;
 }
 
 .cart-count{
@@ -271,7 +290,7 @@ if(localStorage.getItem("dark")=="true"){
 document.body.classList.add("dark");
 }
 
-/* PRODUCTS (FULL LIST RESTORED) */
+/* PRODUCTS (DEFAULT + ADMIN) */
 let defaultProducts = [
 {name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg"},
 {name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},
@@ -290,15 +309,6 @@ let defaultProducts = [
 {name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"images/fan_kent48.jpg"},
 {name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg"},
 {name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg"},
-{name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg"},
-{name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg"},
-
-{name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg"},
-{name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg"},
-
-{name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg"},
-{name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg"},
-{name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg"},
 
 {name:"Havells Panel Light 6W",cat:"light",price:120,img:"images/panel_havells6.jpg"},
 {name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},
@@ -306,21 +316,23 @@ let defaultProducts = [
 {name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}
 ];
 
-let products = defaultProducts.map((p,i)=>({...p,id:i}));
+let defaultWithId = defaultProducts.map((p,i)=>({...p,id:"d-"+i}));
+let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+let products = [...defaultWithId,...adminProducts];
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
 /* SHOW */
 function showProducts(list=products){
-document.getElementById("products").innerHTML = list.map(p=>`
+productsDiv.innerHTML = list.map(p=>`
 <div class="card">
-<span class="wish ${wishlist.includes(p.id)?'active':''}" onclick="toggleWish(${p.id})">❤</span>
+<span class="wish ${wishlist.includes(p.id)?'active':''}" onclick="toggleWish('${p.id}')">❤</span>
 <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">
 <h3>${p.name}</h3>
 <div class="rating">⭐⭐⭐⭐☆</div>
 <p>₹${p.price}</p>
-<button onclick="addToCart(${p.id})">Add to Cart</button>
+<button onclick="addToCart('${p.id}')">Add to Cart</button>
 </div>
 `).join("");
 
@@ -329,8 +341,8 @@ updateCartCount();
 
 /* FILTER */
 function filter(){
-let s=document.getElementById("search").value.toLowerCase();
-let c=document.getElementById("cat").value;
+let s=search.value.toLowerCase();
+let c=cat.value;
 
 let filtered = products.filter(p =>
 p.name.toLowerCase().includes(s) &&
@@ -355,8 +367,8 @@ renderCart();
 
 function updateCartCount(){
 let total=cart.reduce((s,p)=>s+(p.qty||1),0);
-document.getElementById("cartCount").innerText=total;
-document.getElementById("floatingCount").innerText=total;
+cartCount.innerText=total;
+floatingCount.innerText=total;
 }
 
 function toggleCart(){
@@ -366,21 +378,20 @@ renderCart();
 }
 
 function renderCart(){
-let div=document.getElementById("miniItems");
 let total=0;
 
 if(cart.length===0){
-div.innerHTML="Cart is empty";
-document.getElementById("total").innerText="";
+miniItems.innerHTML="Cart is empty";
+totalText.innerText="";
 return;
 }
 
-div.innerHTML=cart.map((p,i)=>{
+miniItems.innerHTML=cart.map((p,i)=>{
 total+=p.price*p.qty;
 return `<p>${p.name} (${p.qty}) <button onclick="removeItem(${i})">❌</button></p>`;
 }).join("");
 
-document.getElementById("total").innerText="Total ₹"+total;
+totalText.innerText="Total ₹"+total;
 }
 
 function removeItem(i){
