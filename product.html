@@ -7,14 +7,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 
 <style>
 
-/* RESET */
+/* 🔥 FIX LEFT WHITE SPACE */
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{overflow-x:hidden;width:100%;font-family:Poppins;}
+html,body{overflow-x:hidden;width:100%;}
 
-/* DARK */
+/* DARK MODE */
 .dark{background:#111;color:#fff;}
 
 /* HEADER */
@@ -30,19 +31,27 @@ top:0;
 z-index:1000;
 }
 
+/* LOGO */
 .logo{
 font-size:22px;
 font-weight:700;
 background:linear-gradient(90deg,#fff,#FFD700,#fff);
+background-size:200% auto;
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
+animation:shine 3s linear infinite;
+}
+@keyframes shine{to{background-position:200% center;}}
+
+nav a{
+color:#fff;
+margin:0 10px;
+text-decoration:none;
 }
 
-nav a{color:#fff;margin:0 10px;text-decoration:none;}
-
-.menu-btn{font-size:22px;cursor:pointer;}
-
 /* MENU */
+.menu-btn{font-size:22px;cursor:pointer;margin-right:10px;}
+
 .menu-box{
 position:fixed;
 left:-260px;
@@ -56,17 +65,18 @@ z-index:3000;
 }
 .menu-box.open{left:0;}
 
-/* CONTROLS */
+.menu-box a,.menu-box button{
+display:block;
+margin:15px 0;
+}
+
+/* SEARCH */
 .controls{
 max-width:900px;
 margin:20px auto;
 display:flex;
 gap:10px;
 padding:0 10px;
-}
-.controls input,.controls select{
-padding:10px;
-width:100%;
 }
 
 /* GRID */
@@ -103,7 +113,9 @@ cursor:pointer;
 }
 .wish.active{color:red;}
 
-/* CART */
+.rating{color:#f5a623;}
+
+/* MINI CART */
 .mini-cart{
 position:fixed;
 right:-320px;
@@ -141,18 +153,17 @@ cursor:pointer;
 
 /* FLOATING CART */
 .floating-cart{
-position:fixed;
-bottom:20px;
-right:20px;
+position:fixed !important;
+bottom:20px !important;
+right:20px !important;
 width:60px;
 height:60px;
 background:#FFD700;
 border-radius:50%;
-display:flex;
+display:flex !important;
 align-items:center;
 justify-content:center;
-z-index:99999;
-cursor:pointer;
+z-index:99999 !important;
 }
 
 .cart-count{
@@ -165,6 +176,7 @@ padding:3px 7px;
 border-radius:50%;
 }
 
+/* FOOTER */
 footer{
 background:#111;
 color:#fff;
@@ -195,6 +207,7 @@ margin-top:40px;
 </div>
 </header>
 
+<!-- MENU -->
 <div class="menu-box" id="menuBox">
 <button onclick="toggleDark()">🌓 Dark Mode</button>
 <a href="order-history.html">📦 Orders</a>
@@ -217,6 +230,7 @@ margin-top:40px;
 
 <div class="products-grid" id="products"></div>
 
+<!-- CART -->
 <div class="mini-cart" id="miniCart">
 <h3>Your Cart</h3>
 <div id="miniItems"></div>
@@ -224,9 +238,10 @@ margin-top:40px;
 <button onclick="window.location.href='cart.html'">Checkout</button>
 </div>
 
+<!-- FLOATING CART -->
 <div class="floating-cart" onclick="toggleCart()">
 🛒 <span id="floatingCount" class="cart-count">0</span>
-</div>
+</div>and 
 
 <footer>
 <p>📞 +91 9639228237</p>
@@ -235,11 +250,6 @@ margin-top:40px;
 </footer>
 
 <script>
-
-/* DOM FIX */
-const menuBox = document.getElementById("menuBox");
-const miniCart = document.getElementById("miniCart");
-const overlay = document.getElementById("overlay");
 
 /* MENU */
 function toggleMenu(){
@@ -252,7 +262,7 @@ miniCart.classList.remove("open");
 overlay.classList.remove("show");
 }
 
-/* DARK */
+/* DARK MODE */
 function toggleDark(){
 document.body.classList.toggle("dark");
 localStorage.setItem("dark",document.body.classList.contains("dark"));
@@ -262,7 +272,7 @@ document.body.classList.add("dark");
 }
 
 /* PRODUCTS */
-let defaultProducts =  [
+  let defaultProducts = [
 {name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg"},
 {name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},
 {name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg"},
@@ -294,26 +304,35 @@ let defaultProducts =  [
 {name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},
 {name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg"},
 {name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}
-];;
+];
 
-let defaultWithId = defaultProducts.map((p,i)=>({...p,id:"d-"+i}));
+let products = defaultProducts.map((p,i)=>({...p,id:i}));
 
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+/* ADD IDS */
+let defaultWithId = defaultProducts.map((p,i)=>({...p,id:i}));
+
+/* ADMIN PRODUCTS */
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
 
-let products = [...defaultWithId,...adminProducts];
+/* MERGE */
+let products = [...defaultWithId, ...adminProducts];
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
 /* SHOW */
 function showProducts(list=products){
-products.innerHTML = list.map(p=>`
+document.getElementById("products").innerHTML = list.map(p=>`
 <div class="card">
-<span class="wish ${wishlist.includes(p.id)?'active':''}" onclick="toggleWish('${p.id}')">❤</span>
+<span class="wish ${wishlist.includes(p.id)?'active':''}" onclick="toggleWish(${p.id})">❤</span>
 <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">
 <h3>${p.name}</h3>
+<div class="rating">⭐⭐⭐⭐☆</div>
 <p>₹${p.price}</p>
-<button onclick="addToCart('${p.id}')">Add to Cart</button>
+<button onclick="addToCart(${p.id})">Add to Cart</button>
 </div>
 `).join("");
 
@@ -322,13 +341,15 @@ updateCartCount();
 
 /* FILTER */
 function filter(){
-let s=search.value.toLowerCase();
-let c=cat.value;
+let s=document.getElementById("search").value.toLowerCase();
+let c=document.getElementById("cat").value;
 
-showProducts(products.filter(p =>
+let filtered = products.filter(p =>
 p.name.toLowerCase().includes(s) &&
 (c==='all'||p.cat===c)
-));
+);
+
+showProducts(filtered);
 }
 
 /* CART */
@@ -357,15 +378,16 @@ renderCart();
 }
 
 function renderCart(){
+let div=miniItems;
 let total=0;
 
 if(cart.length===0){
-miniItems.innerHTML="Cart is empty";
-total.innerText="";
+div.innerHTML="Cart is empty";
+total="";
 return;
 }
 
-miniItems.innerHTML=cart.map((p,i)=>{
+div.innerHTML=cart.map((p,i)=>{
 total+=p.price*p.qty;
 return `<p>${p.name} (${p.qty}) <button onclick="removeItem(${i})">❌</button></p>`;
 }).join("");
