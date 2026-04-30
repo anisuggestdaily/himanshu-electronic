@@ -10,11 +10,11 @@
 
 <style>
 
-/* RESET + FIX */
+/* RESET */
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{overflow-x:hidden;width:100%;font-family:Poppins;}
 
-/* DARK MODE */
+/* DARK */
 .dark{background:#111;color:#fff;}
 
 /* HEADER */
@@ -30,7 +30,6 @@ top:0;
 z-index:1000;
 }
 
-/* LOGO */
 .logo{
 font-size:22px;
 font-weight:700;
@@ -39,24 +38,11 @@ background:linear-gradient(90deg,#fff,#FFD700,#fff);
 -webkit-text-fill-color:transparent;
 }
 
-/* NAV */
-nav a{
-color:#fff;
-margin:0 10px;
-text-decoration:none;
-}
+nav a{color:#fff;margin:0 10px;text-decoration:none;}
 
-/* 3 DOT MENU BUTTON */
-.menu-btn{
-font-size:24px;
-cursor:pointer;
-padding:5px 10px;
-border-radius:8px;
-transition:.3s;
-}
-.menu-btn:hover{background:#333;}
+.menu-btn{font-size:22px;cursor:pointer;}
 
-/* MENU BOX */
+/* MENU */
 .menu-box{
 position:fixed;
 left:-260px;
@@ -67,20 +53,10 @@ background:#fff;
 padding:20px;
 transition:.3s;
 z-index:3000;
-box-shadow:0 5px 20px rgba(0,0,0,.2);
 }
 .menu-box.open{left:0;}
 
-.menu-box a,.menu-box button{
-display:block;
-margin:15px 0;
-font-size:16px;
-background:none;
-border:none;
-cursor:pointer;
-}
-
-/* SEARCH */
+/* CONTROLS */
 .controls{
 max-width:900px;
 margin:20px auto;
@@ -91,8 +67,6 @@ padding:0 10px;
 .controls input,.controls select{
 padding:10px;
 width:100%;
-border-radius:6px;
-border:1px solid #ccc;
 }
 
 /* GRID */
@@ -110,9 +84,7 @@ padding:10px;
 border-radius:10px;
 box-shadow:0 5px 10px rgba(0,0,0,0.1);
 position:relative;
-transition:.3s;
 }
-.card:hover{transform:translateY(-5px);}
 .dark .card{background:#222;}
 
 .card img{
@@ -130,8 +102,6 @@ right:10px;
 cursor:pointer;
 }
 .wish.active{color:red;}
-
-.rating{color:#f5a623;}
 
 /* CART */
 .mini-cart{
@@ -181,7 +151,7 @@ border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-z-index:9999;
+z-index:99999;
 cursor:pointer;
 }
 
@@ -195,7 +165,6 @@ padding:3px 7px;
 border-radius:50%;
 }
 
-/* FOOTER */
 footer{
 background:#111;
 color:#fff;
@@ -226,7 +195,6 @@ margin-top:40px;
 </div>
 </header>
 
-<!-- MENU -->
 <div class="menu-box" id="menuBox">
 <button onclick="toggleDark()">🌓 Dark Mode</button>
 <a href="order-history.html">📦 Orders</a>
@@ -249,7 +217,6 @@ margin-top:40px;
 
 <div class="products-grid" id="products"></div>
 
-<!-- CART -->
 <div class="mini-cart" id="miniCart">
 <h3>Your Cart</h3>
 <div id="miniItems"></div>
@@ -257,7 +224,6 @@ margin-top:40px;
 <button onclick="window.location.href='cart.html'">Checkout</button>
 </div>
 
-<!-- FLOATING CART -->
 <div class="floating-cart" onclick="toggleCart()">
 🛒 <span id="floatingCount" class="cart-count">0</span>
 </div>
@@ -270,6 +236,11 @@ margin-top:40px;
 
 <script>
 
+/* DOM FIX */
+const menuBox = document.getElementById("menuBox");
+const miniCart = document.getElementById("miniCart");
+const overlay = document.getElementById("overlay");
+
 /* MENU */
 function toggleMenu(){
 menuBox.classList.toggle("open");
@@ -281,7 +252,7 @@ miniCart.classList.remove("open");
 overlay.classList.remove("show");
 }
 
-/* DARK MODE */
+/* DARK */
 function toggleDark(){
 document.body.classList.toggle("dark");
 localStorage.setItem("dark",document.body.classList.contains("dark"));
@@ -290,8 +261,8 @@ if(localStorage.getItem("dark")=="true"){
 document.body.classList.add("dark");
 }
 
-/* PRODUCTS (DEFAULT + ADMIN) */
-let defaultProducts = [
+/* PRODUCTS */
+let defaultProducts =  [
 {name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg"},
 {name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},
 {name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg"},
@@ -309,15 +280,26 @@ let defaultProducts = [
 {name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"images/fan_kent48.jpg"},
 {name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg"},
 {name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg"},
+{name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg"},
+{name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg"},
+
+{name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg"},
+{name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg"},
+
+{name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg"},
+{name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg"},
+{name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg"},
 
 {name:"Havells Panel Light 6W",cat:"light",price:120,img:"images/panel_havells6.jpg"},
 {name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},
 {name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg"},
 {name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}
-];
+];;
 
 let defaultWithId = defaultProducts.map((p,i)=>({...p,id:"d-"+i}));
+
 let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+
 let products = [...defaultWithId,...adminProducts];
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -325,12 +307,11 @@ let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
 /* SHOW */
 function showProducts(list=products){
-productsDiv.innerHTML = list.map(p=>`
+products.innerHTML = list.map(p=>`
 <div class="card">
 <span class="wish ${wishlist.includes(p.id)?'active':''}" onclick="toggleWish('${p.id}')">❤</span>
 <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">
 <h3>${p.name}</h3>
-<div class="rating">⭐⭐⭐⭐☆</div>
 <p>₹${p.price}</p>
 <button onclick="addToCart('${p.id}')">Add to Cart</button>
 </div>
@@ -344,12 +325,10 @@ function filter(){
 let s=search.value.toLowerCase();
 let c=cat.value;
 
-let filtered = products.filter(p =>
+showProducts(products.filter(p =>
 p.name.toLowerCase().includes(s) &&
 (c==='all'||p.cat===c)
-);
-
-showProducts(filtered);
+));
 }
 
 /* CART */
@@ -382,7 +361,7 @@ let total=0;
 
 if(cart.length===0){
 miniItems.innerHTML="Cart is empty";
-totalText.innerText="";
+total.innerText="";
 return;
 }
 
@@ -391,7 +370,7 @@ total+=p.price*p.qty;
 return `<p>${p.name} (${p.qty}) <button onclick="removeItem(${i})">❌</button></p>`;
 }).join("");
 
-totalText.innerText="Total ₹"+total;
+document.getElementById("total").innerText="Total ₹"+total;
 }
 
 function removeItem(i){
