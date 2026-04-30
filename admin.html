@@ -7,11 +7,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
 
 <style>
 
-/* LOGIN BOX */
+body{
+font-family:'Poppins',sans-serif;
+background:#f5f5f5;
+margin:0;
+}
+
+/* LOGIN */
 .login-box{
 max-width:350px;
 margin:80px auto;
@@ -20,6 +25,7 @@ padding:25px;
 border-radius:12px;
 box-shadow:0 5px 20px rgba(0,0,0,.1);
 text-align:center;
+animation:fadeIn .5s ease;
 }
 
 /* DASHBOARD */
@@ -27,6 +33,7 @@ text-align:center;
 max-width:1100px;
 margin:auto;
 padding:20px;
+animation:fadeIn .5s ease;
 }
 
 /* CARDS */
@@ -36,14 +43,48 @@ padding:20px;
 margin-bottom:20px;
 border-radius:12px;
 box-shadow:0 2px 10px rgba(0,0,0,.08);
+transition:.3s;
+}
+.admin-card:hover{
+transform:translateY(-3px);
 }
 
-/* TOP BAR */
-.top-bar{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-margin:10px 0;
+/* BUTTON */
+button{
+padding:8px 15px;
+border:none;
+background:#111;
+color:#fff;
+border-radius:6px;
+cursor:pointer;
+transition:.2s;
+}
+button:hover{
+background:#FFD700;
+color:#000;
+}
+button:active{
+transform:scale(0.95);
+}
+
+/* INPUT */
+input,select{
+width:100%;
+padding:10px;
+margin:5px 0;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+/* PRODUCT ITEM */
+.product{
+border-bottom:1px solid #eee;
+padding:10px 0;
+animation:fadeIn .3s ease;
+}
+.product img{
+border-radius:6px;
+margin-top:5px;
 }
 
 /* POPUP */
@@ -54,15 +95,27 @@ left:50%;
 transform:translateX(-50%) scale(0);
 background:#111;
 color:#fff;
-padding:10px 20px;
+padding:12px 25px;
 border-radius:8px;
 transition:.3s;
 z-index:5000;
 }
-.popup.show{transform:translateX(-50%) scale(1);}
+.popup.show{
+transform:translateX(-50%) scale(1);
+}
+
+/* SUCCESS ANIMATION */
+.success{
+background:green !important;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
+}
 
 </style>
-
 </head>
 
 <body>
@@ -80,9 +133,8 @@ z-index:5000;
 <button onclick="login()">Login</button>
 </div>
 
-<!-- ADMIN PANEL -->
+<!-- ADMIN -->
 <div id="adminPage" style="display:none;">
-
 <div class="dashboard">
 
 <h2 style="text-align:center;">📊 Admin Dashboard</h2>
@@ -93,12 +145,10 @@ z-index:5000;
 
 <!-- ADD PRODUCT -->
 <div class="admin-card">
-
 <h3>Add Product</h3>
 
 <input id="name" placeholder="Product Name">
 <input id="price" type="number" placeholder="Price">
-
 <input id="imgFile" type="file" accept="image/*">
 
 <select id="cat">
@@ -109,60 +159,41 @@ z-index:5000;
 
 <br>
 <button onclick="addProduct()">Add Product</button>
-
 </div>
 
 <!-- PRODUCT LIST -->
 <div class="admin-card">
-
 <h3>All Products</h3>
 <div id="list"></div>
-
-</div>
-
-<!-- ORDERS -->
-<div class="admin-card">
-
-<h3>All Orders</h3>
-
-<div class="top-bar">
-<input id="searchOrder" placeholder="Search by ID / Name / Phone" onkeyup="showOrders()">
-
-<select id="filterStatus" onchange="showOrders()">
-<option value="all">All</option>
-<option value="Pending">Pending</option>
-<option value="Delivered">Delivered</option>
-</select>
-</div>
-
-<div id="orders"></div>
-
 </div>
 
 </div>
-
 </div>
 
 <script>
 
-/* LOGIN CONFIG */
+/* LOGIN */
 const ADMIN_USER="admin";
 const ADMIN_PASS="1234";
 
 /* POPUP */
-function showPopup(msg){
+function showPopup(msg,type="normal"){
 let p=document.getElementById("popup");
 p.innerText=msg;
+
+if(type==="success"){
+p.classList.add("success");
+}else{
+p.classList.remove("success");
+}
+
 p.classList.add("show");
 setTimeout(()=>p.classList.remove("show"),2000);
 }
 
 /* LOGIN */
 function login(){
-let u=user.value.trim();
-let p=pass.value.trim();
-
-if(u===ADMIN_USER && p===ADMIN_PASS){
+if(user.value===ADMIN_USER && pass.value===ADMIN_PASS){
 localStorage.setItem("adminLogin","true");
 showAdmin();
 }else{
@@ -175,14 +206,12 @@ if(localStorage.getItem("adminLogin")==="true"){
 showAdmin();
 }
 
-/* SHOW ADMIN */
 function showAdmin(){
 loginPage.style.display="none";
 adminPage.style.display="block";
 init();
 }
 
-/* LOGOUT */
 function logout(){
 localStorage.removeItem("adminLogin");
 location.reload();
@@ -191,16 +220,12 @@ location.reload();
 /* INIT */
 function init(){
 showProducts();
-showOrders();
 }
 
-/* ===================== */
 /* PRODUCTS */
-/* ===================== */
-
 let products = JSON.parse(localStorage.getItem("adminProducts")) || [];
 
-/* IMAGE COMPRESS */
+/* COMPRESS IMAGE */
 function compressImage(file,callback){
 let reader=new FileReader();
 
@@ -232,23 +257,20 @@ let priceVal=price.value;
 let file=imgFile.files[0];
 let catVal=cat.value;
 
-/* VALIDATION */
 if(!nameVal || !priceVal || !file){
 alert("Fill all fields");
 return;
 }
 
-/* DUPLICATE CHECK */
 if(products.find(p=>p.name.toLowerCase()===nameVal.toLowerCase())){
 alert("Product already exists");
 return;
 }
 
-/* COMPRESS + SAVE */
 compressImage(file,(imgData)=>{
 
 products.push({
-id:"admin-"+Date.now(),   // ✅ FIXED ID SYSTEM
+id:"admin-"+Date.now(),
 name:nameVal,
 price:Number(priceVal),
 img:imgData,
@@ -258,7 +280,7 @@ cat:catVal
 localStorage.setItem("adminProducts", JSON.stringify(products));
 
 showProducts();
-showPopup("Product Added ✅");
+showPopup("Product Added ✅","success");
 
 /* CLEAR */
 name.value="";
@@ -268,13 +290,13 @@ imgFile.value="";
 });
 }
 
-/* SHOW PRODUCTS */
+/* SHOW */
 function showProducts(){
 
 productCount.innerText="Total Products: "+products.length;
 
 if(products.length===0){
-list.innerHTML="<p>No products added yet</p>";
+list.innerHTML="<p>No products</p>";
 return;
 }
 
@@ -296,97 +318,11 @@ if(confirm("Delete this product?")){
 products.splice(i,1);
 localStorage.setItem("adminProducts", JSON.stringify(products));
 showProducts();
-showPopup("Product Deleted ❌");
+showPopup("Deleted ❌");
 }
-}
-
-/* ===================== */
-/* ORDERS */
-/* ===================== */
-
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-
-function showOrders(){
-
-let div=document.getElementById("orders");
-
-let search=searchOrder.value.toLowerCase();
-let filter=filterStatus.value;
-
-let filtered = orders.filter(o=>{
-
-let matchSearch =
-o.id.toLowerCase().includes(search) ||
-o.name.toLowerCase().includes(search) ||
-o.phone.includes(search);
-
-let matchFilter =
-filter==="all" || (o.status || "Pending")===filter;
-
-return matchSearch && matchFilter;
-});
-
-if(filtered.length===0){
-div.innerHTML="<p>No matching orders</p>";
-return;
-}
-
-div.innerHTML = filtered.map((o,i)=>{
-
-let items = o.items.map(p=>
-`${p.name} x${p.qty} = ₹${p.price*p.qty}`
-).join("<br>");
-
-return `
-<div class="product">
-
-<p><b>Order ID:</b> ${o.id}</p>
-<p><b>Date:</b> ${o.date}</p>
-<p><b>Name:</b> ${o.name}</p>
-<p><b>Phone:</b> ${o.phone}</p>
-<p><b>Address:</b> ${o.address}</p>
-
-<p><b>Items:</b><br>${items}</p>
-
-<p><b>Total:</b> ₹${o.total}</p>
-<p><b>Payment:</b> ${o.payment}</p>
-
-<p><b>Status:</b> 
-<span style="color:${(o.status||"Pending")==="Delivered"?"green":"orange"}">
-${o.status || "Pending"}
-</span>
-</p>
-
-<button onclick="markDelivered(${i})">Mark Delivered</button>
-<button onclick="deleteOrder(${i})">Delete</button>
-
-</div>
-`;
-}).join("");
-}
-
-/* STATUS */
-function markDelivered(i){
-orders[i].status="Delivered";
-saveOrders();
-}
-
-/* DELETE ORDER */
-function deleteOrder(i){
-if(confirm("Delete this order?")){
-orders.splice(i,1);
-saveOrders();
-showPopup("Order Deleted ❌");
-}
-}
-
-/* SAVE */
-function saveOrders(){
-localStorage.setItem("orders", JSON.stringify(orders));
-showOrders();
 }
 
 </script>
 
 </body>
-</html>
+  </html>
