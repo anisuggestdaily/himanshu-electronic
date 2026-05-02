@@ -1,422 +1,371 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>Products - Himanshu Electronics</title>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-
-<style>
-
-/* 🔥 FIX LEFT WHITE SPACE */
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{overflow-x:hidden;width:100%;}
-
-/* DARK MODE */
-.dark{background:#111;color:#fff;}
-
-/* HEADER */
-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:15px;
-background:#111;
-color:#fff;
-position:sticky;
-top:0;
-z-index:1000;
-}
-
-/* LOGO */
-.logo{
-font-size:22px;
-font-weight:700;
-background:linear-gradient(90deg,#fff,#FFD700,#fff);
-background-size:200% auto;
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-animation:shine 3s linear infinite;
-}
-@keyframes shine{to{background-position:200% center;}}
-
-nav a{
-color:#fff;
-margin:0 10px;
-text-decoration:none;
-}
-
-/* MENU */
-.menu-btn{font-size:22px;cursor:pointer;margin-right:10px;}
-
-.menu-box{
-position:fixed;
-left:-260px;
-top:0;
-width:250px;
-height:100%;
-background:#fff;
-padding:20px;
-transition:.3s;
-z-index:3000;
-}
-.menu-box.open{left:0;}
-
-.menu-box a,.menu-box button{
-display:block;
-margin:15px 0;
-}
-
-/* SEARCH */
-.controls{
-max-width:900px;
-margin:20px auto;
-display:flex;
-gap:10px;
-padding:0 10px;
-}
-
-/* GRID */
-.products-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-gap:15px;
-padding:15px;
-}
-
-/* CARD */
-.card{
-background:#fff;
-padding:10px;
-border-radius:10px;
-box-shadow:0 5px 10px rgba(0,0,0,0.1);
-position:relative;
-}
-.dark .card{background:#222;}
-
-.card img{
-width:100%;
-height:140px;
-object-fit:cover;
-border-radius:8px;
-}
-
-/* WISHLIST */
-.wish{
-position:absolute;
-top:10px;
-right:10px;
-cursor:pointer;
-}
-.wish.active{color:red;}
-
-.rating{color:#f5a623;}
-
-/* MINI CART */
-.mini-cart{
-position:fixed;
-right:-320px;
-top:0;
-width:300px;
-height:100%;
-background:#fff;
-padding:15px;
-transition:.3s;
-z-index:3000;
-overflow:auto;
-}
-.mini-cart.open{right:0;}
-
-.overlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-display:none;
-background:rgba(0,0,0,0.5);
-z-index:2000;
-}
-.overlay.show{display:block;}
-
-button{
-background:#111;
-color:#fff;
-border:none;
-padding:8px 12px;
-border-radius:5px;
-cursor:pointer;
-}
-
-/* FLOATING CART */
-.floating-cart{
-position:fixed !important;
-bottom:20px !important;
-right:20px !important;
-width:60px;
-height:60px;
-background:#FFD700;
-border-radius:50%;
-display:flex !important;
-align-items:center;
-justify-content:center;
-z-index:99999 !important;
-}
-
-.cart-count{
-position:absolute;
-top:-5px;
-right:-5px;
-background:red;
-color:#fff;
-padding:3px 7px;
-border-radius:50%;
-}
-
-/* FOOTER */
-footer{
-background:#111;
-color:#fff;
-text-align:center;
-padding:20px;
-margin-top:40px;
-}
-
-</style>
-</head>
-
-<body>
-
-<header>
-<div style="display:flex;align-items:center;">
-<div class="menu-btn" onclick="toggleMenu()">☰</div>
-<h2 class="logo">Himanshu Electronics</h2>
-</div>
-
-<nav>
-<a href="index.html">Home</a>
-<a href="product.html">Products</a>
-<a href="contact.html">Contact</a>
-</nav>
-
-<div onclick="toggleCart()" style="cursor:pointer;">
-🛒 <span id="cartCount">0</span>
-</div>
-</header>
-
-<!-- MENU -->
-<div class="menu-box" id="menuBox">
-<button onclick="toggleDark()">🌓 Dark Mode</button>
-<a href="order-history.html">📦 Orders</a>
-<a href="contact.html">📞 Contact</a>
-</div>
-
-<div class="overlay" id="overlay" onclick="closeAll()"></div>
-
-<h2 style="text-align:center;">Our Products</h2>
-
-<div class="controls">
-<input id="search" placeholder="🔍 Search..." onkeyup="filter()">
-<select id="cat" onchange="filter()">
-<option value="all">All</option>
-<option value="bulb">Bulbs</option>
-<option value="fan">Fans</option>
-<option value="light">Lights</option>
-</select>
-</div>
-
-<div class="products-grid" id="products"></div>
-
-<!-- CART -->
-<div class="mini-cart" id="miniCart">
-<h3>Your Cart</h3>
-<div id="miniItems"></div>
-<p id="total"></p>
-<button onclick="window.location.href='cart.html'">Checkout</button>
-</div>
-
-<!-- FLOATING CART -->
-<div class="floating-cart" onclick="toggleCart()">
-🛒 <span id="floatingCount" class="cart-count">0</span>
-</div>and 
-
-<footer>
-<p>📞 +91 9639228237</p>
-<p>📧 anisuggestdaily@gmail.com</p>
-<p>© 2026 Himanshu Electronics</p>
-</footer>
-
-<script>
-
-/* MENU */
-function toggleMenu(){
-menuBox.classList.toggle("open");
-overlay.classList.toggle("show");
-}
-function closeAll(){
-menuBox.classList.remove("open");
-miniCart.classList.remove("open");
-overlay.classList.remove("show");
-}
-
-/* DARK MODE */
-function toggleDark(){
-document.body.classList.toggle("dark");
-localStorage.setItem("dark",document.body.classList.contains("dark"));
-}
-if(localStorage.getItem("dark")=="true"){
-document.body.classList.add("dark");
-}
-
-/* PRODUCTS */
-  let defaultProducts = [
-{name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg"},
-{name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},
-{name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg"},
-{name:"LED Bulb 18W",cat:"bulb",price:150,img:"images/led18w.jpg"},
-{name:"LED Bulb 20W",cat:"bulb",price:170,img:"images/led20w.jpg"},
-{name:"LED Bulb 30W",cat:"bulb",price:230,img:"images/led30w.jpg"},
-{name:"LED Bulb 50W",cat:"bulb",price:400,img:"images/led50w.jpg"},
-
-{name:"Master Fan 48 inch",cat:"fan",price:1250,img:"images/fan_master48.jpg"},
-{name:"Mysore Fan 48 inch",cat:"fan",price:1250,img:"images/fan_mysore48.jpg"},
-{name:"Orient Fan 48 inch",cat:"fan",price:1550,img:"images/fan_orient48.jpg"},
-{name:"Fybros Fan 48 inch",cat:"fan",price:1450,img:"images/fan_fybros48.jpg"},
-{name:"Havells Fan 48 inch",cat:"fan",price:1800,img:"images/fan_havells48.jpg"},
-{name:"Anchor Fan 48 inch",cat:"fan",price:1500,img:"images/fan_anchor48.jpg"},
-{name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"images/fan_kent48.jpg"},
-{name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg"},
-{name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg"},
-{name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg"},
-{name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg"},
-
-{name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg"},
-{name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg"},
-
-{name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg"},
-{name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg"},
-{name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg"},
-
-{name:"Havells Panel Light 6W",cat:"light",price:120,img:"images/panel_havells6.jpg"},
-{name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},
-{name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg"},
-{name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}
-];
-
-let products = defaultProducts.map((p,i)=>({...p,id:i}));
-
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-
-/* ADD IDS */
-let defaultWithId = defaultProducts.map((p,i)=>({...p,id:i}));
-
-/* ADMIN PRODUCTS */
-let adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
-
-/* MERGE */
-let products = [...defaultWithId, ...adminProducts];
-
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-
-/* SHOW */
-function showProducts(list=products){
-document.getElementById("products").innerHTML = list.map(p=>`
-<div class="card">
-<span class="wish ${wishlist.includes(p.id)?'active':''}" onclick="toggleWish(${p.id})">❤</span>
-<img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">
-<h3>${p.name}</h3>
-<div class="rating">⭐⭐⭐⭐☆</div>
-<p>₹${p.price}</p>
-<button onclick="addToCart(${p.id})">Add to Cart</button>
-</div>
-`).join("");
-
-updateCartCount();
-}
-
-/* FILTER */
-function filter(){
-let s=document.getElementById("search").value.toLowerCase();
-let c=document.getElementById("cat").value;
-
-let filtered = products.filter(p =>
-p.name.toLowerCase().includes(s) &&
-(c==='all'||p.cat===c)
-);
-
-showProducts(filtered);
-}
-
-/* CART */
-function addToCart(id){
-let item = products.find(p=>p.id==id);
-let existing = cart.find(p=>p.id==id);
-
-if(existing){existing.qty++;}
-else{cart.push({...item,qty:1});}
-
-localStorage.setItem("cart",JSON.stringify(cart));
-updateCartCount();
-renderCart();
-}
-
-function updateCartCount(){
-let total=cart.reduce((s,p)=>s+(p.qty||1),0);
-cartCount.innerText=total;
-floatingCount.innerText=total;
-}
-
-function toggleCart(){
-miniCart.classList.toggle("open");
-overlay.classList.toggle("show");
-renderCart();
-}
-
-function renderCart(){
-let div=miniItems;
-let total=0;
-
-if(cart.length===0){
-div.innerHTML="Cart is empty";
-total="";
-return;
-}
-
-div.innerHTML=cart.map((p,i)=>{
-total+=p.price*p.qty;
-return `<p>${p.name} (${p.qty}) <button onclick="removeItem(${i})">❌</button></p>`;
-}).join("");
-
-document.getElementById("total").innerText="Total ₹"+total;
-}
-
-function removeItem(i){
-cart.splice(i,1);
-localStorage.setItem("cart",JSON.stringify(cart));
-updateCartCount();
-renderCart();
-}
-
-/* WISHLIST */
-function toggleWish(id){
-if(wishlist.includes(id)){
-wishlist=wishlist.filter(x=>x!==id);
-}else wishlist.push(id);
-
-localStorage.setItem("wishlist",JSON.stringify(wishlist));
-showProducts();
-}
-
-/* INIT */
-showProducts();
-updateCartCount();
-
-</script>
-
-</body>
-</html>
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<title>Products - Himanshu Electronics</title>  <meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">  
+<link rel="stylesheet" href="style.css">  <style>  
+  
+/* 🔥 FIX LEFT WHITE SPACE */  
+*{margin:0;padding:0;box-sizing:border-box;}  
+html,body{overflow-x:hidden;width:100%;}  
+  
+/* DARK MODE */  
+.dark{background:#111;color:#fff;}  
+  
+/* HEADER */  
+header{  
+display:flex;  
+justify-content:space-between;  
+align-items:center;  
+padding:15px;  
+background:#111;  
+color:#fff;  
+position:sticky;  
+top:0;  
+z-index:1000;  
+}  
+  
+/* LOGO */  
+.logo{  
+font-size:22px;  
+font-weight:700;  
+background:linear-gradient(90deg,#fff,#FFD700,#fff);  
+background-size:200% auto;  
+-webkit-background-clip:text;  
+-webkit-text-fill-color:transparent;  
+animation:shine 3s linear infinite;  
+}  
+@keyframes shine{to{background-position:200% center;}}  
+  
+nav a{  
+color:#fff;  
+margin:0 10px;  
+text-decoration:none;  
+}  
+  
+/* MENU */  
+.menu-btn{font-size:22px;cursor:pointer;margin-right:10px;}  
+  
+.menu-box{  
+position:fixed;  
+left:-260px;  
+top:0;  
+width:250px;  
+height:100%;  
+background:#fff;  
+padding:20px;  
+transition:.3s;  
+z-index:3000;  
+}  
+.menu-box.open{left:0;}  
+  
+.menu-box a,.menu-box button{  
+display:block;  
+margin:15px 0;  
+}  
+  
+/* SEARCH */  
+.controls{  
+max-width:900px;  
+margin:20px auto;  
+display:flex;  
+gap:10px;  
+padding:0 10px;  
+}  
+  
+/* GRID */  
+.products-grid{  
+display:grid;  
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));  
+gap:15px;  
+padding:15px;  
+}  
+  
+/* CARD */  
+.card{  
+background:#fff;  
+padding:10px;  
+border-radius:10px;  
+box-shadow:0 5px 10px rgba(0,0,0,0.1);  
+position:relative;  
+}  
+.dark .card{background:#222;}  
+  
+.card img{  
+width:100%;  
+height:140px;  
+object-fit:cover;  
+border-radius:8px;  
+}  
+  
+/* WISHLIST */  
+.wish{  
+position:absolute;  
+top:10px;  
+right:10px;  
+cursor:pointer;  
+}  
+.wish.active{color:red;}  
+  
+.rating{color:#f5a623;}  
+  
+/* MINI CART */  
+.mini-cart{  
+position:fixed;  
+right:-320px;  
+top:0;  
+width:300px;  
+height:100%;  
+background:#fff;  
+padding:15px;  
+transition:.3s;  
+z-index:3000;  
+overflow:auto;  
+}  
+.mini-cart.open{right:0;}  
+  
+.overlay{  
+position:fixed;  
+top:0;  
+left:0;  
+width:100%;  
+height:100%;  
+display:none;  
+background:rgba(0,0,0,0.5);  
+z-index:2000;  
+}  
+.overlay.show{display:block;}  
+  
+button{  
+background:#111;  
+color:#fff;  
+border:none;  
+padding:8px 12px;  
+border-radius:5px;  
+cursor:pointer;  
+}  
+  
+/* 🔥 FLOATING CART FIX */  
+.floating-cart{  
+position:fixed !important;  
+bottom:20px !important;  
+right:20px !important;  
+width:60px;  
+height:60px;  
+background:#FFD700;  
+border-radius:50%;  
+display:flex !important;  
+align-items:center;  
+justify-content:center;  
+z-index:99999 !important;  
+}  
+  
+.cart-count{  
+position:absolute;  
+top:-5px;  
+right:-5px;  
+background:red;  
+color:#fff;  
+padding:3px 7px;  
+border-radius:50%;  
+}  
+  
+/* FOOTER */  
+footer{  
+background:#111;  
+color:#fff;  
+text-align:center;  
+padding:20px;  
+margin-top:40px;  
+}  
+  
+</style>  </head>  <body>  <header>  
+<div style="display:flex;align-items:center;">  
+<div class="menu-btn" onclick="toggleMenu()">☰</div>  
+<h2 class="logo">Himanshu Electronics</h2>  
+</div>  <nav>  
+<a href="index.html">Home</a>  
+<a href="product.html">Products</a>  
+<a href="contact.html">Contact</a>  
+</nav>  <div onclick="toggleCart()" style="cursor:pointer;">  
+🛒 <span id="cartCount">0</span>  
+</div>  
+</header>  <!-- MENU -->  <div class="menu-box" id="menuBox">  
+<button onclick="toggleDark()">🌓 Dark Mode</button>  
+<a href="order-history.html">📦 Orders</a>  
+<a href="contact.html">📞 Contact</a>  
+</div>  <div class="overlay" id="overlay" onclick="closeAll()"></div>  <h2 style="text-align:center;">Our Products</h2>  <div class="controls">  
+<input id="search" placeholder="🔍 Search..." onkeyup="filter()">  
+<select id="cat" onchange="filter()">  
+<option value="all">All</option>  
+<option value="bulb">Bulbs</option>  
+<option value="fan">Fans</option>  
+<option value="light">Lights</option>  
+</select>  
+</div>  <div class="products-grid" id="products"></div>  <!-- CART -->  <div class="mini-cart" id="miniCart">  
+<h3>Your Cart</h3>  
+<div id="miniItems"></div>  
+<p id="total"></p>  
+<button onclick="window.location.href='cart.html'">Checkout</button>  
+</div>  <!-- FLOATING CART -->  <div class="floating-cart" onclick="toggleCart()">  
+🛒 <span id="floatingCount" class="cart-count">0</span>  
+</div>  <footer>  
+<p>📞 +91 9639228237</p>  
+<p>📧 anisuggestdaily@gmail.com</p>  
+<p>© 2026 Himanshu Electronics</p>  
+</footer>  <script>  
+  
+/* MENU */  
+function toggleMenu(){  
+menuBox.classList.toggle("open");  
+overlay.classList.toggle("show");  
+}  
+function closeAll(){  
+menuBox.classList.remove("open");  
+miniCart.classList.remove("open");  
+overlay.classList.remove("show");  
+}  
+  
+/* DARK MODE */  
+function toggleDark(){  
+document.body.classList.toggle("dark");  
+localStorage.setItem("dark",document.body.classList.contains("dark"));  
+}  
+if(localStorage.getItem("dark")=="true"){  
+document.body.classList.add("dark");  
+}  
+  
+/* PRODUCTS (FULL LIST RESTORED) */  
+let defaultProducts = [  
+{name:"LED Bulb 9W",cat:"bulb",price:40,img:"images/led9w.jpg"},  
+{name:"LED Bulb 12W",cat:"bulb",price:90,img:"images/led12w.jpg"},  
+{name:"LED Bulb 15W",cat:"bulb",price:120,img:"images/led15w.jpg"},  
+{name:"LED Bulb 18W",cat:"bulb",price:150,img:"images/led18w.jpg"},  
+{name:"LED Bulb 20W",cat:"bulb",price:170,img:"images/led20w.jpg"},  
+{name:"LED Bulb 30W",cat:"bulb",price:230,img:"images/led30w.jpg"},  
+{name:"LED Bulb 50W",cat:"bulb",price:400,img:"images/led50w.jpg"},  
+  
+{name:"Master Fan 48 inch",cat:"fan",price:1250,img:"images/fan_master48.jpg"},  
+{name:"Mysore Fan 48 inch",cat:"fan",price:1250,img:"images/fan_mysore48.jpg"},  
+{name:"Orient Fan 48 inch",cat:"fan",price:1550,img:"images/fan_orient48.jpg"},  
+{name:"Fybros Fan 48 inch",cat:"fan",price:1450,img:"images/fan_fybros48.jpg"},  
+{name:"Havells Fan 48 inch",cat:"fan",price:1800,img:"images/fan_havells48.jpg"},  
+{name:"Anchor Fan 48 inch",cat:"fan",price:1500,img:"images/fan_anchor48.jpg"},  
+{name:"Kent Fan 48 inch",cat:"fan",price:1350,img:"images/fan_kent48.jpg"},  
+{name:"Oxaler Fan 48 inch",cat:"fan",price:1250,img:"images/fan_oxaler48.jpg"},  
+{name:"Murphy Fan 48 inch",cat:"fan",price:1100,img:"images/fan_murphy48.jpg"},  
+{name:"Oxaler Fan 36 inch",cat:"fan",price:1300,img:"images/fan_oxaler36.jpg"},  
+{name:"Oxaler Fan 24 inch",cat:"fan",price:1300,img:"images/fan_oxaler24.jpg"},  
+  
+{name:"Master Pedestal Fan 400mm",cat:"fan",price:1350,img:"images/pedestal_master400.jpg"},  
+{name:"Mysore Pedestal Fan 400mm",cat:"fan",price:1450,img:"images/pedestal_mysore400.jpg"},  
+  
+{name:"Exhaust Fan 12 inch",cat:"fan",price:1200,img:"images/exhaust12.jpg"},  
+{name:"Exhaust Fan 9 inch",cat:"fan",price:1100,img:"images/exhaust9.jpg"},  
+{name:"Exhaust Fan 6 inch",cat:"fan",price:1100,img:"images/exhaust6.jpg"},  
+  
+{name:"Havells Panel Light 6W",cat:"light",price:120,img:"images/panel_havells6.jpg"},  
+{name:"Fybros Panel Light 6W",cat:"light",price:80,img:"images/panel_fybros6.jpg"},  
+{name:"Orient Panel Light 5W",cat:"light",price:80,img:"images/panel_orient5.jpg"},  
+{name:"Orient Tube Light 20W",cat:"light",price:299,img:"images/tube_orient20.jpg"}  
+];  
+  
+let products = defaultProducts.map((p,i)=>({...p,id:i}));  
+  
+let cart = JSON.parse(localStorage.getItem("cart")) || [];  
+let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];  
+  
+/* SHOW */  
+function showProducts(list=products){  
+document.getElementById("products").innerHTML = list.map(p=>`  
+<div class="card">  
+<span class="wish ${wishlist.includes(p.id)?'active':''}" onclick="toggleWish(${p.id})">❤</span>  
+<img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'">  
+<h3>${p.name}</h3>  
+<div class="rating">⭐⭐⭐⭐☆</div>  
+<p>₹${p.price}</p>  
+<button onclick="addToCart(${p.id})">Add to Cart</button>  
+</div>  
+`).join("");  
+  
+updateCartCount();  
+}  
+  
+/* FILTER */  
+function filter(){  
+let s=document.getElementById("search").value.toLowerCase();  
+let c=document.getElementById("cat").value;  
+  
+let filtered = products.filter(p =>  
+p.name.toLowerCase().includes(s) &&  
+(c==='all'||p.cat===c)  
+);  
+  
+showProducts(filtered);  
+}  
+  
+/* CART */  
+function addToCart(id){  
+let item = products.find(p=>p.id==id);  
+let existing = cart.find(p=>p.id==id);  
+  
+if(existing){existing.qty++;}  
+else{cart.push({...item,qty:1});}  
+  
+localStorage.setItem("cart",JSON.stringify(cart));  
+updateCartCount();  
+renderCart();  
+}  
+  
+function updateCartCount(){  
+let total=cart.reduce((s,p)=>s+(p.qty||1),0);  
+document.getElementById("cartCount").innerText=total;  
+document.getElementById("floatingCount").innerText=total;  
+}  
+  
+function toggleCart(){  
+miniCart.classList.toggle("open");  
+overlay.classList.toggle("show");  
+renderCart();  
+}  
+  
+function renderCart(){  
+let div=document.getElementById("miniItems");  
+let total=0;  
+  
+if(cart.length===0){  
+div.innerHTML="Cart is empty";  
+document.getElementById("total").innerText="";  
+return;  
+}  
+  
+div.innerHTML=cart.map((p,i)=>{  
+total+=p.price*p.qty;  
+return `<p>${p.name} (${p.qty}) <button onclick="removeItem(${i})">❌</button></p>`;  
+}).join("");  
+  
+document.getElementById("total").innerText="Total ₹"+total;  
+}  
+  
+function removeItem(i){  
+cart.splice(i,1);  
+localStorage.setItem("cart",JSON.stringify(cart));  
+updateCartCount();  
+renderCart();  
+}  
+  
+/* WISHLIST */  
+function toggleWish(id){  
+if(wishlist.includes(id)){  
+wishlist=wishlist.filter(x=>x!==id);  
+}else wishlist.push(id);  
+  
+localStorage.setItem("wishlist",JSON.stringify(wishlist));  
+showProducts();  
+}  
+  
+/* INIT */  
+showProducts();  
+updateCartCount();  
+  
+</script>  </body>  
+</html>  
